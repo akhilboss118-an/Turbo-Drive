@@ -22,7 +22,12 @@ window.__firebaseUser = null;
 window.__lastFetchedScore = 0;
 
 const isTauri = typeof window !== 'undefined' && (window.__TAURI__ || window.__TAURI_INTERNALS__);
-const isCapacitor = typeof window !== 'undefined' && (window.Capacitor && window.Capacitor.isNativePlatform());
+let isCapacitor = false;
+try {
+  isCapacitor = typeof window !== 'undefined' && !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+} catch (e) {
+  isCapacitor = false;
+}
 
 // -------------------------------------------------------
 // UI Helpers
@@ -347,6 +352,10 @@ window._guestMode = false;
 function skipLogin() {
   _guestMode = true;
   window._guestMode = true;
+  // Clear any stale Firebase session so onAuthStateChanged doesn't re-login
+  if (auth) {
+    auth.signOut().catch(function(){});
+  }
   var overlay = document.getElementById('login-overlay');
   if (overlay) {
     overlay.classList.remove('show');
@@ -399,6 +408,11 @@ loadFirebaseCDN().then(function() {
   firebaseReady = true;
 
   auth.onAuthStateChanged(function(user) {
+    // If user chose guest mode, sign out any stale session
+    if (user && (_guestMode || window._guestMode)) {
+      auth.signOut().catch(function(){});
+      return;
+    }
     window.__firebaseUser = user;
     initAuthUI(user);
   });
