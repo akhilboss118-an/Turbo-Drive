@@ -1,0 +1,73 @@
+{
+  "name": "turbo-drive",
+  "version": "1.0.0",
+  "description": "Turbo Drive - 3D Racing Game",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "electron:dev": "electron .",
+    "electron:build": "npx @electron/packager . \"Turbo Drive\" --platform=win32 --arch=x64 --out=dist-electron --app-version=1.0.0 --no-prune",
+    "dist": "npx electron-builder --win nsis",
+    "android:sync": "npx cap sync android",
+    "android:build": "cd android && .\\gradlew.bat assembleDebug --no-daemon",
+    "android:build-apk": "powershell -ExecutionPolicy Bypass -File scripts/build-apk.ps1",
+    "build:all": "npm run electron:build && npm run android:build-apk",
+    "tauri:build": "npx tauri build"
+  },
+  "build": {
+    "appId": "com.turbodrive.racing",
+    "productName": "Turbo Drive",
+    "directories": {
+      "output": "dist-electron-installer"
+    },
+    "files": [
+      "electron/**/*",
+      "index.html",
+      "js/**/*",
+      "css/**/*",
+      "lib/**/*",
+      "assets/**/*",
+      "sounds/**/*",
+      "textures/**/*",
+      "!android/**/*",
+      "!src-tauri/**/*",
+      "!www/**/*",
+      "!scripts/**/*",
+      "!dist/**/*",
+      "!dist-electron/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Turbo Drive",
+      "uninstallDisplayName": "Turbo Drive"
+    }
+  },
+  "keywords": [
+    "racing",
+    "game",
+    "3d"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@bubblewrap/cli": "^1.24.1",
+    "@electron/packager": "^20.0.1",
+    "@tauri-apps/cli": "^2.11.2",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.3",
+    "electron-packager": "^17.1.2",
+    "pngjs": "^7.0.0"
+  },
+  "dependencies": {
+    "@capacitor-firebase/authentication": "^8.3.0",
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "appId": "com.turbodrive.racing",
+  "appName": "Turbo Drive",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "http"
+  },
+  "android": {
+    "allowOrientationChange": true,
+    "orientation": "landscape"
+  }
+}

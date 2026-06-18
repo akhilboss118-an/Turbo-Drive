@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><body><script>
+fetch('http://localhost:8000/').then(r=>r.text()).then(html=>{
+  console.log('Page loaded, checking for issues...');
+  // Check if importmap is present
+  if(html.includes('importmap')) console.log('Importmap found');
+  else console.error('Importmap MISSING');
+  // Check for key elements
+  if(html.includes('game-canvas')) console.log('Canvas found');
+  else console.error('Canvas MISSING');
+  if(html.includes('main.js')) console.log('main.js reference found');
+  else console.error('main.js reference MISSING');
+  console.log('Page size:', html.length, 'bytes');
+}).catch(e=>console.error('Failed to load page:', e));
+</script></body></html>

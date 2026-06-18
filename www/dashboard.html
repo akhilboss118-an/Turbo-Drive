@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Visakhapatnam World Dashboard</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/icons/icon-192x192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06080f;
+  --bg2:#0b0d1a;
+  --bg3:#101326;
+  --surface:#11152b;
+  --surface2:#181d36;
+  --border:rgba(0,212,255,0.06);
+  --border-hover:rgba(0,212,255,0.15);
+  --cyan:#00d4ff;
+  --cyan-dim:rgba(0,212,255,0.08);
+  --cyan-glow:rgba(0,212,255,0.12);
+  --white:#eaedf2;
+  --gray:#556076;
+  --radius:8px;
+  --font:'Inter','Segoe UI',sans-serif
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--white);overflow:hidden;font-size:13px}
+body{display:flex}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-hover);border-radius:2px}
+
+/* SIDEBAR - icon only */
+#sidebar{
+  width:52px;min-width:52px;background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:10;
+  height:100vh;align-items:center;padding-top:16px
+}
+#sidebar .logo{padding:0 0 16px;border-bottom:1px solid var(--border);width:100%;text-align:center}
+#sidebar .logo h1{font-size:0.7rem;font-weight:700;color:var(--cyan);letter-spacing:0.5px}
+#sidebar .logo span{display:none}
+.nav-item{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;margin:2px 0;cursor:pointer;color:var(--gray);
+  font-size:0;border-radius:6px;transition:all 0.2s;position:relative
+}
+.nav-item .icon{font-size:1rem;line-height:1}
+.nav-item:hover{color:var(--white);background:var(--cyan-dim)}
+.nav-item.active{color:var(--cyan);background:var(--cyan-dim)}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:8px;bottom:8px;width:2px;background:var(--cyan);border-radius:1px}
+.nav-item span:not(.icon){display:none}
+#sidebar .stats-mini{display:none}
+/* Tooltip on hover */
+.nav-item:hover::after{
+  content:attr(data-label);position:absolute;left:48px;top:50%;transform:translateY(-50%);
+  background:var(--surface2);color:var(--white);padding:5px 10px;border-radius:4px;
+  font-size:0.65rem;white-space:nowrap;z-index:100;border:1px solid var(--border);
+  pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.4)
+}
+
+/* MAIN */
+#main{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg)
+}
+#header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;border-bottom:1px solid var(--border);
+  background:var(--bg2);min-height:46px
+}
+#header h2{font-size:0.8rem;font-weight:500;color:var(--white);letter-spacing:0.2px}
+#header .header-meta{font-size:0.6rem;color:var(--gray);display:flex;gap:12px;align-items:center}
+#header .header-meta .badge{
+  background:var(--cyan-dim);color:var(--cyan);padding:2px 9px;
+  border-radius:4px;font-size:0.55rem
+}
+#content{
+  flex:1;overflow-y:auto;padding:24px 28px;
+  display:flex;flex-direction:column;gap:16px
+}
+.section{display:none}
+.section.active{display:flex;flex-direction:column;gap:16px;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* CARDS */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px 22px
+}
+.card h3{font-size:0.6rem;font-weight:600;color:var(--gray);margin-bottom:14px;letter-spacing:0.5px;text-transform:uppercase}
+.card .row{display:flex;gap:10px;flex-wrap:wrap}
+.card .stat{
+  flex:1;min-width:80px;padding:14px 12px;background:var(--bg3);
+  border-radius:6px;text-align:center
+}
+.card .stat .val{font-size:1.5rem;font-weight:600;color:var(--white);letter-spacing:-0.5px;line-height:1.2}
+.card .stat .lbl{font-size:0.55rem;color:var(--gray);margin-top:4px;text-transform:uppercase;letter-spacing:0.3px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* BUTTONS */
+.btn{
+  padding:6px 14px;border-radius:5px;border:1px solid var(--border);
+  background:transparent;color:var(--gray);font-size:0.65rem;
+  cursor:pointer;transition:all 0.2s;font-family:var(--font)
+}
+.btn:hover{background:var(--cyan-dim);border-color:var(--border-hover);color:var(--white)}
+.btn.primary{background:var(--cyan);border-color:var(--cyan);color:var(--bg);font-weight:600}
+.btn.primary:hover{background:#33ddff;border-color:#33ddff;box-shadow:0 0 20px var(--cyan-glow)}
+.btn.danger{color:#ff5555;border-color:rgba(255,50,50,0.2)}
+.btn.danger:hover{background:rgba(255,50,50,0.1);border-color:rgba(255,50,50,0.3)}
+.btn-sm{padding:4px 10px;font-size:0.55rem}
+
+/* SLIDER */
+input[type=range]{-webkit-appearance:none;width:100%;height:2px;border-radius:1px;background:var(--bg3);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;background:var(--cyan);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--cyan);cursor:pointer;border:none}
+.slider-group{margin-bottom:10px}
+.slider-group label{display:flex;justify-content:space-between;font-size:0.6rem;color:var(--gray);margin-bottom:3px}
+.slider-group label span{color:var(--cyan)}
+
+/* SELECT / INPUT */
+select,.dashboard-input{
+  background:var(--bg3);border:1px solid var(--border);color:var(--white);
+  padding:5px 10px;border-radius:5px;font-size:0.6rem;font-family:var(--font);outline:none
+}
+select:focus,.dashboard-input:focus{border-color:var(--border-hover)}
+
+/* TOGGLE */
+.toggle{position:relative;display:inline-block;width:30px;height:16px;cursor:pointer;vertical-align:middle}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider-track{
+  position:absolute;inset:0;background:var(--bg3);border-radius:8px;transition:0.25s
+}
+.toggle .slider-track::before{
+  content:'';position:absolute;width:12px;height:12px;left:2px;bottom:2px;
+  background:var(--gray);border-radius:50%;transition:0.25s
+}
+.toggle input:checked+.slider-track{background:var(--cyan)}
+.toggle input:checked+.slider-track::before{background:#fff;transform:translateX(14px)}
+
+/* DISTRICT CARD */
+.district-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;transition:all 0.2s
+}
+.district-card:hover{border-color:var(--border-hover)}
+.district-card .d-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.district-card .d-name{font-size:0.65rem;font-weight:500;color:var(--white)}
+.district-card .d-bar{height:2px;border-radius:1px;background:var(--surface);margin:5px 0;overflow:hidden}
+.district-card .d-bar .fill{height:100%;background:linear-gradient(90deg,var(--cyan),#00ff88);border-radius:1px;transition:width 0.5s}
+.district-card .d-meta{font-size:0.5rem;color:var(--gray);display:flex;gap:6px;flex-wrap:wrap}
+
+/* LANDMARK CARD */
+.lm-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:5px;padding:7px 10px;display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:4px
+}
+.lm-card .lm-info{font-size:0.6rem}
+.lm-card .lm-info .lm-name{color:var(--white);font-weight:500}
+.lm-card .lm-info .lm-type{color:var(--gray);font-size:0.5rem}
+.lm-tag{
+  font-size:0.45rem;padding:1px 5px;border-radius:3px;
+  background:var(--cyan-dim);color:var(--cyan)
+}
+
+/* CANVAS */
+#minimap-canvas{width:100%;height:150px;border-radius:6px;background:var(--bg3);display:block}
+canvas.chart-canvas{width:100%;height:65px;border-radius:4px}
+
+/* ASSET GRID */
+.asset-cat{margin-bottom:10px}
+.asset-cat h4{font-size:0.6rem;color:var(--gray);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px}
+.asset-tags{display:flex;flex-wrap:wrap;gap:3px}
+.asset-tag{
+  padding:2px 7px;border-radius:3px;font-size:0.5rem;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--gray);cursor:pointer;transition:all 0.15s
+}
+.asset-tag:hover{background:var(--cyan-dim);color:var(--cyan);border-color:var(--border-hover)}
+
+/* MISSION CARD */
+.mission-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:6px;padding:11px 13px;margin-bottom:6px
+}
+.mission-card .m-header{display:flex;justify-content:space-between;margin-bottom:4px}
+.mission-card .m-title{font-size:0.65rem;font-weight:500;color:var(--white)}
+.mission-card .m-diff{font-size:0.5rem;padding:1px 6px;border-radius:3px}
+.mission-card .m-diff.easy{background:rgba(0,200,100,0.1);color:#00cc66}
+.mission-card .m-diff.medium{background:rgba(255,200,0,0.1);color:#ffcc00}
+.mission-card .m-diff.hard{background:rgba(255,50,50,0.1);color:#ff5555}
+.mission-card .m-progress{height:2px;background:var(--surface);border-radius:1px;overflow:hidden}
+.mission-card .m-progress .fill{height:100%;background:var(--cyan);border-radius:1px;width:0%}
+
+/* METRIC */
+.metric{display:flex;justify-content:space-between;padding:4px 0;font-size:0.6rem;border-bottom:1px solid var(--border)}
+.metric .lbl{color:var(--gray)}
+.metric .val{color:var(--cyan)}
+
+/* SEARCH */
+.search-bar{
+  width:100%;padding:6px 10px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:5px;
+  color:var(--white);font-size:0.6rem;outline:none;font-family:var(--font);margin-bottom:10px
+}
+.search-bar:focus{border-color:var(--border-hover)}
+
+/* LABEL row helper */
+.label-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.label-row span{font-size:0.6rem;color:var(--gray)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  #sidebar{width:40px;min-width:40px}
+  #sidebar .logo{padding:0 0 12px}
+  .nav-item{width:28px;height:28px}
+  .nav-item .icon{font-size:0.85rem}
+  #content{padding:14px}
+  #header{padding:10px 14px}
+  #header h2{font-size:0.7rem}
+}
+</style>
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="logo">
+    <h1>VIZAG</h1>
+    <span>World Dashboard</span>
+  </div>
+  <div class="nav-item active" data-section="overview" data-label="World Overview"><span class="icon">&#9829;</span><span>World Overview</span></div>
+  <div class="nav-item" data-section="districts" data-label="District Manager"><span class="icon">&#9632;</span><span>District Manager</span></div>
+  <div class="nav-item" data-section="roads" data-label="Road Network"><span class="icon">&#8644;</span><span>Road Network</span></div>
+  <div class="nav-item" data-section="traffic" data-label="Traffic Control"><span class="icon">&#9881;</span><span>Traffic Control</span></div>
+  <div class="nav-item" data-section="landmarks" data-label="Landmarks"><span class="icon">&#9733;</span><span>Landmarks</span></div>
+  <div class="nav-item" data-section="environment" data-label="Environment"><span class="icon">&#9728;</span><span>Environment</span></div>
+  <div class="nav-item" data-section="terrain" data-label="Terrain"><span class="icon">&#9650;</span><span>Terrain</span></div>
+  <div class="nav-item" data-section="assets" data-label="Asset Library"><span class="icon">&#9776;</span><span>Asset Library</span></div>
+  <div class="nav-item" data-section="missions" data-label="Missions"><span class="icon">&#9878;</span><span>Missions</span></div>
+  <div class="nav-item" data-section="routes" data-label="Route Manager"><span class="icon">&#8594;</span><span>Route Manager</span></div>
+  <div class="nav-item" data-section="analytics" data-label="Analytics"><span class="icon">&#9635;</span><span>Analytics</span></div>
+  <div class="stats-mini">
+    <div>FPS <span id="s-fps">60</span></div>
+    <div>Memory <span id="s-mem">0 MB</span></div>
+    <div>Active Districts <span id="s-ad">12</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="header">
+    <h2 id="section-title">World Overview</h2>
+    <div class="header-meta">
+      <span class="badge" id="h-weather">Sunny</span>
+      <span class="badge">v1.0</span>
+      <span id="h-time">10:30 AM</span>
+    </div>
+  </div>
+  <div id="content">
+
+<!-- ===== 1. WORLD OVERVIEW ===== -->
+<div class="section active" id="sec-overview">
+  <div class="grid-2">
+    <div class="card">
+      <h3>World Stats</h3>
+      <div class="row">
+        <div class="stat"><div class="val" id="ov-map">144 km&sup2;</div><div class="lbl">Map Size</div></div>
+        <div class="stat"><div class="val" id="ov-districts">9</div><div class="lbl">Locations</div></div>
+        <div class="stat"><div class="val" id="ov-traffic">847</div><div class="lbl">Active Vehicles</div></div>
+        <div class="stat"><div class="val" id="ov-npcs">2,340</div><div class="lbl">Active NPCs</div></div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="stat"><div class="val" id="ov-density">62%</div><div class="lbl">Traffic Density</div></div>
+        <div class="stat"><div class="val" id="ov-weather">Sunny</div><div class="lbl">Weather</div></div>
+        <div class="stat"><div class="val" id="ov-time">10:30 AM</div><div class="lbl">Time of Day</div></div>
+        <div class="stat"><div class="val" id="ov-fps">60</div><div class="lbl">FPS</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Mini-Map Preview</h3>
+      <canvas id="minimap-canvas" width="400" height="160"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Quick Actions</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn primary" onclick="saveWorld()">Save World</button>
+      <button class="btn" onclick="loadWorld()">Load World</button>
+      <button class="btn" onclick="resetWorld()">Reset World</button>
+      <button class="btn danger" onclick="if(confirm('Reset all districts?'))resetDistricts()">Reset Districts</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. DISTRICT MANAGER ===== -->
+<div class="section" id="sec-districts">
+  <div class="card">
+      <h3>Visakhapatnam Locations <span style="font-weight:400;color:var(--gray);font-size:0.6rem">9 locations &middot; <span id="act-district-count">5</span> active</span></h3>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="btn primary btn-sm" onclick="enableAllDistricts()">Enable All</button>
+      <button class="btn btn-sm" onclick="disableAllDistricts()">Disable All</button>
+      <span style="flex:1"></span>
+      <select id="district-filter" style="width:auto" onchange="renderDistricts()">
+        <option value="all">All Locations</option>
+        <option value="active">Active Only</option>
+        <option value="inactive">Inactive Only</option>
+      </select>
+    </div>
+    <div id="district-grid" class="grid-4"></div>
+  </div>
+</div>
+
+<!-- ===== 3. ROAD NETWORK ===== -->
+<div class="section" id="sec-roads">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Road Types</h3>
+      <div id="road-controls"></div>
+    </div>
+    <div class="card">
+      <h3>Network Statistics</h3>
+      <div class="metric"><span class="lbl">Total Roads</span><span class="val" id="rn-total">2,847 km</span></div>
+      <div class="metric"><span class="lbl">Highways</span><span class="val" id="rn-highway">186 km</span></div>
+      <div class="metric"><span class="lbl">Service Roads</span><span class="val" id="rn-service">412 km</span></div>
+      <div class="metric"><span class="lbl">Residential</span><span class="val" id="rn-res">1,280 km</span></div>
+      <div class="metric"><span class="lbl">Flyovers</span><span class="val" id="rn-fly">23</span></div>
+      <div class="metric"><span class="lbl">Junctions</span><span class="val" id="rn-junc">156</span></div>
+      <div class="metric"><span class="lbl">Roundabouts</span><span class="val" id="rn-round">18</span></div>
+      <div class="metric"><span class="lbl">Traffic Islands</span><span class="val" id="rn-island">42</span></div>
+      <div class="metric"><span class="lbl">U-Turn Zones</span><span class="val" id="rn-uturn">67</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Live Road Network</h3>
+    <canvas id="road-canvas" width="800" height="200" style="width:100%;height:160px;border-radius:8px;background:var(--navy3)"></canvas>
+  </div>
+</div>
+
+<!-- ===== 4. TRAFFIC CONTROL ===== -->
+<div class="section" id="sec-traffic">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Vehicle Mix</h3>
+      <div class="slider-group"><label>APSRTC Buses <span id="tv-bus-v">120</span></label><input type="range" min="0" max="500" value="120" oninput="tvBus=+this.value;document.getElementById('tv-bus-v').textContent=this.value;updateTrafficStats()"></div>
+      <div class="slider-group"><label>Auto-Rickshaws <span id="tv-auto-v">340</span></label><input type="range" min="0" max="800" value="340" oninput="tvAuto=+this.value;document.getElementById('tv-auto-v').textContent=this.value;updateTrafficStats()"></div>
+      <div class="slider-group"><label>Bikes <span id="tv-bike-v">580</span></label><input type="range" min="0" max="1200" value="580" oninput="tvBike=+this.value;document.getElementById('tv-bike-v').textContent=this.value;updateTrafficStats()"></div>
+      <div class="slider-group"><label>Cars <span id="tv-car-v">720</span></label><input type="range" min="0" max="1500" value="720" oninput="tvCar=+this.value;document.getElementById('tv-car-v').textContent=this.value;updateTrafficStats()"></div>
+      <div class="slider-group"><label>Trucks <span id="tv-truck-v">180</span></label><input type="range" min="0" max="400" value="180" oninput="tvTruck=+this.value;document.getElementById('tv-truck-v').textContent=this.value;updateTrafficStats()"></div>
+      <div class="slider-group"><label>Emergency Vehicles <span id="tv-em-v">25</span></label><input type="range" min="0" max="80" value="25" oninput="tvEmerg=+this.value;document.getElementById('tv-em-v').textContent=this.value;updateTrafficStats()"></div>
+    </div>
+    <div class="card">
+      <h3>Traffic Controls</h3>
+      <div class="slider-group"><label>Traffic Density <span id="tc-density">62%</span></label><input type="range" min="0" max="100" value="62" oninput="tcDensity=+this.value;document.getElementById('tc-density').textContent=this.value+'%'"></div>
+      <div class="slider-group"><label>Spawn Rate <span id="tc-spawn">0.8x</span></label><input type="range" min="0" max="200" value="80" oninput="tcSpawn=+this.value;document.getElementById('tc-spawn').textContent=(this.value/100).toFixed(1)+'x'"></div>
+      <div class="slider-group"><label>Rush Hour Intensity <span id="tc-rush">40%</span></label><input type="range" min="0" max="100" value="40" oninput="tcRush=+this.value;document.getElementById('tc-rush').textContent=this.value+'%'"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <label class="toggle"><input type="checkbox" checked onchange="tcSchool=this.checked"><span class="slider-track"></span></label><span style="font-size:0.7rem;color:var(--gray)">School Zone Traffic</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <label class="toggle"><input type="checkbox" onchange="tcNight=this.checked;updateTrafficStats()"><span class="slider-track"></span></label><span style="font-size:0.7rem;color:var(--gray)">Night Traffic Pattern</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Traffic Heatmap <span style="font-weight:400;color:var(--gray);font-size:0.65rem">Real-time density across districts</span></h3>
+    <canvas id="heatmap-canvas" width="800" height="120" style="width:100%;height:100px;border-radius:8px;background:var(--navy3)"></canvas>
+  </div>
+</div>
+
+<!-- ===== 5. LANDMARK MANAGER ===== -->
+<div class="section" id="sec-landmarks">
+  <input class="search-bar" id="lm-search" placeholder="Search landmarks..." oninput="renderLandmarks()">
+  <div class="grid-2">
+    <div class="card"><h3>Educational</h3><div id="lm-edu"></div></div>
+    <div class="card"><h3>Commercial</h3><div id="lm-com"></div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><h3>Religious</h3><div id="lm-rel"></div></div>
+    <div class="card"><h3>Public</h3><div id="lm-pub"></div></div>
+  </div>
+</div>
+
+<!-- ===== 6. ENVIRONMENT ===== -->
+<div class="section" id="sec-environment">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Weather</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="weather-btns"></div>
+      <div class="slider-group"><label>Fog Density <span id="env-fog">15%</span></label><input type="range" min="0" max="100" value="15" oninput="envFog=+this.value;document.getElementById('env-fog').textContent=this.value+'%'"></div>
+      <div class="slider-group"><label>Cloud Coverage <span id="env-cloud">20%</span></label><input type="range" min="0" max="100" value="20" oninput="envCloud=+this.value;document.getElementById('env-cloud').textContent=this.value+'%'"></div>
+      <div class="slider-group"><label>Wind Strength <span id="env-wind">5 km/h</span></label><input type="range" min="0" max="80" value="5" oninput="envWind=+this.value;document.getElementById('env-wind').textContent=this.value+' km/h'"></div>
+    </div>
+    <div class="card">
+      <h3>Time of Day</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="time-btns"></div>
+      <div class="slider-group"><label>Sun Intensity <span id="env-sun">80%</span></label><input type="range" min="0" max="100" value="80" oninput="envSun=+this.value;document.getElementById('env-sun').textContent=this.value+'%'"></div>
+      <div class="slider-group"><label>Ambient Lighting <span id="env-amb">50%</span></label><input type="range" min="0" max="100" value="50" oninput="envAmb=+this.value;document.getElementById('env-amb').textContent=this.value+'%'"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 7. TERRAIN ===== -->
+<div class="section" id="sec-terrain">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Terrain Zones</h3>
+      <div id="terrain-zones"></div>
+    </div>
+    <div class="card">
+      <h3>Terrain Settings</h3>
+      <div class="slider-group"><label>Elevation Scale <span id="tr-elev">1.0x</span></label><input type="range" min="0" max="300" value="100" oninput="trElev=this.value/100;document.getElementById('tr-elev').textContent=trElev.toFixed(1)+'x'"></div>
+      <div class="slider-group"><label>Vegetation Density <span id="tr-veg">60%</span></label><input type="range" min="0" max="100" value="60" oninput="trVeg=+this.value;document.getElementById('tr-veg').textContent=this.value+'%'"></div>
+      <div class="slider-group"><label>Water Level <span id="tr-water">0%</span></label><input type="range" min="0" max="100" value="0" oninput="trWater=+this.value;document.getElementById('tr-water').textContent=this.value+'%'"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn primary btn-sm">Paint Terrain</button>
+        <button class="btn btn-sm">Flatten</button>
+        <button class="btn btn-sm">Smooth</button>
+        <button class="btn btn-sm">Generate Coastal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 8. ASSET LIBRARY ===== -->
+<div class="section" id="sec-assets">
+  <input class="search-bar" id="asset-search" placeholder="Search assets..." oninput="renderAssets()">
+  <div id="asset-grid" class="grid-2"></div>
+</div>
+
+<!-- ===== 9. MISSIONS ===== -->
+<div class="section" id="sec-missions">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Active Missions <span style="font-weight:400;color:var(--gray);font-size:0.65rem">6 available</span></h3>
+      <div id="mission-list"></div>
+    </div>
+    <div class="card">
+      <h3>Mission Analytics</h3>
+      <div class="metric"><span class="lbl">Completion Rate</span><span class="val" id="ms-rate">72%</span></div>
+      <div class="metric"><span class="lbl">Total Completed</span><span class="val" id="ms-done">186</span></div>
+      <div class="metric"><span class="lbl">Average Difficulty</span><span class="val" id="ms-diff">Medium</span></div>
+      <div class="metric"><span class="lbl">Total Rewards</span><span class="val" id="ms-reward">&#8377; 45,200</span></div>
+      <div class="metric"><span class="lbl">Active Routes</span><span class="val" id="ms-routes">8</span></div>
+      <canvas class="chart-canvas" id="mission-chart" width="300" height="80"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ROUTE MANAGER ===== -->
+<div class="section" id="sec-routes">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Route Overview</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="stat" style="flex:1"><div class="val" id="rm-total-routes">9</div><div class="lbl">Locations</div></div>
+        <div class="stat" style="flex:1"><div class="val" id="rm-avg-dist">7.2</div><div class="lbl">Avg Distance (KM)</div></div>
+        <div class="stat" style="flex:1"><div class="val" id="rm-longest">12</div><div class="lbl">Longest (KM)</div></div>
+        <div class="stat" style="flex:1"><div class="val" id="rm-shortest">4</div><div class="lbl">Shortest (KM)</div></div>
+      </div>
+      <div style="font-size:0.6rem;color:var(--gray);margin-bottom:6px">Select any start and end point. Route distance calculated automatically. Same start/end not allowed.</div>
+    </div>
+    <div class="card">
+      <h3>Route Analytics</h3>
+      <div class="metric"><span class="lbl">Total Route KM</span><span class="val" id="rm-total-km">66.5</span></div>
+      <div class="metric"><span class="lbl">Shortest Route</span><span class="val" id="rm-short-name">Murali Nagar (4 KM)</span></div>
+      <div class="metric"><span class="lbl">Longest Route</span><span class="val" id="rm-long-name">Parvathipuram (12 KM)</span></div>
+      <div class="metric"><span class="lbl">Route Type</span><span class="val">Start → End</span></div>
+      <div class="metric"><span class="lbl">Traffic Types</span><span class="val">Dense / Mix / Light</span></div>
+      <canvas class="chart-canvas" id="route-chart" width="300" height="70"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Available Locations <span style="font-weight:400;color:var(--gray);font-size:0.6rem">9 locations across Visakhapatnam region</span></h3>
+    <div id="route-table"></div>
+  </div>
+</div>
+
+<!-- ===== 10. ANALYTICS ===== -->
+<div class="section" id="sec-analytics">
+  <div class="grid-2">
+    <div class="card">
+      <h3>Performance</h3>
+      <div class="metric"><span class="lbl">Average FPS</span><span class="val" id="an-fps">58</span></div>
+      <div class="metric"><span class="lbl">Memory Usage</span><span class="val" id="an-mem">284 MB</span></div>
+      <div class="metric"><span class="lbl">Draw Calls</span><span class="val" id="an-draw">1,240</span></div>
+      <div class="metric"><span class="lbl">Triangle Count</span><span class="val" id="an-tri">2.4M</span></div>
+      <div class="metric"><span class="lbl">Instanced Meshes</span><span class="val" id="an-inst">186</span></div>
+      <div class="metric"><span class="lbl">Render Time</span><span class="val" id="an-rt">14 ms</span></div>
+    </div>
+    <div class="card">
+      <h3>Traffic Statistics</h3>
+      <div class="metric"><span class="lbl">Total Vehicles</span><span class="val" id="an-tv">1,965</span></div>
+      <div class="metric"><span class="lbl">Road Utilization</span><span class="val" id="an-ru">68%</span></div>
+      <div class="metric"><span class="lbl">Peak Traffic Time</span><span class="val" id="an-pt">08:30 AM</span></div>
+      <div class="metric"><span class="lbl">Avg Speed</span><span class="val" id="an-sp">32 km/h</span></div>
+      <div class="metric"><span class="lbl">Accidents (24h)</span><span class="val" id="an-acc">3</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Player Travel Heatmap</h3>
+    <canvas id="travel-canvas" width="800" height="150" style="width:100%;height:130px;border-radius:8px;background:var(--navy3)"></canvas>
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ================================================================
+// DATA
+// ================================================================
+const DISTRICT_DATA = [
+  {id:'maddilapalem',name:'Maddilapalem',completion:85,traffic:72,buildings:340,roads:78,popDensity:'High',assets:56,active:true,color:'#00d4ff'},
+  {id:'kailasapuram',name:'Kailasapuram',completion:62,traffic:55,buildings:210,roads:65,popDensity:'Medium',assets:32,active:true,color:'#3ab0e8'},
+  {id:'murali',name:'Murali Nagar Masjid Area',completion:90,traffic:80,buildings:280,roads:85,popDensity:'Very High',assets:48,active:true,color:'#1a8bcd'},
+  {id:'nad',name:'NAD Junction',completion:78,traffic:90,buildings:310,roads:72,popDensity:'Very High',assets:62,active:true,color:'#00ccff'},
+  {id:'mvp',name:'MVP Colony',completion:55,traffic:50,buildings:170,roads:55,popDensity:'Medium',assets:28,active:false,color:'#55aadd'},
+  {id:'beach',name:'Beach Road',completion:95,traffic:85,buildings:120,roads:95,popDensity:'Low',assets:45,active:true,color:'#00ddff'},
+  {id:'sanghivalasa',name:'Sanghivalasa',completion:30,traffic:20,buildings:55,roads:35,popDensity:'Very Low',assets:12,active:false,color:'#88eeff'},
+  {id:'vizianagaram',name:'Vizianagaram Connection Zone',completion:40,traffic:45,buildings:140,roads:55,popDensity:'Medium',assets:25,active:true,color:'#99ffff'},
+  {id:'parvathipuram',name:'Parvathipuram',completion:25,traffic:15,buildings:40,roads:30,popDensity:'Low',assets:10,active:true,color:'#77ffcc'}
+];
+
+const LANDMARK_DATA = {
+  educational:[
+    {name:'AU College of Engineering',type:'University',district:'Maddilapalem',tags:['engineering','campus']},
+    {name:'GITAM University',type:'University',district:'Maddilapalem',tags:['engineering','campus']},
+    {name:'Andhra University',type:'University',district:'Maddilapalem',tags:['campus','heritage']},
+    {name:'D.A.V. Public School',type:'School',district:'NAD Junction',tags:['school']},
+    {name:'St. Joseph\'s School',type:'School',district:'Murali Nagar',tags:['school']}
+  ],
+  commercial:[
+    {name:'CMR Shopping Mall',type:'Shopping Complex',district:'Maddilapalem',tags:['mall','retail']},
+    {name:'Rama Talkies Junction',type:'Business Center',district:'Murali Nagar',tags:['business','junction']},
+    {name:'HP Petrol Station',type:'Petrol Station',district:'NAD Junction',tags:['fuel','highway']},
+    {name:'VUDA Park Complex',type:'Shopping Complex',district:'Beach Road',tags:['park','retail']}
+  ],
+  religious:[
+    {name:'Sri Kanaka Mahalakshmi Temple',type:'Temple',district:'Maddilapalem',tags:['temple','heritage']},
+    {name:'ISKCON Temple',type:'Temple',district:'NAD Junction',tags:['temple']},
+    {name:'Murali Nagar Masjid',type:'Mosque',district:'Murali Nagar',tags:['mosque']}
+  ],
+  public:[
+    {name:'VUDA Park',type:'Park',district:'Beach Road',tags:['park','recreation']},
+    {name:'RK Beach',type:'Beach',district:'Beach Road',tags:['beach','tourist']},
+    {name:'RTC Complex',type:'Bus Station',district:'Maddilapalem',tags:['bus','transport']}
+  ]
+};
+
+const MISSION_DATA = [
+  {title:'Maddilapalem Package Delivery',district:'Maddilapalem',diff:'easy',progress:100,reward:'₹1,200',desc:'Deliver packages across Maddilapalem residential zones'},
+  {title:'Beach Road Sunset Cruise',district:'Beach Road',diff:'easy',progress:65,reward:'₹800',desc:'Drive from RK Beach along the coast'},
+  {title:'Vizianagaram Highway Run',district:'Vizianagaram Connection Zone',diff:'medium',progress:30,reward:'₹2,500',desc:'High-speed run from NAD to Vizianagaram junction'},
+  {title:'School Bus Route MVP',district:'MVP Colony',diff:'medium',progress:0,reward:'₹1,800',desc:'Complete the morning school pickup route in MVP Colony'},
+  {title:'NAD Junction Taxi Service',district:'NAD Junction',diff:'hard',progress:15,reward:'₹3,000',desc:'Navigate peak traffic at NAD Junction for passenger pickups'},
+  {title:'Parvathipuram Rural Run',district:'Parvathipuram',diff:'hard',progress:0,reward:'₹5,000',desc:'Cross-country drive to Parvathipuram through rural highways'}
+];
+
+const ASSET_DATA = {
+  buildings:[
+    {name:'4-Story Apartment',count:120,cat:'buildings'},
+    {name:'Villa (3BHK)',count:85,cat:'buildings'},
+    {name:'Corner Shop',count:210,cat:'buildings'},
+    {name:'Clinic/Hospital',count:30,cat:'buildings'},
+    {name:'Budget Hotel',count:15,cat:'buildings'},
+    {name:'Office Tower',count:22,cat:'buildings'}
+  ],
+  road:[
+    {name:'Traffic Signal',count:156,cat:'road'},
+    {name:'Signboard (Directional)',count:340,cat:'road'},
+    {name:'Streetlight (LED)',count:1,cat:'road'},
+    {name:'Bus Stop Shelter',count:85,cat:'road'},
+    {name:'Speed Breaker',count:120,cat:'road'}
+  ],
+  nature:[
+    {name:'Coconut Palm',count:850,cat:'nature'},
+    {name:'Neem Tree',count:620,cat:'nature'},
+    {name:'Hedge Row',count:410,cat:'nature'},
+    {name:'Coastal Grass',count:280,cat:'nature'},
+    {name:'Flowering Shrub',count:190,cat:'nature'}
+  ],
+  infra:[
+    {name:'Bridge (Small)',count:8,cat:'infra'},
+    {name:'Flyover Pillar',count:92,cat:'infra'},
+    {name:'Road Barrier',count:340,cat:'infra'},
+    {name:'Utility Pole',count:520,cat:'infra'},
+    {name:'Drainage Cover',count:280,cat:'infra'}
+  ]
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let tvBus=120,tvAuto=340,tvBike=580,tvCar=720,tvTruck=180,tvEmerg=25;
+let tcDensity=62,tcSpawn=80,tcRush=40,tcSchool=true,tcNight=false;
+let envFog=15,envCloud=20,envWind=5,envSun=80,envAmb=50;
+let trElev=1,trVeg=60,trWater=0;
+let currentWeather='sunny',currentTime='morning';
+const weatherNames=['sunny','cloudy','rain','heavyRain','cyclone','fog'];
+const timeNames=['dawn','morning','afternoon','sunset','night'];
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.onclick=()=>{
+    document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+    el.classList.add('active');
+    const sec=el.dataset.section;
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById('sec-'+sec).classList.add('active');
+    document.getElementById('section-title').textContent=el.querySelector('span:last-child').textContent;
+  };
+});
+
+// ================================================================
+// MINIMAP
+// ================================================================
+function drawMinimap(){
+  const c=document.getElementById('minimap-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(0,212,255,0.15)';ctx.lineWidth=1;
+  for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+  const districts=document.querySelectorAll('#district-grid .district-card')||[];
+  // Draw coast
+  ctx.fillStyle='rgba(0,180,255,0.08)';ctx.beginPath();ctx.moveTo(0,50);
+  ctx.quadraticCurveTo(100,20,200,50);ctx.quadraticCurveTo(300,80,w,40);
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+  // Draw highway
+  ctx.strokeStyle='rgba(255,200,50,0.3)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,90);ctx.quadraticCurveTo(w*0.3,60,w*0.5,90);
+  ctx.quadraticCurveTo(w*0.7,120,w,95);ctx.stroke();
+  // District dots
+  const pts=[[30,75,0x00d4ff],[70,55,0x3ab0e8],[110,70,0x1a8bcd],[140,95,0x00ccff],
+             [200,80,0x55aadd],[240,45,0x00ddff],[310,35,0x88eeff],[370,50,0x99ffff],[410,25,0x77ffcc]];
+  for(const [dx,dy,col] of pts){
+    ctx.fillStyle=`rgba(${(col>>16)&255},${(col>>8)&255},${col&255},0.6)`;
+    ctx.beginPath();ctx.arc(dx*400/w,dy*160/h,3,0,Math.PI*2);ctx.fill()
+  }
+}
+setTimeout(drawMinimap,100);
+
+// ================================================================
+// DISTRICTS
+// ================================================================
+function renderDistricts(){
+  const filter=document.getElementById('district-filter').value;
+  const grid=document.getElementById('district-grid');grid.innerHTML='';
+  for(const d of DISTRICT_DATA){
+    if(filter==='active'&&!d.active)continue;
+    if(filter==='inactive'&&d.active)continue;
+    const bar=d.completion;
+    grid.innerHTML+=`<div class="district-card">
+      <div class="d-header"><span class="d-name">${d.name}</span>
+        <label class="toggle"><input type="checkbox" ${d.active?'checked':''} onchange="d.active=this.checked;updateMiniStat()">
+          <span class="slider-track"></span>
+        </label></div>
+      <div class="d-bar"><div class="fill" style="width:${bar}%;background:${d.color||'#00d4ff'}"></div></div>
+      <div class="d-meta">
+        <span>Traffic ${d.traffic}%</span>
+        <span>Bldgs ${d.buildings}</span>
+        <span>Roads ${d.roads}%</span>
+        <span>Pop ${d.popDensity}</span>
+      </div>
+    </div>`;
+  }
+  updateMiniStat();
+}
+function updateMiniStat(){
+  const active=DISTRICT_DATA.filter(d=>d.active).length;
+  document.getElementById('s-ad').textContent=active;
+  const el = document.getElementById('act-district-count');
+  if(el) el.textContent = active;
+}
+function enableAllDistricts(){DISTRICT_DATA.forEach(d=>d.active=true);renderDistricts()}
+function disableAllDistricts(){DISTRICT_DATA.forEach(d=>d.active=false);renderDistricts()}
+renderDistricts();
+
+// ================================================================
+// ROADS
+// ================================================================
+function renderRoadControls(){
+  const types=[
+    {id:'hw',name:'Highway Generation',val:85},
+    {id:'sr',name:'Service Roads',val:62},
+    {id:'rr',name:'Residential Roads',val:45},
+    {id:'fo',name:'Flyovers',val:23},
+    {id:'jn',name:'Junctions',val:70},
+    {id:'rb',name:'Roundabouts',val:35},
+    {id:'ti',name:'Traffic Islands',val:50},
+    {id:'uz',name:'U-Turn Zones',val:42}
+  ];
+  const el=document.getElementById('road-controls');
+  el.innerHTML=types.map(t=>
+    `<div class="slider-group"><label>${t.name} <span id="rn-${t.id}-v">${t.val}</span></label>
+     <input type="range" min="0" max="100" value="${t.val}" oninput="document.getElementById('rn-${t.id}-v').textContent=this.value;drawRoadNetwork()"></div>`
+  ).join('');
+}
+renderRoadControls();
+
+function drawRoadNetwork(){
+  const c=document.getElementById('road-canvas');
+  if(!c)return;const ctx=c.getContext('2d');const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  // Main highway
+  ctx.strokeStyle='rgba(0,212,255,0.5)';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(0,60);ctx.lineTo(w*0.3,50);ctx.lineTo(w*0.6,70);ctx.lineTo(w,55);ctx.stroke();
+  // Service roads
+  ctx.strokeStyle='rgba(0,212,255,0.2)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,85);ctx.quadraticCurveTo(w*0.25,100,w*0.4,85);
+  ctx.quadraticCurveTo(w*0.55,70,w*0.7,90);ctx.quadraticCurveTo(w*0.85,105,w,85);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,40);ctx.quadraticCurveTo(w*0.3,25,w*0.5,40);
+  ctx.quadraticCurveTo(w*0.7,55,w,35);ctx.stroke();
+  // Junctions
+  const jx=[w*0.15,w*0.35,w*0.55,w*0.75,w*0.9];
+  ctx.fillStyle='rgba(255,200,50,0.4)';
+  for(const x of jx){ctx.beginPath();ctx.arc(x,60+Math.sin(x*0.1)*15,4,0,Math.PI*2);ctx.fill()}
+  // Roundabouts
+  ctx.strokeStyle='rgba(255,200,50,0.3)';ctx.lineWidth=2;
+  for(const x of [w*0.25,w*0.65]){ctx.beginPath();ctx.arc(x,75,8,0,Math.PI*2);ctx.stroke()}
+}
+setTimeout(drawRoadNetwork,200);
+
+// ================================================================
+// TRAFFIC
+// ================================================================
+function updateTrafficStats(){
+  const total=tvBus+tvAuto+tvBike+tvCar+tvTruck+tvEmerg;
+  document.getElementById('s-fps').textContent=57+Math.floor(Math.random()*6);
+  document.getElementById('ov-traffic').textContent=total;
+  document.getElementById('tc-density').textContent=tcDensity+'%';
+  drawHeatmap();
+}
+function drawHeatmap(){
+  const c=document.getElementById('heatmap-canvas');
+  if(!c)return;const ctx=c.getContext('2d');const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const bars=[tvBus*0.4,tvAuto*0.3,tvBike*0.25,tvCar*0.5,tvTruck*0.35,tvEmerg*1.5,
+              tvBus*0.2,tvAuto*0.4,tvBike*0.3,tvCar*0.6,tvTruck*0.4,tvEmerg*0.8];
+  const bw=w/bars.length;
+  for(let i=0;i<bars.length;i++){
+    const bh=Math.min(bars[i]+15,h)*0.8;
+    const grad=ctx.createLinearGradient(0,h-bh,0,h);
+    grad.addColorStop(0,`rgba(0,${180+bars[i]*0.3},255,0.6)`);
+    grad.addColorStop(1,'rgba(0,212,255,0.05)');
+    ctx.fillStyle=grad;
+    ctx.fillRect(i*bw+2,h-bh,bw-4,bh);
+  }
+}
+updateTrafficStats();
+
+// ================================================================
+// LANDMARKS
+// ================================================================
+function renderLandmarks(){
+  const q=(document.getElementById('lm-search').value||'').toLowerCase();
+  for(const [cat,items] of Object.entries(LANDMARK_DATA)){
+    const el=document.getElementById('lm-'+cat.slice(0,3));
+    if(!el)continue;
+    el.innerHTML=items.filter(i=>!q||i.name.toLowerCase().includes(q)||i.district.toLowerCase().includes(q))
+      .map(i=>`<div class="lm-card">
+        <div class="lm-info"><div class="lm-name">${i.name}</div>
+          <div class="lm-type">${i.type} &middot; ${i.district}</div></div>
+        <span class="lm-tag">${i.tags[0]}</span>
+      </div>`).join('')||'<div style="font-size:0.65rem;color:var(--gray);padding:8px">No matching landmarks</div>';
+  }
+}
+renderLandmarks();
+
+// ================================================================
+// ENVIRONMENT
+// ================================================================
+function initEnv(){
+  const wb=document.getElementById('weather-btns');
+  wb.innerHTML=weatherNames.map(w=>`<button class="btn btn-sm ${w==='sunny'?'primary':''}" onclick="setWeather('${w}')">${w.charAt(0).toUpperCase()+w.slice(1)}</button>`).join('');
+  const tb=document.getElementById('time-btns');
+  tb.innerHTML=timeNames.map(t=>`<button class="btn btn-sm ${t==='morning'?'primary':''}" onclick="setTime('${t}')">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('');
+}
+function setWeather(w){currentWeather=w;document.querySelectorAll('#weather-btns .btn').forEach(b=>b.classList.toggle('primary',b.textContent.toLowerCase()===w));
+  document.getElementById('h-weather').textContent=w.charAt(0).toUpperCase()+w.slice(1);document.getElementById('ov-weather').textContent=w.charAt(0).toUpperCase()+w.slice(1)}
+function setTime(t){currentTime=t;document.querySelectorAll('#time-btns .btn').forEach(b=>b.classList.toggle('primary',b.textContent.toLowerCase()===t));
+  const labels={dawn:'5:30 AM',morning:'10:30 AM',afternoon:'2:00 PM',sunset:'6:15 PM',night:'9:45 PM'};
+  document.getElementById('h-time').textContent=labels[t];document.getElementById('ov-time').textContent=labels[t]}
+initEnv();
+
+// ================================================================
+// TERRAIN
+// ================================================================
+function renderTerrain(){
+  const zones=[
+    {name:'Coastal Vizag',type:'Coastal',elev:0.3,veg:40,color:'#44bbdd'},
+    {name:'Hill Corridors',type:'Hilly',elev:0.8,veg:70,color:'#33aa55'},
+    {name:'Beach Region',type:'Coastal',elev:0.1,veg:20,color:'#ffdd44'},
+    {name:'Urban Valley',type:'Urban',elev:0.2,veg:15,color:'#aa8888'},
+    {name:'Highway Outskirts',type:'Semi-Urban',elev:0.4,veg:55,color:'#88aa44'}
+  ];
+  document.getElementById('terrain-zones').innerHTML=zones.map(z=>`
+    <div class="district-card" style="margin-bottom:6px">
+      <div class="d-header"><span class="d-name">${z.name}</span><span style="font-size:0.55rem;color:var(--gray)">${z.type}</span></div>
+      <div class="d-meta"><span>Elev ${z.elev*100}%</span><span>Veg ${z.veg}%</span></div>
+    </div>`).join('');
+}
+renderTerrain();
+
+// ================================================================
+// ASSETS
+// ================================================================
+function renderAssets(){
+  const q=(document.getElementById('asset-search').value||'').toLowerCase();
+  const grid=document.getElementById('asset-grid');grid.innerHTML='';
+  const catLabels={buildings:'Buildings',road:'Road Assets',nature:'Nature',infra:'Infrastructure'};
+  for(const [key,items] of Object.entries(ASSET_DATA)){
+    const filtered=q?items.filter(i=>i.name.toLowerCase().includes(q)):items;
+    if(filtered.length===0)continue;
+    grid.innerHTML+=`<div class="asset-cat"><h4>${catLabels[key]||key}</h4>
+      <div class="asset-tags">${filtered.map(i=>`<span class="asset-tag">${i.name} <span style="color:var(--cyan)">(${i.count})</span></span>`).join('')}</div></div>`;
+  }
+}
+renderAssets();
+
+// ================================================================
+// MISSIONS
+// ================================================================
+function renderMissions(){
+  const el=document.getElementById('mission-list');
+  el.innerHTML=MISSION_DATA.map(m=>`
+    <div class="mission-card">
+      <div class="m-header"><span class="m-title">${m.title}</span><span class="m-diff ${m.diff}">${m.diff.toUpperCase()}</span></div>
+      <div style="font-size:0.6rem;color:var(--gray);margin-bottom:4px">${m.district} &middot; ${m.reward}</div>
+      <div class="m-progress"><div class="fill" style="width:${m.progress}%"></div></div>
+      <div style="font-size:0.55rem;color:var(--gray);margin-top:4px">${m.desc}</div>
+    </div>`).join('');
+  // Mission chart
+  const cc=document.getElementById('mission-chart');
+  if(cc){
+    const cctx=cc.getContext('2d');const cw=cc.width,ch=cc.height;
+    cctx.clearRect(0,0,cw,ch);
+    const vals=[40,75,30,60,85,50,70,45,80,55];
+    const bw=cw/vals.length;
+    cctx.fillStyle='rgba(0,212,255,0.3)';
+    for(let i=0;i<vals.length;i++){
+      const bh=vals[i]/100*ch*0.7;
+      cctx.fillRect(i*bw+2,ch-bh,bw-4,bh);
+    }
+    cctx.strokeStyle='rgba(0,212,255,0.6)';cctx.lineWidth=1.5;cctx.beginPath();
+    for(let i=0;i<vals.length;i++){const x=i*bw+bw/2,y=ch-vals[i]/100*ch*0.7;i===0?cctx.moveTo(x,y):cctx.lineTo(x,y)}
+    cctx.stroke();
+  }
+}
+renderMissions();
+
+// ================================================================
+// ROUTE MANAGER
+// ================================================================
+const ROUTE_DATA = [
+  {id:'beach',name:'Beach Road',dist:2.0,traffic:'Tourist Medium',scenery:'night'},
+  {id:'murali',name:'Murali Nagar Masjid Area',dist:3.0,traffic:'Dense Urban',scenery:'city'},
+  {id:'maddilapalem',name:'Maddilapalem',dist:4.5,traffic:'Dense Urban',scenery:'city'},
+  {id:'mvp',name:'MVP Colony',dist:5.5,traffic:'Residential Light',scenery:'city'},
+  {id:'kailasapuram',name:'Kailasapuram',dist:6.5,traffic:'Medium Urban',scenery:'city'},
+  {id:'nad',name:'NAD Junction',dist:7.5,traffic:'Heavy Traffic',scenery:'city'},
+  {id:'sanghivalasa',name:'Sanghivalasa',dist:8.5,traffic:'Open Highway',scenery:'highway'},
+  {id:'vizianagaram',name:'Vizianagaram Connection Zone',dist:9.0,traffic:'Highway Mix',scenery:'highway'},
+  {id:'parvathipuram',name:'Parvathipuram',dist:10.0,traffic:'Rural Highway',scenery:'highway'}
+];
+ROUTE_DATA.sort((a,b) => a.dist - b.dist);
+
+function renderRouteTable(sortBy){
+  sortBy = sortBy || 'dist-asc';
+  let sorted = [...ROUTE_DATA];
+  if(sortBy === 'dist-asc') sorted.sort((a,b) => a.dist - b.dist);
+  else if(sortBy === 'dist-desc') sorted.sort((a,b) => b.dist - a.dist);
+  else sorted.sort((a,b) => a.name.localeCompare(b.name));
+  const el = document.getElementById('route-table');
+  if(!el) return;
+  el.innerHTML = sorted.map(r => {
+    const barW = (r.dist / 10) * 100;
+    const cat = r.dist <= 4 ? 'Short' : r.dist <= 7 ? 'Medium' : 'Long';
+    return `<div class="mission-card">
+      <div class="m-header">
+        <span class="m-title">${r.name}</span>
+        <span class="m-diff ${cat==='Short'?'easy':cat==='Medium'?'medium':'hard'}">${cat}</span>
+      </div>
+      <div style="font-size:0.6rem;color:var(--gray);margin-bottom:4px">
+        ${r.dist} KM &middot; ${r.traffic} &middot; ${r.scenery}
+      </div>
+      <div class="m-progress"><div class="fill" style="width:${barW}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function initRouteStats(){
+  const dists = ROUTE_DATA.map(r => r.dist);
+  const totalKm = dists.reduce((s,d) => s + d, 0);
+  const avgKm = (totalKm / dists.length).toFixed(1);
+  const longest = Math.max(...dists);
+  const shortest = Math.min(...dists);
+  const longRoute = ROUTE_DATA.find(r => r.dist === longest);
+  const shortRoute = ROUTE_DATA.find(r => r.dist === shortest);
+  document.getElementById('rm-total-routes').textContent = ROUTE_DATA.length;
+  document.getElementById('rm-avg-dist').textContent = avgKm;
+  document.getElementById('rm-longest').textContent = longest;
+  document.getElementById('rm-shortest').textContent = shortest;
+  document.getElementById('rm-total-km').textContent = totalKm.toFixed(1);
+  if(shortRoute) document.getElementById('rm-short-name').textContent = shortRoute.name + ' (' + shortRoute.dist + ' KM)';
+  if(longRoute) document.getElementById('rm-long-name').textContent = longRoute.name + ' (' + longest + ' KM)';
+  drawRouteChart();
+}
+function drawRouteChart(){
+  const cc = document.getElementById('route-chart');
+  if(!cc) return;
+  const cctx = cc.getContext('2d'); const cw = cc.width, ch = cc.height;
+  cctx.clearRect(0,0,cw,ch);
+  const vals = ROUTE_DATA.map(r => (r.dist / 10) * 100);
+  const bw = cw / vals.length;
+  for(let i=0;i<vals.length;i++){
+    const bh = (vals[i]/100) * ch * 0.7;
+    const grad = cctx.createLinearGradient(0,ch-bh,0,ch);
+    grad.addColorStop(0,'rgba(0,212,255,0.5)');
+    grad.addColorStop(1,'rgba(0,212,255,0.05)');
+    cctx.fillStyle = grad;
+    cctx.fillRect(i*bw, ch-bh, bw-2, bh);
+  }
+  cctx.strokeStyle = 'rgba(0,212,255,0.7)'; cctx.lineWidth = 1.5; cctx.beginPath();
+  for(let i=0;i<vals.length;i++){
+    const x = i*bw + bw/2, y = ch - (vals[i]/100)*ch*0.7;
+    i===0 ? cctx.moveTo(x,y) : cctx.lineTo(x,y);
+  }
+  cctx.stroke();
+}
+renderRouteTable('dist-asc');
+initRouteStats();
+
+// ================================================================
+// WORLD ACTIONS
+// ================================================================
+function saveWorld(){
+  const data={districts:DISTRICT_DATA,weather:currentWeather,time:currentTime,
+    traffic:{tvBus,tvAuto,tvBike,tvCar,tvTruck,tvEmerg,tcDensity,tcSpawn,tcRush,tcSchool,tcNight},
+    env:{envFog,envCloud,envWind,envSun,envAmb}};
+  localStorage.setItem('vizagWorld',JSON.stringify(data));
+  showToast('World saved successfully');
+}
+function loadWorld(){
+  const raw=localStorage.getItem('vizagWorld');
+  if(!raw){showToast('No saved world found');return}
+  const data=JSON.parse(raw);
+  if(data.districts)data.districts.forEach((d,i)=>DISTRICT_DATA[i]&&Object.assign(DISTRICT_DATA[i],d));
+  if(data.weather)setWeather(data.weather);
+  if(data.time)setTime(data.time);
+  if(data.traffic){Object.assign({tvBus,tvAuto,tvBike,tvCar,tvTruck,tvEmerg,tcDensity,tcSpawn,tcRush},data.traffic);tcSchool=data.traffic.tcSchool;tcNight=data.traffic.tcNight}
+  renderDistricts();updateTrafficStats();showToast('World loaded');
+}
+function resetWorld(){
+  DISTRICT_DATA.forEach((d,i)=>{
+    const defaults=[
+      {completion:85,traffic:72,buildings:340,roads:78,popDensity:'High',assets:56,active:true},
+      {completion:62,traffic:55,buildings:210,roads:65,popDensity:'Medium',assets:32,active:true},
+      {completion:90,traffic:80,buildings:280,roads:85,popDensity:'Very High',assets:48,active:true},
+      {completion:78,traffic:90,buildings:310,roads:72,popDensity:'Very High',assets:62,active:true},
+      {completion:55,traffic:50,buildings:170,roads:55,popDensity:'Medium',assets:28,active:false},
+      {completion:95,traffic:85,buildings:120,roads:95,popDensity:'Low',assets:45,active:true},
+      {completion:30,traffic:20,buildings:55,roads:35,popDensity:'Very Low',assets:12,active:false},
+      {completion:40,traffic:45,buildings:140,roads:55,popDensity:'Medium',assets:25,active:true},
+      {completion:25,traffic:15,buildings:40,roads:30,popDensity:'Low',assets:10,active:true}
+    ];
+    if(defaults[i])Object.assign(d,defaults[i]);
+  });
+  renderDistricts();showToast('World reset to defaults');
+}
+function resetDistricts(){DISTRICT_DATA.forEach(d=>d.active=false);renderDistricts()}
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';
+    Object.assign(t.style,{position:'fixed',bottom:'24px',right:'24px',padding:'10px 18px',
+      background:'rgba(0,212,255,0.12)',border:'1px solid var(--glass-border)',borderRadius:'8px',
+      color:'var(--cyan)',fontSize:'0.75rem',backdropFilter:'blur(12px)',zIndex:999,
+      transition:'opacity 0.3s'});document.body.appendChild(t)}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2500);
+}
+
+// ================================================================
+// REAL-TIME UPDATES
+// ================================================================
+function updateDashboard(){
+  document.getElementById('s-fps').textContent=55+Math.floor(Math.random()*10);
+  document.getElementById('ov-fps').textContent=document.getElementById('s-fps').textContent;
+  document.getElementById('s-mem').textContent=(250+Math.floor(Math.random()*80))+' MB';
+  document.getElementById('an-fps').textContent=document.getElementById('s-fps').textContent;
+  document.getElementById('an-mem').textContent=document.getElementById('s-mem').textContent;
+}
+setInterval(updateDashboard,2000);
+
+// ================================================================
+// DRAW TRAVEL HEATMAP
+// ================================================================
+function drawTravelHeatmap(){
+  const c=document.getElementById('travel-canvas');
+  if(!c)return;const ctx=c.getContext('2d');const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const zones=[[0,60],[w*0.15,40],[w*0.3,75],[w*0.45,50],[w*0.6,80],[w*0.75,45],[w*0.9,65],[w,55]];
+  ctx.lineWidth=3;
+  for(let i=0;i<zones.length-1;i++){
+    const intensity=0.2+Math.random()*0.4;
+    ctx.strokeStyle=`rgba(0,212,255,${intensity})`;
+    ctx.beginPath();ctx.moveTo(zones[i][0],zones[i][1]);
+    const cx=(zones[i][0]+zones[i+1][0])/2,cy=(zones[i][1]+zones[i+1][1])/2-15+Math.random()*30;
+    ctx.quadraticCurveTo(cx,cy,zones[i+1][0],zones[i+1][1]);ctx.stroke();
+    ctx.fillStyle=`rgba(0,212,255,${intensity*0.5})`;
+    ctx.beginPath();ctx.arc(zones[i+1][0],zones[i+1][1],3+Math.random()*4,0,Math.PI*2);ctx.fill();
+  }
+}
+setTimeout(drawTravelHeatmap,300);
+setInterval(drawTravelHeatmap,4000);
+
+// ================================================================
+// ANALYTICS - Draw Traffic Stats
+// ================================================================
+function drawAnCharts(){
+  const canvas=document.createElement('canvas');
+  document.querySelector('.card .metric').after(canvas);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules
+dist-electron
+android
+www
+scripts
+*.zip
+*.log
+.DS_Store
+Thumbs.db
