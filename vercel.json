@@ -1,7 +1,7 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "overrides": {
+    "*.glb": { "contentType": "model/gltf-binary" }
+  }
 }
