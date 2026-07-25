@@ -4333,7 +4333,7 @@ function preloadFerrari() {
   ferrariLoading = true;
   const loader = new THREE.GLTFLoader();
   const dracoLoader = new THREE.DRACOLoader();
-  dracoLoader.setDecoderPath('js/libs/draco/gltf/');
+  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
   loader.setDRACOLoader(dracoLoader);
   loader.load('assets/ferrari.glb', function(gltf) {
     const model = gltf.scene;
