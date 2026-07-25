@@ -1,5 +1,7 @@
 {
-  "redirects": [
-    { "source": "/", "destination": "/game.html", "permanent": true }
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
