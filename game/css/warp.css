@@ -1,0 +1,36 @@
+/* Stage transition: rocket launch between Earth / Mars / Moon */
+#warp{position:fixed;inset:0;z-index:25;overflow:hidden;background:radial-gradient(ellipse at 50% 120%,#1a2a6a,#02030c 70%);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:all}
+#warp[data-to="mars"]{background:radial-gradient(ellipse at 50% 120%,#7a2a12,#0a0304 70%)}
+#warp[data-to="moon"]{background:radial-gradient(ellipse at 50% 120%,#3a4470,#02030a 70%)}
+#warp.hidden{display:none}
+#warp.go{animation:warpFade 3s ease both}
+@keyframes warpFade{0%{opacity:0}12%{opacity:1}84%{opacity:1}100%{opacity:0}}
+#warp .wstars{position:absolute;inset:-20% 0;background:
+ repeating-linear-gradient(90deg,transparent 0 37px,rgba(255,255,255,.55) 37px 38px,transparent 38px 91px),
+ repeating-linear-gradient(90deg,transparent 0 23px,rgba(180,220,255,.4) 23px 24px,transparent 24px 59px);
+ background-size:100% 160px,100% 260px;mask-image:linear-gradient(180deg,transparent,#000 25%,#000 75%,transparent);-webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 75%,transparent);opacity:0}
+#warp.go .wstars{animation:warpStars .45s linear 0.6s infinite,warpStarsIn .6s ease 0.5s both}
+@keyframes warpStars{to{background-position:0 160px,0 260px}}
+@keyframes warpStarsIn{from{opacity:0}to{opacity:.85}}
+#warp .wtop{position:absolute;top:7vh;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:14px;font-weight:900;letter-spacing:.2em;font-size:clamp(11px,3vh,16px)}
+#warp .wline{width:min(260px,34vw);height:3px;border-radius:3px;background:rgba(255,255,255,.2);overflow:hidden}
+#warp .wline i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffe066,#ff8a3d);box-shadow:0 0 10px #ffb02e}
+#warp.go .wline i{animation:warpBar 2.3s ease-in-out .1s both}
+@keyframes warpBar{to{width:100%}}
+#warp .rocket{position:absolute;bottom:-40vh;left:50%;width:clamp(44px,11vh,76px);height:clamp(88px,22vh,152px);margin-left:calc(clamp(44px,11vh,76px) / -2);transform:translateY(0)}
+#warp.go .rocket{animation:rocketUp 2.4s cubic-bezier(.5,0,.9,.4) .15s both,rocketShake .08s linear .15s 25}
+@keyframes rocketUp{0%{transform:translateY(0)}25%{transform:translateY(-52vh)}100%{transform:translateY(-190vh)}}
+@keyframes rocketShake{0%{margin-left:calc(clamp(44px,11vh,76px) / -2 - 2px)}50%{margin-left:calc(clamp(44px,11vh,76px) / -2 + 2px)}100%{margin-left:calc(clamp(44px,11vh,76px) / -2 - 2px)}}
+#warp .rocket svg{display:block;filter:drop-shadow(0 0 12px rgba(255,255,255,.45))}
+#warp .flame{position:absolute;left:50%;top:97%;width:46%;height:90%;margin-left:-23%;display:flex;justify-content:center;gap:2px;transform-origin:top center}
+#warp .flame b{display:block;width:100%;height:100%;border-radius:0 0 50% 50%;background:linear-gradient(180deg,#fff6c0,#ffb02e 45%,#ff4a1a 80%,transparent);filter:blur(1.5px);animation:flick .09s ease-in-out infinite alternate}
+#warp .flame b:nth-child(2){position:absolute;inset:0 22% 18%;background:linear-gradient(180deg,#fff,#7fe8ff 60%,transparent);animation-duration:.07s}
+#warp .flame b:nth-child(3){position:absolute;inset:0 -30% 40%;background:radial-gradient(ellipse at 50% 0,rgba(255,200,100,.8),transparent 70%);filter:blur(5px)}
+@keyframes flick{from{transform:scaleY(.8) scaleX(.92)}to{transform:scaleY(1.25) scaleX(1.05)}}
+#warp #warpTxt{position:absolute;left:0;right:0;top:36%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0}
+#warp.go #warpTxt{animation:warpTxt 2.4s ease .5s both}
+@keyframes warpTxt{0%{opacity:0;transform:translateY(14px) scale(.96)}18%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+#warp #warpTxt b{font-size:clamp(12px,3vh,17px);letter-spacing:.5em;color:#ffe9a8}
+#warp #warpName{font-weight:900;font-style:italic;font-size:clamp(30px,10vh,76px);letter-spacing:.08em;text-shadow:3px 3px 0 rgba(255,138,61,.85),0 0 30px rgba(255,255,255,.3)}
+#warp[data-to="moon"] #warpName{text-shadow:3px 3px 0 rgba(120,140,220,.9),0 0 30px rgba(200,215,255,.4)}
+@media (prefers-reduced-motion:reduce){#warp{display:none !important}}

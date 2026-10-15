@@ -1,0 +1,57 @@
+/* Stage select (Earth / Mars) */
+#stages{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:2vh max(4vw,env(safe-area-inset-left));background:radial-gradient(ellipse at 50% 55%,rgba(10,6,40,.5),rgba(6,3,24,.88));pointer-events:none}
+#stages .stitle{margin-bottom:clamp(8px,2.6vh,20px)}
+#worlds{display:flex;gap:clamp(12px,3vw,36px);justify-content:center;align-items:stretch}
+.wcard{position:relative;flex:0 1 min(330px,30vw);min-width:0;border-radius:20px;border:2px solid rgba(53,230,255,.55);background:linear-gradient(180deg,rgba(30,40,120,.9),rgba(10,12,52,.95));padding:0 0 clamp(8px,1.8vh,16px);display:flex;flex-direction:column;align-items:center;text-align:center;overflow:hidden;box-shadow:0 7px 0 rgba(6,8,40,.6);transition:transform .2s ease,border-color .2s,box-shadow .2s;animation:rise .5s cubic-bezier(.2,.9,.3,1) both}
+.wcard.mars{border-color:rgba(255,140,70,.65);background:linear-gradient(180deg,rgba(100,40,22,.92),rgba(36,12,10,.96));animation-delay:.1s}
+@media (hover:hover){.wcard:not(.locked):hover{transform:translateY(-7px);box-shadow:0 12px 0 rgba(6,8,40,.5),0 0 30px rgba(53,230,255,.45)}.wcard.mars:not(.locked):hover{box-shadow:0 12px 0 rgba(30,8,4,.5),0 0 30px rgba(255,130,60,.5)}}
+.wcard.cur{border-color:#ffd24a;box-shadow:0 7px 0 rgba(120,70,0,.6),0 0 0 2px rgba(255,210,74,.3),0 0 24px rgba(255,190,60,.5)}
+.wcard:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.wpv{position:relative;width:100%;height:clamp(80px,30vh,200px);overflow:hidden;border-bottom:2px solid rgba(255,255,255,.14)}
+.wpv canvas{position:absolute;inset:0;width:100%;height:100%;display:block;transition:transform .6s ease,filter .3s}
+@media (hover:hover){.wcard:not(.locked):hover .wpv canvas{transform:scale(1.08)}}
+.wnum{position:absolute;left:10px;top:10px;padding:3px 10px;border-radius:999px;background:rgba(10,6,40,.8);border:1.5px solid rgba(255,255,255,.35);font-weight:900;font-size:clamp(9px,2.2vh,13px);letter-spacing:.14em}
+.wcard .lk{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(6,4,28,.6)}
+.wcard.locked .lk{display:flex}
+.wcard .lk{flex-direction:column;gap:6px;text-align:center;padding:0 12px}.wcard .lk b{font-size:clamp(9px,2.2vh,13px);letter-spacing:.05em;text-transform:uppercase;color:#ffe3d3;text-shadow:0 1px 4px #000}.wcard .lk i{width:clamp(40px,11vh,64px);height:clamp(40px,11vh,64px);border-radius:50%;display:grid;place-items:center;font-size:clamp(18px,5vh,30px);background:rgba(10,8,46,.8);border:2px solid rgba(255,190,160,.6);color:#ffd9c8}
+.wcard.locked .wpv canvas{filter:grayscale(.55) brightness(.6)}
+.wnm{margin-top:clamp(5px,1.2vh,10px);font-weight:900;font-style:italic;font-size:clamp(18px,5vh,32px);letter-spacing:.1em;text-transform:uppercase;text-shadow:2px 2px 0 rgba(255,138,61,.8)}
+.wsub{font-size:clamp(10px,2.4vh,14px);opacity:.85;font-weight:700;letter-spacing:.04em;padding:0 12px;min-height:1.3em}
+.wbar{width:70%;height:clamp(6px,1.2vh,9px);border-radius:99px;background:rgba(255,255,255,.14);margin:clamp(6px,1.4vh,12px) 0 4px;overflow:hidden}
+.wbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffe066,#ff8a3d)}
+.wst{display:flex;align-items:center;gap:5px;font-weight:900;font-size:clamp(10px,2.5vh,15px);letter-spacing:.06em;text-transform:uppercase}
+.wst .ico{color:#ffb83d}
+#levels[data-world="mars"]{background:radial-gradient(ellipse at 50% 55%,rgba(60,16,8,.55),rgba(24,6,4,.88))}
+#levels[data-world="mars"] .card{border-color:rgba(255,140,70,.55);background:linear-gradient(180deg,rgba(100,40,22,.9),rgba(36,12,10,.95))}
+#levels[data-world="mars"] .card.cur{border-color:#ffd24a}
+#levels[data-world="mars"] .card .pv{border-bottom-color:rgba(255,140,70,.4)}
+#stStars{margin-left:auto}
+
+.wcard.moon{border-color:rgba(190,205,255,.6);background:linear-gradient(180deg,rgba(54,60,96,.92),rgba(14,16,34,.96));animation-delay:.2s}
+@media (hover:hover){.wcard.moon:not(.locked):hover{box-shadow:0 12px 0 rgba(8,10,24,.5),0 0 30px rgba(190,210,255,.5)}}
+.wcard.moon .wnm{text-shadow:2px 2px 0 rgba(120,140,220,.8)}
+.wcard.moon .wbar i{background:linear-gradient(90deg,#e8eeff,#8fa4ff)}
+.wcard.mars .wbar i{background:linear-gradient(90deg,#ffb27a,#ff5a2a)}
+.wcard.full{border-color:#7dffb0}
+.wcard.full .wbar i{background:linear-gradient(90deg,#b8ffd0,#3ddc84)}
+.wcard.locked{filter:saturate(.7)}
+.wflag{position:absolute;right:10px;top:10px;padding:3px 10px;border-radius:999px;background:linear-gradient(90deg,#ffe066,#ffb02e);color:#2a1a00;font-weight:900;font-size:clamp(8px,2vh,11px);letter-spacing:.12em;display:flex;align-items:center;gap:4px;animation:wpulse 1.8s ease-in-out infinite}
+.wflag.done{background:linear-gradient(90deg,#b8ffd0,#3ddc84);animation:none}
+.wflag .ico{width:11px;height:11px;stroke-width:3}
+@keyframes wpulse{50%{box-shadow:0 0 14px rgba(255,200,60,.9)}}
+.wg{position:absolute;left:10px;bottom:8px;display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:999px;background:rgba(6,6,28,.78);border:1.5px solid rgba(255,255,255,.3);font-weight:900;font-size:clamp(8px,2vh,11px);letter-spacing:.1em}
+.wg .ico{width:11px;height:11px;color:#ffd34d}
+.wtags{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;padding:0 10px;margin-top:clamp(3px,.8vh,7px)}
+.wtags span{padding:1px 8px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);font-weight:800;font-size:clamp(7px,1.8vh,10px);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.wdiff{display:inline-flex;gap:2px;margin-left:4px;font-style:normal}
+.wdiff u{width:6px;height:11px;border-radius:2px;background:rgba(255,255,255,.2);transform:skewX(-14deg);display:block}
+.wdiff u.on{background:#ff6a4a;box-shadow:0 0 6px rgba(255,106,74,.8)}
+.wnext{margin-top:clamp(3px,.8vh,7px);font-weight:900;font-size:clamp(9px,2.2vh,12px);letter-spacing:.08em;text-transform:uppercase;color:#ffe9a8;opacity:.9;padding:0 10px}
+.wcard.locked .wnext{color:#c9c0d8;opacity:.7}
+#lvBlurb{font-size:clamp(9px,2.4vh,13px);font-weight:700;letter-spacing:.06em;opacity:.75;text-transform:uppercase;align-self:center}
+#levels[data-world="moon"]{background:radial-gradient(ellipse at 50% 55%,rgba(30,34,70,.55),rgba(6,8,20,.9))}
+#levels[data-world="moon"] .card{border-color:rgba(190,205,255,.55);background:linear-gradient(180deg,rgba(54,60,96,.9),rgba(14,16,34,.95))}
+#levels[data-world="moon"] .card.cur{border-color:#ffd24a}
+#levels[data-world="moon"] .card .pv{border-bottom-color:rgba(190,205,255,.4)}
+#levels[data-world="moon"] #cards{justify-content:center}
+#levels[data-world="moon"] .card{flex:0 1 min(380px,34vw)}

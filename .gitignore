@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+www/
+dist/
+build/
+.vercel/
+*.apk
+
+# Android build outputs & local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/app/*.iml
+android/.navigation/
+android/captures/
+.externalNativeBuild/
+.cxx/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak

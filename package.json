@@ -1,0 +1,19 @@
+{
+  "name": "turbo-drive-upgraded",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Turbo Drive with per-car stats, upgrade shop and cosmetics. Static game, no Python needed.",
+  "scripts": {
+    "prepare-www": "node scripts/prepare-www.js",
+    "build": "node scripts/prepare-www.js",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npm run prepare-www && npx cap sync android",
+    "start": "npx --yes serve -l 3000 .",
+    "dev": "npx --yes serve -l 3000 ."
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  }
+}

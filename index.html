@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b0722">
+<meta name="description" content="Turbo Drive - floor it, jump the gaps, land it flat. Race for a spot on the global leaderboard.">
+<title>Turbo Drive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="game/css/style.css">
+<link rel="stylesheet" href="game/css/upgrade.css">
+<link rel="stylesheet" href="game/css/shop.css">
+<link rel="stylesheet" href="game/css/stages.css">
+<link rel="stylesheet" href="game/css/cutscene.css">
+<link rel="stylesheet" href="game/css/warp.css">
+<link rel="stylesheet" href="game/css/intro.css">
+</head>
+<body>
+<div id="stage"></div><canvas id="speedfx"></canvas><div id="vig"></div><div id="grain"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.6v14.8a1 1 0 0 0 1.5.86l12-7.4a1 1 0 0 0 0-1.72l-12-7.4A1 1 0 0 0 7 4.6z"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.4l2.95 6.2 6.75.85-4.98 4.7 1.3 6.7L12 17.5l-6 3.35 1.3-6.7L2.3 9.45l6.75-.85z"/></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#b4730a"/><circle cx="12" cy="12" r="9" fill="#ffd24a" stroke="#fff3b0" stroke-width="1"/><path d="M12 6.2l1.7 3.6 3.9.5-2.9 2.7.8 3.9L12 14.9 8.5 16.9l.8-3.9-2.9-2.7 3.9-.5z" fill="#d98a0b" stroke="none"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-time" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect width="12" height="20" x="6" y="2" rx="2"/><path d="M11 18h2"/></symbol>
+</defs></svg>
+<div id="ui">
+  <div id="menu" class="hidden">
+    <div class="kicker" id="kicker"><span></span>Season 01 &middot; Sky Circuit</div>
+    <h1 class="title">TURBO<br>DRIVE</h1>
+    <p class="tag">Floor it. Jump the gaps. Land it flat.</p>
+    <div class="mstack">
+      <button class="mbtn play" id="btnPlay" data-testid="menu-play-btn" aria-label="Play"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Play</b><small id="playSub">Level 1</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
+      <div class="mrow">
+        <button class="mbtn" id="btnGarage" data-testid="menu-garage-btn" aria-label="Garage, choose your vehicle"><span class="ib"><svg class="ico "><use href="#i-car"/></svg></span><span class="lb"><b>Garage</b><small id="garSub">Police Car</small></span></button>
+        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars and Moon"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
+      </div>
+      <div id="menuLbSlot"></div>
+    </div>
+    <div id="topbar"><div id="authSlot"></div><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
+    <div class="hint"><span class="kbd-only">Up / W / Space = gas &middot; A / D = tilt left / right &middot; Shift = nitro.</span><span class="touch-only">Hold GAS. In the air, use the left / right tilt buttons so your wheels meet the road.</span></div>
+  </div>
+  <div id="stages" class="hidden"><div class="stitle"><button class="rbtn" id="btnStBack" data-testid="stages-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Select Stage</h2><div class="pill" id="stStars"></div></div><div id="worlds" data-testid="stage-cards"></div></div>
+  <div id="levels" class="hidden"><div class="stitle"><button class="rbtn" id="btnLvBack" data-testid="levels-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2 id="lvTitle">Select Level</h2><span id="lvBlurb"></span><div class="pill" id="lvStars"></div></div><div id="cards" data-testid="level-cards"></div></div>
+  <div id="garage" class="hidden">
+    <div class="stitle"><button class="rbtn" id="btnGarBack" data-testid="garage-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Garage</h2></div><div class="pill" id="garCoins"></div>
+    <div class="gInfo">
+      <div class="gk" id="gKind">Emergency vehicle</div>
+      <div class="gName" id="gName">Police Car</div>
+      <div class="gTag" id="gTag"></div>
+      <div class="chips" id="gChips"></div>
+      <div class="gTabs" role="tablist"><button class="gtab on" data-tab="ride" data-testid="garage-tab-ride">Ride</button><button class="gtab" data-tab="tune" data-testid="garage-tab-tune">Tune</button><button class="gtab" data-tab="style" data-testid="garage-tab-style">Style</button></div>
+      <div class="gPane" id="gPane" data-testid="garage-pane"></div>
+      <button class="mbtn play" id="btnEquip" data-testid="garage-equip-btn"><span class="ib" id="equipIc"><svg class="ico "><use href="#i-check"/></svg></span><span class="lb"><b id="equipLb">Select</b></span></button>
+    </div>
+    <div class="gList" id="gList"></div>
+  </div>
+  <div id="settings" class="hidden">
+    <div class="stitle"><button class="rbtn" id="btnBack" data-testid="settings-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Settings</h2></div>
+    <div class="row"><span>Sound</span><button class="btn" id="optSound" data-testid="settings-sound-btn">On</button></div>
+    <div class="row"><span>Motion FX</span><button class="btn" id="optShake" data-testid="settings-shake-btn">On</button></div>
+    <div class="row"><span>Graphics</span><button class="btn" id="optQuality" data-testid="settings-quality-btn">High</button></div>
+  </div>
+  <div id="hud" class="hidden">
+    <button id="btnPause" data-testid="hud-pause-btn" aria-label="Pause"><i></i><i></i></button>
+    <div id="lvlName"></div>
+    <div id="stormFlash"></div>
+    <div id="coldFrost"></div>
+    <div id="coldBox" class="hidden" data-testid="hud-cold"><span id="coldTxt" data-testid="hud-cold-text"></span><div id="coldBar"><b></b></div></div>
+    <div id="chasmBox" class="hidden" data-testid="hud-chasm"><span id="chasmTxt" data-testid="hud-chasm-text"></span><div id="chasmBar"><b></b></div></div>
+    <div id="stormBox" class="hidden" data-testid="hud-storm"><span id="stormTxt" data-testid="hud-storm-text"></span><div id="stormBar"><b></b></div></div>
+    <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="cp">Checkpoint 0/3</div><div id="bar"><div id="progress"></div></div></div>
+    <div class="hudr panel"><div class="hlab">Speed</div><div class="spdrow"><div id="speed" data-testid="hud-speed">0</div><small>km/h</small></div><div id="spdbar"><i></i></div><div class="sc">Style <span id="score" data-testid="hud-score">0</span></div><div class="sc flipsc lowg-only">Flip bonus <span id="flipPts" data-testid="hud-flip-bonus">0</span></div><div class="sc cn" id="hudCoins"></div></div>
+    <div id="kbHint" class="kbd-only">W gas &middot; S brake &middot; A/D tilt &middot; Shift nitro<span class="lowg-only"> &middot; Z left flip &middot; C right flip</span> &middot; Esc pause</div>
+  </div>
+  <div id="controls" class="hidden">
+    <button class="ctl lowg-only" id="flipL" data-act="flipL" data-testid="touch-flip-left" aria-label="Left flip (backflip)"><span class="ic">&#8630;</span><small>LEFT FLIP</small></button>
+    <button class="ctl lowg-only" id="flipR" data-act="flipR" data-testid="touch-flip-right" aria-label="Right flip (frontflip)"><span class="ic">&#8631;</span><small>RIGHT FLIP</small></button>
+    <button class="ctl" id="tiltUp" data-act="tiltUp" data-testid="touch-tilt-up" aria-label="Tilt left (nose up)"><span class="ic">&#9664;</span><small>TILT LEFT</small></button>
+    <button class="ctl" id="tiltDown" data-act="tiltDown" data-testid="touch-tilt-down" aria-label="Tilt right (nose down)"><span class="ic">&#9654;</span><small>TILT RIGHT</small></button>
+    <button class="ctl" id="brake" data-act="brake" data-testid="touch-brake" aria-label="Brake"><span class="ic">&#9632;</span><small>BRAKE</small></button>
+    <button class="ctl" id="nitro" data-act="nitro" data-testid="touch-nitro" aria-label="Nitro"><span class="ic"><svg class="ico fill"><use href="#i-bolt"/></svg></span><small>NITRO</small></button>
+    <button class="ctl" id="gas" data-act="gas" data-testid="touch-gas" aria-label="Gas"><span class="ic" style="font-size:38px">&#9650;</span><span style="font-size:22px">GAS</span></button>
+  </div>
+  <div id="toast" class="hidden"></div><div id="pops"></div><div id="combo" class="hidden"></div>
+  <div id="countdown" class="hidden" data-testid="countdown"></div>
+  <div id="pauseMenu" class="hidden"><div class="modal panel"><h2>Paused</h2>
+    <button class="btn primary" id="btnResume" data-testid="pause-resume-btn">Resume</button>
+    <button class="btn" id="btnRestartCp" data-testid="pause-restart-cp-btn">Restart from checkpoint</button>
+    <button class="btn" id="btnRestartLevel" data-testid="pause-restart-level-btn">Restart level</button>
+    <button class="btn" id="btnPauseSettings" data-testid="pause-settings-btn">Settings</button>
+    <button class="btn" id="btnMenu1" data-testid="pause-menu-btn">Main menu</button></div></div>
+  <div id="crashMenu" class="hidden"><div class="modal panel"><h2>Crashed</h2><div id="crashReason"></div><button class="btn primary" id="btnRetry" data-testid="crash-retry-btn">Retry from checkpoint</button><button class="btn" id="btnMenu3" data-testid="crash-menu-btn">Main menu</button></div></div>
+  <div id="results" class="hidden"><div class="modal panel" data-testid="results-modal">
+    <div class="resHead"><span id="resLevel">Level 1</span><b>Finish</b></div>
+    <div id="resStars"></div>
+    <div class="resLab">Your time</div>
+    <div id="resTime" data-testid="results-time"></div>
+    <div id="resTrophy" class="hidden" data-testid="results-hover-trophy"></div>
+    <div id="resBadge" class="hidden" data-testid="results-new-best">New best</div>
+    <div id="resStats"></div>
+    <div id="resCoins"></div>
+    <div id="resOnline"></div>
+    <div class="resBtns">
+      <button class="btn primary hidden" id="btnNext" data-testid="results-next-btn">Next level</button><button class="btn hidden" id="btnEnding" data-testid="results-ending-btn">Watch ending</button><button class="btn" id="btnAgain" data-testid="results-again-btn">Race again</button><button class="btn" id="btnLvl2" data-testid="results-levels-btn">Levels</button><button class="btn" id="btnMenu2" data-testid="results-menu-btn">Main menu</button>
+    </div></div></div>
+</div>
+<div id="cutscene" class="hidden" data-testid="ending-cutscene">
+  <div id="csFade"></div>
+  <div id="csCap" data-testid="cutscene-caption"></div>
+  <div id="csCredits"><div class="csRoll">
+    <h2>MISSION COMPLETE</h2><p class="big">YOU ESCAPED THE COLLAPSING MOON</p>
+    <p><small>PILOT</small><br>YOU</p><p><small>VEHICLE</small><br>MARS HOVER</p><p><small>MISSION</small><br>EARTH &middot; MARS &middot; MOON &middot; SPACE</p>
+    <p><small>ENGINE</small><br>THREE.JS</p><p class="big">THANKS FOR PLAYING</p><h1>TURBO DRIVE</h1>
+  </div></div>
+  <button class="btn" id="btnCsSkip" data-testid="cutscene-skip-btn">Skip</button>
+  <button class="btn primary hidden" id="btnCsDone" data-testid="cutscene-continue-btn">Continue</button>
+</div>
+<div id="warp" class="hidden" aria-hidden="true" data-testid="stage-transition"><div class="wstars"></div><div class="wtop"><small id="warpFrom">EARTH</small><span class="wline"><i></i></span><small id="warpTo">MARS</small></div><div class="rocket"><svg viewBox="0 0 64 128" width="100%" height="100%"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#b9c2e6"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#8f9ac8"/></linearGradient></defs><path d="M32 2C46 22 50 44 48 76H16C14 44 18 22 32 2Z" fill="url(#rg)"/><path d="M16 76 4 100l12-6zM48 76l12 24-12-6z" fill="#ff5a3d"/><path d="M32 2C40 12 44 22 45 32H19C20 22 24 12 32 2Z" fill="#ff5a3d"/><circle cx="32" cy="52" r="8" fill="#35e6ff" stroke="#5a6aa8" stroke-width="3"/><path d="M22 76h20l-3 8H25z" fill="#5a6aa8"/></svg><div class="flame"><b></b><b></b><b></b></div></div><div id="warpTxt"><b>LAUNCHING</b><span id="warpName">TO MARS</span></div></div>
+<div id="root"></div>
+<div id="intro" aria-hidden="true" data-testid="intro-splash"><div class="iwrap"><img id="introLogo" src="game/assets/logo.png" alt="Little Hearts logo" data-testid="intro-logo"><div id="introTitle" data-testid="intro-title">A LITTLE HEARTS PRODUCTION</div><div id="introSub" data-testid="intro-subtitle"><span id="introType"></span><i class="caret"></i></div></div></div>
+<div id="loading"><h1 class="title">TURBO<br>DRIVE</h1><div id="loadmsg">Building the track&hellip;</div><div id="loadbar"><i></i></div></div>
+<div id="rotate"><div class="ph"><svg class="ico"><use href="#i-phone"/></svg></div><b>Rotate your phone</b><div>Turbo Drive plays in landscape only.<br>Turn your phone sideways to continue.</div></div>
+<script src="game/js/lib/three.min.js"></script>
+<script src="game/js/data/models.js"></script>
+<script src="game/js/data/car5.js"></script>
+<script src="game/js/data/thumbs.js"></script>
+<script src="game/js/data/hover.js"></script>
+<script src="game/js/physics.js"></script>
+<script src="game/js/core/storm.js"></script>
+<script src="game/js/core/config.js"></script>
+<script src="game/js/render/renderer.js"></script>
+<script src="game/js/render/path.js"></script>
+<script src="game/js/render/track.js"></script>
+<script src="game/js/render/desert.js"></script>
+<script src="game/js/render/ice.js"></script>
+<script src="game/js/render/jungle.js"></script>
+<script src="game/js/render/moon.js"></script>
+<script src="game/js/render/lava.js"></script>
+<script src="game/js/render/environment.js"></script>
+<script src="game/js/render/obstacles.js"></script>
+<script src="game/js/render/meteors.js"></script>
+<script src="game/js/render/cold.js"></script>
+<script src="game/js/render/chasm.js"></script>
+<script src="game/js/render/level.js"></script>
+<script src="game/js/render/vehicle.js"></script>
+<script src="game/js/render/particles.js"></script>
+<script src="game/js/core/audio.js"></script>
+<script src="game/js/core/input.js"></script>
+<script src="game/js/game/game.js"></script>
+<script src="game/js/game/effects.js"></script>
+<script src="game/js/game/cosmetics.js"></script>
+<script src="game/js/game/loop.js"></script>
+<script src="game/js/ui/ui.js"></script>
+<script src="game/js/ui/shop.js"></script>
+<script src="game/js/game/cutscene.js"></script>
+<script src="game/js/core/intro.js"></script>
+<script src="game/js/core/orientation.js"></script>
+<script src="game/js/main.js"></script>
+<script src="game/js/core/pwa.js"></script>
+</body>
+</html>

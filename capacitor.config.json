@@ -1,0 +1,11 @@
+{
+  "appId": "com.littlehearts.turbodrive",
+  "appName": "Turbo Drive",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
