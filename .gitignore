@@ -27,3 +27,5 @@ android/captures/
 Thumbs.db
 *.swp
 *.bak
+
+.vercel

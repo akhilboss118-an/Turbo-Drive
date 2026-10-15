@@ -61,7 +61,7 @@ html,body{font-family:var(--body);background:var(--ink)}
 /* touch vs keyboard */
 .touch-only{display:none}
 @media (hover:none),(pointer:coarse){.touch-only{display:inline}.kbd-only{display:none !important}}
-@media (hover:hover) and (pointer:fine){#controls .ctl:not(.lowg-only){display:none !important}#flipL,#flipR{bottom:max(16px,env(safe-area-inset-bottom)) !important}#flipR{left:calc(max(18px,env(safe-area-inset-left)) + clamp(66px,17vh,88px) + 12px) !important}}
+@media (hover:hover) and (pointer:fine){#controls .ctl{display:none !important}}
 .ctl{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:var(--disp)}
 .ctl small{font-family:var(--body);letter-spacing:.08em}
 /* countdown */

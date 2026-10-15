@@ -60,16 +60,22 @@
   <div id="levels" class="hidden"><div class="stitle"><button class="rbtn" id="btnLvBack" data-testid="levels-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2 id="lvTitle">Select Level</h2><span id="lvBlurb"></span><div class="pill" id="lvStars"></div></div><div id="cards" data-testid="level-cards"></div></div>
   <div id="garage" class="hidden">
     <div class="stitle"><button class="rbtn" id="btnGarBack" data-testid="garage-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Garage</h2></div><div class="pill" id="garCoins"></div>
+    <div class="gStage" id="gStage">
+      <div class="gHead">
+        <div class="gk" id="gKind">Emergency vehicle</div>
+        <div class="gName" id="gName">Police Car</div>
+        <div class="chips" id="gChips"></div>
+      </div>
+      <button class="gnav prev" id="btnGarPrev" data-testid="garage-prev-btn" aria-label="Previous Vehicle">&#10094;</button>
+      <button class="gnav next" id="btnGarNext" data-testid="garage-next-btn" aria-label="Next Vehicle">&#10095;</button>
+      <div class="gList" id="gList"></div>
+    </div>
     <div class="gInfo">
-      <div class="gk" id="gKind">Emergency vehicle</div>
-      <div class="gName" id="gName">Police Car</div>
       <div class="gTag" id="gTag"></div>
-      <div class="chips" id="gChips"></div>
       <div class="gTabs" role="tablist"><button class="gtab on" data-tab="ride" data-testid="garage-tab-ride">Ride</button><button class="gtab" data-tab="tune" data-testid="garage-tab-tune">Tune</button><button class="gtab" data-tab="style" data-testid="garage-tab-style">Style</button></div>
       <div class="gPane" id="gPane" data-testid="garage-pane"></div>
       <button class="mbtn play" id="btnEquip" data-testid="garage-equip-btn"><span class="ib" id="equipIc"><svg class="ico "><use href="#i-check"/></svg></span><span class="lb"><b id="equipLb">Select</b></span></button>
     </div>
-    <div class="gList" id="gList"></div>
   </div>
   <div id="settings" class="hidden">
     <div class="stitle"><button class="rbtn" id="btnBack" data-testid="settings-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Settings</h2></div>
@@ -82,16 +88,16 @@
     <div id="lvlName"></div>
     <div id="stormFlash"></div>
     <div id="coldFrost"></div>
-    <div id="coldBox" class="hidden" data-testid="hud-cold"><span id="coldTxt" data-testid="hud-cold-text"></span><div id="coldBar"><b></b></div></div>
-    <div id="chasmBox" class="hidden" data-testid="hud-chasm"><span id="chasmTxt" data-testid="hud-chasm-text"></span><div id="chasmBar"><b></b></div></div>
-    <div id="stormBox" class="hidden" data-testid="hud-storm"><span id="stormTxt" data-testid="hud-storm-text"></span><div id="stormBar"><b></b></div></div>
+    <div id="hazardHud" data-testid="hazard-hud">
+      <div id="stormBox" class="hidden" data-testid="hud-storm"><span id="stormTxt" data-testid="hud-storm-text"></span><div id="stormBar"><b></b></div></div>
+      <div id="chasmBox" class="hidden" data-testid="hud-chasm"><span id="chasmTxt" data-testid="hud-chasm-text"></span><div id="chasmBar"><b></b></div></div>
+      <div id="coldBox" class="hidden" data-testid="hud-cold"><span id="coldTxt" data-testid="hud-cold-text"></span><div id="coldBar"><b></b></div></div>
+    </div>
     <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="cp">Checkpoint 0/3</div><div id="bar"><div id="progress"></div></div></div>
     <div class="hudr panel"><div class="hlab">Speed</div><div class="spdrow"><div id="speed" data-testid="hud-speed">0</div><small>km/h</small></div><div id="spdbar"><i></i></div><div class="sc">Style <span id="score" data-testid="hud-score">0</span></div><div class="sc flipsc lowg-only">Flip bonus <span id="flipPts" data-testid="hud-flip-bonus">0</span></div><div class="sc cn" id="hudCoins"></div></div>
-    <div id="kbHint" class="kbd-only">W gas &middot; S brake &middot; A/D tilt &middot; Shift nitro<span class="lowg-only"> &middot; Z left flip &middot; C right flip</span> &middot; Esc pause</div>
+    <div id="kbHint" class="kbd-only">W gas &middot; S brake &middot; A/D tilt<span class="lowg-only">/flip</span> &middot; Shift nitro &middot; Esc pause</div>
   </div>
   <div id="controls" class="hidden">
-    <button class="ctl lowg-only" id="flipL" data-act="flipL" data-testid="touch-flip-left" aria-label="Left flip (backflip)"><span class="ic">&#8630;</span><small>LEFT FLIP</small></button>
-    <button class="ctl lowg-only" id="flipR" data-act="flipR" data-testid="touch-flip-right" aria-label="Right flip (frontflip)"><span class="ic">&#8631;</span><small>RIGHT FLIP</small></button>
     <button class="ctl" id="tiltUp" data-act="tiltUp" data-testid="touch-tilt-up" aria-label="Tilt left (nose up)"><span class="ic">&#9664;</span><small>TILT LEFT</small></button>
     <button class="ctl" id="tiltDown" data-act="tiltDown" data-testid="touch-tilt-down" aria-label="Tilt right (nose down)"><span class="ic">&#9654;</span><small>TILT RIGHT</small></button>
     <button class="ctl" id="brake" data-act="brake" data-testid="touch-brake" aria-label="Brake"><span class="ic">&#9632;</span><small>BRAKE</small></button>

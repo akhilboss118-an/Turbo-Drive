@@ -10,9 +10,9 @@ function readInput() {
   input.tiltUp = held.tiltUp.size > 0 || !!(keys.ArrowLeft || keys.KeyA);
   input.nitro = held.nitro.size > 0 || !!(keys.ShiftLeft || keys.ShiftRight || keys.KeyN || keys.KeyE);
   input.tiltDown = held.tiltDown.size > 0 || !!(keys.ArrowRight || keys.KeyD);
-  const lowg = !!LEVELS[level].gravity;   // flip buttons only exist on the low-gravity levels
-  input.flipL = lowg && (held.flipL.size > 0 || !!keys.KeyZ);
-  input.flipR = lowg && (held.flipR.size > 0 || !!keys.KeyC);
+  const lowg = !!LEVELS[level].gravity;   // in low-gravity levels, tilt buttons execute flips seamlessly
+  input.flipL = lowg && (held.tiltUp.size > 0 || (held.flipL && held.flipL.size > 0) || !!keys.KeyA || !!keys.ArrowLeft || !!keys.KeyZ);
+  input.flipR = lowg && (held.tiltDown.size > 0 || (held.flipR && held.flipR.size > 0) || !!keys.KeyD || !!keys.ArrowRight || !!keys.KeyC);
   for (const b of document.querySelectorAll('.ctl')) b.classList.toggle('on', held[b.dataset.act].size > 0 || (b.dataset.act === 'gas' && input.gas) || (b.dataset.act === 'brake' && input.brake));
 }
 for (const b of document.querySelectorAll('.ctl')) {
@@ -38,4 +38,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 window.addEventListener('blur', () => { clearInput(); if (state === 'playing') pause(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { clearInput(); if (state === 'playing') pause(); } });
-document.addEventListener('touchmove', (e) => { if (!(e.target.closest && e.target.closest('.lbList, #results .modal'))) e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', (e) => {
+  if (e.target.closest && e.target.closest('.lbList, #results .modal, .gPane, .gList, .gInfo, #cards, .modal')) return;
+  e.preventDefault();
+}, { passive: false });

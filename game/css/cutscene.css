@@ -25,9 +25,9 @@
 #resTrophy{display:inline-block;margin:6px 0 0;padding:5px 16px;border-radius:999px;background:linear-gradient(180deg,#fff2a8,#ffc83a 55%,#e0881a);color:#2a1200;font-weight:900;font-size:12px;letter-spacing:.14em;box-shadow:0 0 18px rgba(255,200,60,.7),inset 0 1px 0 #fff}
 #resTrophy.hidden{display:none}
 .chip.trophy{background:linear-gradient(180deg,#fff2a8,#ffc83a 55%,#e0881a);color:#2a1200;border-color:#ffe9a0;font-weight:900}
-#chasmBox{position:absolute;top:172px;left:50%;transform:translateX(-50%);min-width:190px;padding:5px 14px 7px;text-align:center;border-radius:10px;border:1px solid rgba(255,70,40,.6);background:rgba(30,6,6,.7);font-weight:900;font-size:clamp(11px,2.5vh,14px);letter-spacing:.06em;color:#ff9a7a;pointer-events:none}
+#chasmBox{position:relative;top:auto;left:auto;transform:none;min-width:180px;padding:4px 14px 6px;text-align:center;border-radius:999px;border:1px solid rgba(255,70,40,.6);background:rgba(30,6,6,.75);font-weight:900;font-size:clamp(10px,2.2vh,13px);letter-spacing:.06em;color:#ff9a7a;pointer-events:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.55)}
 #chasmBox.hidden{display:none}
 #chasmBox.warn{color:#ffd34d;border-color:#ffd34d}
-#chasmBox.danger{color:#fff;border-color:#ff3b2a;background:rgba(150,20,10,.75);animation:stormPulse .45s ease-in-out infinite alternate}
-#chasmBar{height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin-top:5px;overflow:hidden}
+#chasmBox.danger{color:#fff;border-color:#ff3b2a;background:rgba(150,20,10,.8);animation:stormPulse .45s ease-in-out infinite alternate}
+#chasmBar{height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin-top:4px;overflow:hidden}
 #chasmBar b{display:block;height:100%;width:calc(var(--g,0)*100%);background:linear-gradient(90deg,#ff3b2a,#ffd34d,#6dff8a)}

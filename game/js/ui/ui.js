@@ -171,7 +171,14 @@ function previewVehicle(id) {
 }
 function syncGarage() {
   const v = vehicleById(previewId), eq = previewId === vehicleId;
-  for (const b of $('gList').children) { b.classList.toggle('sel', b.dataset.id === previewId); b.classList.toggle('eq', b.dataset.id === vehicleId); }
+  for (const b of $('gList').children) {
+    const isSel = b.dataset.id === previewId;
+    b.classList.toggle('sel', isSel);
+    b.classList.toggle('eq', b.dataset.id === vehicleId);
+    if (isSel) {
+      try { b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch (x) {}
+    }
+  }
   $('gKind').textContent = v.kind; $('gName').textContent = v.name; $('gTag').textContent = v.tag;
   const own = owned.indexOf(v.id) >= 0, need = v.price - coins;
   renderPane();
@@ -190,13 +197,51 @@ function equip() {
   if (previewId !== vehicleId) { vehicleId = previewId; applyStats(vehicleId); save(); Snd.cp(); } refreshMenu(); setState('menu');
 }
 function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicle(vehicleId); setState('menu'); Snd.click(); }
-const on = (id, fn) => $(id).addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); });
+const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
 on('btnStBack', () => { setState('menu'); Snd.click(); });
 on('btnGarage', () => { setState('garage'); Snd.click(); });
 on('btnGarBack', leaveGarage);
+on('btnGarPrev', () => { cycleVehicle(-1); });
+on('btnGarNext', () => { cycleVehicle(1); });
 on('btnEquip', equip);
+let gTouchX0 = null;
+const stageEl = $('gStage');
+if (stageEl) {
+  stageEl.addEventListener('touchstart', (e) => { if (e.touches && e.touches[0]) gTouchX0 = e.touches[0].clientX; }, { passive: true });
+  stageEl.addEventListener('touchend', (e) => {
+    if (gTouchX0 === null || !e.changedTouches || !e.changedTouches[0]) return;
+    const dx = e.changedTouches[0].clientX - gTouchX0; gTouchX0 = null;
+    if (Math.abs(dx) > 35) cycleVehicle(dx > 0 ? -1 : 1);
+  }, { passive: true });
+}
+let gPaneTouchY = null;
+const paneEl = $('gPane');
+if (paneEl) {
+  paneEl.addEventListener('touchstart', (e) => { if (e.touches && e.touches[0]) gPaneTouchY = e.touches[0].clientY; }, { passive: true });
+  paneEl.addEventListener('touchmove', (e) => {
+    if (gPaneTouchY === null || !e.touches || !e.touches[0]) return;
+    const dy = gPaneTouchY - e.touches[0].clientY;
+    gPaneTouchY = e.touches[0].clientY;
+    paneEl.scrollTop += dy;
+  }, { passive: true });
+  paneEl.addEventListener('touchend', () => { gPaneTouchY = null; }, { passive: true });
+  paneEl.addEventListener('touchcancel', () => { gPaneTouchY = null; }, { passive: true });
+}
+let gListTouchX = null;
+const listEl = $('gList');
+if (listEl) {
+  listEl.addEventListener('touchstart', (e) => { if (e.touches && e.touches[0]) gListTouchX = e.touches[0].clientX; }, { passive: true });
+  listEl.addEventListener('touchmove', (e) => {
+    if (gListTouchX === null || !e.touches || !e.touches[0]) return;
+    const dx = gListTouchX - e.touches[0].clientX;
+    gListTouchX = e.touches[0].clientX;
+    listEl.scrollLeft += dx;
+  }, { passive: true });
+  listEl.addEventListener('touchend', () => { gListTouchX = null; }, { passive: true });
+  listEl.addEventListener('touchcancel', () => { gListTouchX = null; }, { passive: true });
+}
 on('btnLvBack', () => { setState('stages'); Snd.click(); });
 on('btnLvl2', () => { clearInput(); viewWorld = worldOf(level); setState('levels'); Snd.click(); });
 on('btnNext', () => { if (level < LEVELS.length - 1) { const nx = level + 1; if (hoverBlock(nx)) return; stageTravel(nx, () => { loadLevel(nx); save(); startRun(); }); } });
