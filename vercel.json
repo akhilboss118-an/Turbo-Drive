@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "turbo-drive",
+  "outputDirectory": "www",
   "cleanUrls": true,
   "headers": [
     {
