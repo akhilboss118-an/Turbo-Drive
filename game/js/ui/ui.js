@@ -350,6 +350,8 @@ function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicl
 const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
 on('btnLoop', () => { Snd.click(); loadLevel(26); startRun(); });
+on('btnStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });
+on('btnReplayStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
 on('btnStBack', () => { setState('menu'); Snd.click(); });
 on('btnGarage', () => { setState('garage'); Snd.click(); });

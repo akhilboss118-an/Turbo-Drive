@@ -35,12 +35,11 @@ const WORLDS = [
   { id: 'earth', name: 'Earth', first: 1, last: 8, blurb: 'Sunset Run to Lava Gauntlet' },
   { id: 'mars', name: 'Mars', first: 9, last: 16, blurb: 'Red dust, thin air, meteors and ice', gravity: '38%', req: 'Finish all 8 Earth levels to unlock', tags: ['Low gravity', 'Meteor storms', 'Freezing cold'], diff: 2 },
   { id: 'moon', name: 'Moon', first: 17, last: 20, blurb: 'Craters, spiral ramps and the final Moon Collapse', gravity: '17%', req: 'Finish all 8 Mars levels to unlock', tags: ['Moon gravity', 'Meteors', 'Lasers & doors', 'Level 20 needs the Hover'], diff: 3 },
-  { id: 'space', name: 'Deep Space', first: 21, last: 25, blurb: 'Zero-G flight to Jupiter, Saturn, Uranus and Neptune', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
+  { id: 'space', name: 'Deep Space', first: 21, last: 25, blurb: 'Zero-G flight to Jupiter, Saturn, Uranus, Neptune & Pluto', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
   { id: 'circuit', name: 'Loop Circuit', first: 26, last: 26, blurb: '5-Lap Grand Prix circuit with bridge crossing', gravity: '100%', req: '', tags: ['Closed circuit', '5 Laps', 'Oil slicks & mud', 'Boost pads'], diff: 2 },
 ];
 WORLDS[0].gravity = '100%'; WORLDS[0].req = ''; WORLDS[0].tags = ['Neon tracks', 'Lasers', 'Lava']; WORLDS[0].diff = 1;
 WORLDS.forEach((w) => { w.count = w.last - w.first + 1; });
-Object.defineProperty(WORLDS[3], 'count', { get() { return this.last - this.first + (LEVELS[this.last].secret && unlocked < this.last ? 0 : 1); } });
 const baseOf = (n) => (n === 26 ? 26 : (n >= 9 && n <= 12) || n >= 15 ? n : ((n - 1) % 8) + 1);
 const worldOf = (n) => (n === 26 ? 4 : n > 20 ? 3 : n > 16 ? 2 : n > 8 ? 1 : 0);
 const MARS_NAMES = ['DUST RUNNER', 'CRATER CANYON', 'SPACE ELEVATOR', 'OLYMPUS FINAL', 'VALLES SPIRAL', 'POLAR MEGA RAMP', 'RED OASIS CLIMB', 'MAGMA GAUNTLET'];
@@ -77,7 +76,7 @@ LEVELS[21] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 21  DEEP SPACE TO JUPI
 LEVELS[22] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 22  SPACE RINGS OF SATURN', base: 22, stars: [74, 98], planet: 'saturn', seed: 2202, sky: ['#01020a', '#04101e', '#0a2440', '#2a5a7a'], fog: 0x04101e, glow: [0x9dffea, 0xffd88a], card: ['#0a2440', '#ffd88a'] });
 LEVELS[23] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 23  ICE GIANT URANUS', base: 23, stars: [66, 90], planet: 'uranus', seed: 2303, sky: ['#01040a', '#042030', '#0a4a5a', '#3a8a9a'], fog: 0x042030, glow: [0x9ffff0, 0x7ad8ff], card: ['#0a4a5a', '#bff6f6'] });
 LEVELS[24] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 24  STORM WORLD NEPTUNE', base: 24, stars: [66, 90], planet: 'neptune', seed: 2404, finale2: true, sky: ['#010414', '#06103a', '#0e2a8a', '#2a5ae0'], fog: 0x06103a, glow: [0x4a78ff, 0xffffff], card: ['#0e2a8a', '#6a9aff'] });
-LEVELS[25] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 25  SECRET PLUTO', base: 25, stars: [70, 96], planet: 'pluto', seed: 2505, secret: true, finale2: true, sky: ['#05030a', '#1a0f1e', '#3a2236', '#8a6a64'], fog: 0x1a0f1e, glow: [0xffb27a, 0xb86aff], card: ['#3a2236', '#f4ead8'] });
+LEVELS[25] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 25  PLUTO FINALE', base: 25, stars: [70, 96], planet: 'pluto', seed: 2505, finale2: true, sky: ['#05030a', '#1a0f1e', '#3a2236', '#8a6a64'], fog: 0x1a0f1e, glow: [0xffb27a, 0xb86aff], card: ['#3a2236', '#f4ead8'] });
 LEVELS[26] = { name: 'LEVEL 26  INFINITE LOOP', stars: [300, 420], camera: 'chase', biome: 'circuit', loop: true, depth: 2.5, noTint: true, world: 4, base: 26,
   fog: 0xc07a82, sky: ['#0a1030', '#2c3a78', '#e0745e', '#ffd49a'], topA: 0x3a3e52, topB: 0x444860, postColor: 0x35304a, seed: 2121,
   island: [0x2a7a50, 0x358a5a, 0x1f6a4a], glow: [0xffe2b0, 0xff5a3a], hoops: [], hoopCoins: 0, card: ['#2c3a78', '#ffd49a'] };

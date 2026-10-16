@@ -1,9 +1,8 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v29';
+const CACHE = 'turbo-drive-v30';
 const FILES = [
  "game/assets/loading.jpg",
  "game/assets/logo.png",
- "game/assets/video/alien-attack.mp4",
  "game/js/game/plutoscene.js",
  "game/js/loop-track.js",
  "game/js/render/circuit.js",

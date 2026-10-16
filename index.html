@@ -61,10 +61,13 @@
       <button class="mbtn play" id="btnPlay" data-testid="menu-play-btn" aria-label="Play"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Play</b><small id="playSub">Level 1</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div class="mrow">
         <button class="mbtn" id="btnGarage" data-testid="menu-garage-btn" aria-label="Garage, choose your vehicle"><span class="ib"><svg class="ico "><use href="#i-car"/></svg></span><span class="lb"><b>Garage</b><small id="garSub">Police Car</small></span></button>
-        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
+        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Stage Select &middot; 25 Levels</small></span></button>
       </div>
       <button class="mbtn loop" id="btnLoop" data-testid="menu-loop-btn" aria-label="Loop Mode, 5-lap Grand Prix circuit"><span class="ib"><svg class="ico"><use href="#i-flag"/></svg></span><span class="lb"><b>Loop Mode</b><small>5-Lap Grand Prix &middot; Infinite Loop</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
-      <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel Race, race a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel Race</b><small>Race a friend online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
+      <div class="mrow">
+        <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel Race, race a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel Race</b><small>Race online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
+        <button class="mbtn intro" id="btnStory" data-testid="menu-story-btn" aria-label="Story Intro, watch Alien Attack cinematic"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Story Intro</b><small>Alien Attack</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
+      </div>
       <div id="menuLbSlot"></div>
     </div>
     <div id="topbar"><div id="authSlot"></div><button class="pill crateBtn" id="crateTotal" data-testid="menu-crates-btn" aria-label="Open space crates"></button><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
@@ -117,6 +120,7 @@
     <div class="row"><span>Sound</span><button class="btn" id="optSound" data-testid="settings-sound-btn">On</button></div>
     <div class="row"><span>Motion FX</span><button class="btn" id="optShake" data-testid="settings-shake-btn">On</button></div>
     <div class="row"><span>Graphics</span><button class="btn" id="optQuality" data-testid="settings-quality-btn">High</button></div>
+    <div class="row"><span>Story Intro</span><button class="btn" id="btnReplayStory" data-testid="settings-story-btn">Watch</button></div>
   </div>
   <div id="duelHome" class="hidden duelScr" data-testid="duel-home">
     <div class="dTop"><button class="rbtn" id="btnDuelBack" data-testid="duel-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Duel Race</h2></div>
