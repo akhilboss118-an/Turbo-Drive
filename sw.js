@@ -1,5 +1,5 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v26';
+const CACHE = 'turbo-drive-v27';
 const FILES = [
  "game/assets/loading.jpg",
  "game/assets/logo.png",
@@ -87,7 +87,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  if (e.request.method !== 'GET' || e.request.url.includes('/api/') || e.request.url.includes('/healthz')) return;
   e.respondWith(fetch(e.request).then((res) => {
     if (res && (res.ok || res.type === 'opaque')) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {}); }
     return res;
