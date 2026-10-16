@@ -8,6 +8,7 @@ dist/
 build/
 .vercel/
 *.apk
+*.zip
 
 # Android build outputs & local config
 android/.gradle/
