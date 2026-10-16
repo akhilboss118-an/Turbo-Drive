@@ -4,7 +4,7 @@
 const DUEL = { ws: null, role: '', pid: '', code: '', room: null, off: 0, bestRtt: 1e9, pingT: 0, result: null, oppFinish: null, ghost: null, samples: [], lastPos: 0, wantClose: false, reconnecting: false, rematchOn: false, modeJoin: false, lastLevelSent: 0, raceLaps: 1 };
 const DUEL_PROTO = 2;                            // v2 = lap-aware client (server refuses race mode with older clients)
 let duelRs = 0;
-const RACE_LEVELS = [1, 5, 7];                   // race-mode tracks (existing levels, different shapes)
+const RACE_LEVELS = [21, 1, 5, 7];                // race-mode tracks: Infinite Loop (5 laps) + three existing levels (3 laps)
 const DUEL_MAX_LEVEL = 19;                       // level 20 needs the Mars Hover
 const serverNow = () => Date.now() + DUEL.off;
 const dName = (n) => LEVELS[n].name.replace('  ', ' \u00B7 ');
@@ -147,7 +147,7 @@ function duelRenderLobby() {
   $('btnModeDuel').classList.toggle('on', !race); $('btnModeRace').classList.toggle('on', race);
   $('btnModeDuel').classList.toggle('off', !isHost); $('btnModeRace').classList.toggle('off', !isHost);
   $('lobModeLab').textContent = isHost ? 'Mode' : 'Mode picked by host';
-  $('lobLevelLab').textContent = race ? (isHost ? 'Pick race track (' + (RACE_LEVELS.indexOf(r.level) + 1) + '/' + RACE_LEVELS.length + ') \u00B7 first to finish 3 laps wins' : 'Race track picked by host') : isHost ? 'Pick level (unlocked: 1\u2013' + maxL + ')' : 'Level picked by host';
+  $('lobLevelLab').textContent = race ? (isHost ? 'Pick race track (' + (RACE_LEVELS.indexOf(r.level) + 1) + '/' + RACE_LEVELS.length + ') \u00B7 first to finish ' + (r.laps || 3) + ' laps wins' : 'Race track picked by host') : isHost ? 'Pick level (unlocked: 1\u2013' + maxL + ')' : 'Level picked by host';
   const btn = $('btnDuelReady'); btn.classList.toggle('off', !guest); btn.classList.toggle('on', !!(mine && mine.ready));
   btn.textContent = !guest ? 'Waiting for friend\u2026' : mine && mine.ready ? 'Ready \u2713 (tap to cancel)' : 'Ready';
   if (level === r.level) dmapDraw($('lobMap'), null, null);

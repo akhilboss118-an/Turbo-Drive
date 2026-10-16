@@ -12,7 +12,7 @@ function loadLevel(n) {
   spaceLeave(); const real = n; if (LEVELS[n].space) n = 1;
   level = n; const L = LEVELS[n]; levelGroup.position.set(0, 0, 0);
   for (const c of levelGroup.children.slice()) { levelGroup.remove(c); disposeGroup(c); }
-  track = Phys.buildTrack(baseOf(n)); if (L.sideCam) track.path = null; ground = Phys.makeGround(track); car.ground = ground; car.pads = track.boosts || null; car.g = L.gravity || Phys.G; CPS = track.checkpoints;
+  track = Phys.buildTrack(baseOf(n)); if (L.sideCam) track.path = null; ground = Phys.makeGround(track); car.ground = ground; car.pads = track.boosts || null; car.slow = track.slow || null; car.inSlow = -1; car.g = L.gravity || Phys.G; CPS = track.checkpoints;
   document.body.classList.toggle('lowg', !!L.gravity);
   setSky(L);
   levelGroup.add(trackGroup2());

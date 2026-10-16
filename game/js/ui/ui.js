@@ -165,7 +165,7 @@ function toggleUnlockAll() {
 }
 document.querySelectorAll('.uabtn').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); toggleUnlockAll(); }));
 syncUnlockAll();
-const worldOpen = (i) => WORLDS[i].first <= unlocked;
+const worldOpen = (i) => i === 4 || !WORLDS[i].req || WORLDS[i].first <= unlocked;
 const worldNext = (i) => { const W = WORLDS[i]; for (let n = W.first; n <= W.last; n++) if (!starsBy[n]) return n; return W.last; };
 function buildStages() {
   const box = $('worlds'); box.innerHTML = '';
@@ -201,7 +201,7 @@ function buildCards() {
   $('lvStars').innerHTML = svg('star', 'fill') + worldStars(viewWorld) + '/' + W.count * 3;
   let curIdx = 0;
   for (let n = W.first; n <= W.last; n++) {
-    const L = LEVELS[n], locked = n > unlocked, st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
+    const L = LEVELS[n], locked = (n !== 21 && n > unlocked), st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
     if (n === level && !locked) curIdx = idx;
     const c = document.createElement('button'); c.className = 'card' + (locked ? ' locked' : '') + (n === level ? ' cur' : ''); c.style.setProperty('--i', idx);
     c.setAttribute('data-testid', 'level-card-' + n); c.setAttribute('role', 'option'); c.setAttribute('aria-label', 'Level ' + ln + ' ' + name + (locked ? ', locked' : ', ' + st + ' of 3 stars'));
@@ -297,7 +297,7 @@ function hoverBlock(n) {
   toast('MARS HOVER REQUIRED', owned.indexOf('hover') < 0 ? 'Buy the Mars Hover in the Garage (2500 coins), then select it' : 'Open the Garage and SELECT the Mars Hover to start this level', 'warn'); Snd.click(); return true;
 }
 function pickLevel(n) {
-  if (n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
+  if (n !== 21 && n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
   if (hoverBlock(n)) return;
   stageTravel(n, () => { if (n !== level) loadLevel(n); save(); startRun(); });
 }
@@ -347,6 +347,7 @@ function equip() {
 function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicle(vehicleId); setState('menu'); Snd.click(); }
 const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
+on('btnLoop', () => { Snd.click(); loadLevel(21); startRun(); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
 on('btnStBack', () => { setState('menu'); Snd.click(); });
 on('btnGarage', () => { setState('garage'); Snd.click(); });

@@ -63,6 +63,7 @@
         <button class="mbtn" id="btnGarage" data-testid="menu-garage-btn" aria-label="Garage, choose your vehicle"><span class="ib"><svg class="ico "><use href="#i-car"/></svg></span><span class="lb"><b>Garage</b><small id="garSub">Police Car</small></span></button>
         <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
       </div>
+      <button class="mbtn loop" id="btnLoop" data-testid="menu-loop-btn" aria-label="Loop Mode, 5-lap Grand Prix circuit"><span class="ib"><svg class="ico"><use href="#i-flag"/></svg></span><span class="lb"><b>Loop Mode</b><small>5-Lap Grand Prix &middot; Infinite Loop</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel Race, race a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel Race</b><small>Race a friend online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div id="menuLbSlot"></div>
     </div>
@@ -132,7 +133,7 @@
     <div class="lobGrid">
       <div class="lobCol">
         <div class="codeBox panel"><div class="dLabel">Room code</div><div class="codeVal" id="lobCode" data-testid="lobby-room-code"></div><div class="dRow"><button class="dbtn sm" id="btnDuelCopy" data-testid="lobby-copy-btn">Copy</button><button class="dbtn sm" id="btnDuelShare" data-testid="lobby-share-btn">Share</button></div></div>
-        <div class="lvlSel panel modeSel"><div class="dLabel" id="lobModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnModeDuel" data-testid="lobby-mode-duel-btn">Duel</button><button class="dbtn sm" id="btnModeRace" data-testid="lobby-mode-race-btn">Race &middot; 3 Laps</button></div></div>
+        <div class="lvlSel panel modeSel"><div class="dLabel" id="lobModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnModeDuel" data-testid="lobby-mode-duel-btn">Duel</button><button class="dbtn sm" id="btnModeRace" data-testid="lobby-mode-race-btn">Race &middot; Laps</button></div></div>
         <div class="lvlSel panel"><div class="dLabel" id="lobLevelLab"></div><div class="nm"><button class="dbtn sm arr" id="lobPrev" data-testid="lobby-level-prev-btn" aria-label="Previous level">&#10094;</button><b id="lobLevelName" data-testid="lobby-level-name"></b><button class="dbtn sm arr" id="lobNext" data-testid="lobby-level-next-btn" aria-label="Next level">&#10095;</button></div></div>
       </div>
       <div class="lobCol">
@@ -227,10 +228,12 @@
 <script src="game/js/data/hover.js"></script>
 <script src="game/js/data/hover2.js"></script>
 <script src="game/js/data/crate.js"></script>
+<script src="game/js/loop-track.js"></script>
 <script src="game/js/physics.js"></script>
 <script src="game/js/core/storm.js"></script>
 <script src="game/js/core/config.js"></script>
 <script src="game/js/render/renderer.js"></script>
+<script src="game/js/render/circuit.js"></script>
 <script src="game/js/render/path.js"></script>
 <script src="game/js/render/track.js"></script>
 <script src="game/js/render/desert.js"></script>

@@ -39,7 +39,7 @@ function countUp(el, to, f, ms) {
   requestAnimationFrame(step);
 }
 function settle(n) { for (let i = 0; i < n; i++) car.step(DT, { gas: false }); car.events.length = 0; car.vx = car.vy = car.w = 0; }
-function resetGates() { resetHoops(); for (const h of hazards) h.warned = false; hzT = 0; for (const g of gates) { g.passed = false; g.mat.color.setHex(g === gates[gates.length - 1] ? 0xffffff : 0xff8a3d); } resetGateModels(); }
+function resetGates() { resetHoops(); if (typeof resetObstacles === 'function') resetObstacles(); for (const h of hazards) h.warned = false; hzT = 0; for (const g of gates) { g.passed = false; g.mat.color.setHex(g === gates[gates.length - 1] ? 0xffffff : 0xff8a3d); } resetGateModels(); }
 function applyStats(id) { car.setStats(Phys.statsFor(id, upgOf(id))); }
 function startRun(cd) {
   applyStats(vehicleId);
@@ -67,9 +67,12 @@ function onCrash(reason) {
   $('crashReason').textContent = reason.charAt(0).toUpperCase() + reason.slice(1); setState('crashed');
 }
 function nextLap() {
-  lap++; cpIndex = 0; duelRs++; resetGates();
+  lap++; cpIndex = 0; if (duelOn) duelRs++; resetGates();
   car.spawn(CPS[0].x, Math.max(7, Math.min(car.speed(), 30))); snapCamera();
-  toast(lap === duelLaps() ? 'FINAL LAP' : 'LAP ' + lap + '/' + duelLaps(), lap === duelLaps() ? 'Lap ' + lap + ' of ' + duelLaps() : null, 'good'); Snd.cp(); duelOnLap();
+  const totalLaps = duelOn ? duelLaps() : (LEVELS[level].loop ? 5 : 1);
+  toast(lap === totalLaps ? 'FINAL LAP' : 'LAP ' + lap + '/' + totalLaps, lap === totalLaps ? 'Lap ' + lap + ' of ' + totalLaps : null, 'good');
+  Snd.cp();
+  if (duelOn) duelOnLap();
 }
 function onFinish() {
   if (duelOn) duelOnFinish();
