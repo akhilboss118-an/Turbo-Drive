@@ -7,13 +7,14 @@ const Phys = (function () {
   const FLIP_W = 6.2, FLIP_ACC = 34, PAD_ACC = 18, AIR_TORQUE = 15, AIR_DAMP = 0.7, GROUND_ANG_DAMP = 2.2, W_MAX = 4.5, BAD_ANGLE = 1.25;
 
   /* ---------- Per-car stats & upgrades: plain multipliers on the constants above ---------- */
-  const NEUTRAL = { engine: 1, vmax: 1, nitroPow: 1, nitroCap: 1, inertia: 1, airTorque: 1, airDamp: 1, groundAngDamp: 1, wMax: 1, landDamp: 1, badAngle: BAD_ANGLE, landLoss: 0, landTol: 1, meteorGuard: 0, coldGuard: 0, coldBoost: 0 };
+  const NEUTRAL = { engine: 1, vmax: 1, nitroPow: 1, nitroCap: 1, inertia: 1, airTorque: 1, airDamp: 1, groundAngDamp: 1, wMax: 1, landDamp: 1, badAngle: BAD_ANGLE, landLoss: 0, landTol: 1, meteorGuard: 0, coldGuard: 0, coldBoost: 0, gScale: 1, fuelRegen: 0 };
   const CAR_STATS = {
-    gt: { },                                    // Red Bug: the plain, normal car
-    night: { engine: 1.14, vmax: 1.1, inertia: 0.85, airTorque: 1.1, groundAngDamp: 0.75, landDamp: 0.9, badAngle: 1.15, landTol: 0.9 },   // Police Car: fast
-    van: { engine: 0.98, vmax: 0.98, inertia: 1.15, airTorque: 0.9, groundAngDamp: 1.1, landDamp: 1.05, badAngle: 1.3, nitroCap: 1.7, nitroPow: 1.3 },   // Ambulance: faster, bigger nitro
-    hover: { engine: 1.1, vmax: 1.08, nitroCap: 1.8, nitroPow: 1.3, inertia: 0.9, airTorque: 1.25, groundAngDamp: 1.2, landDamp: 1.3, badAngle: 1.45, landTol: 1.25, meteorGuard: 0.65, coldGuard: 0.85, coldBoost: 0.5 },   // Mars Hover: meteor runner (shield cuts meteor slowdown by 65%) and cold runner (keeps control on Mars ice, spools up faster, freezes slower)
-    jeep: { engine: 1.08, vmax: 1.05, nitroPow: 1.12, nitroCap: 1.3, inertia: 1.2, airTorque: 1.12, groundAngDamp: 1.35, landDamp: 1.25, badAngle: 1.4, landTol: 1.2 },   // Jeep: a bit of everything
+    gt: { },                                    // Red Bug (NORMAL): the plain, balanced car
+    night: { engine: 1.3, vmax: 1.1, inertia: 0.85, airTorque: 1.1, groundAngDamp: 0.75, landDamp: 0.9, badAngle: 1.15, landTol: 0.9 },   // Police Car (FAMOUS): siren + much faster acceleration
+    van: { engine: 0.98, vmax: 0.98, inertia: 1.15, airTorque: 0.9, groundAngDamp: 1.1, landDamp: 1.05, badAngle: 1.3, nitroCap: 1.7, nitroPow: 1.3, fuelRegen: 0.08, meteorGuard: 0.3, coldGuard: 0.3 },   // Ambulance (FAMOUS): boost-heal - nitro tank refills while driving and boosting, and it shrugs off meteor / frost damage
+    hover: { engine: 1.1, vmax: 1.08, nitroCap: 1.8, nitroPow: 1.3, inertia: 0.9, airTorque: 1.25, groundAngDamp: 1.2, landDamp: 1.3, badAngle: 1.45, landTol: 1.25, meteorGuard: 0.65, coldGuard: 0.85, coldBoost: 0.5 },   // Mars Hover (LEGENDARY): meteor runner (shield cuts meteor slowdown by 65%) and cold runner
+    hover2: { engine: 1.2, vmax: 1.14, nitroCap: 1.6, nitroPow: 1.5, inertia: 0.9, airTorque: 1.3, groundAngDamp: 1.2, landDamp: 1.4, badAngle: 1.5, landTol: 1.4, gScale: 0.78, fuelRegen: 0.03, meteorGuard: 0.2 },   // Aero Hover (LEGENDARY): floats (22% less gravity = long glides), huge speed boost, soft landings
+    jeep: { engine: 1.08, vmax: 1.05, nitroPow: 1.12, nitroCap: 1.3, inertia: 1.2, airTorque: 1.12, groundAngDamp: 1.35, landDamp: 1.35, badAngle: 1.55, landTol: 1.45, landLoss: 0, meteorGuard: 0.25, coldGuard: 0.25 },   // Jeep (FAMOUS): off-road grip + durability - lands almost anything, and takes less meteor / frost damage
   };
   const UPGRADES = [
     { id: 'engine', name: 'Engine', desc: 'Acceleration and top speed', costs: [150, 300, 500, 800, 1200] },
@@ -68,6 +69,7 @@ const Phys = (function () {
     if (level === 18) return buildLevel18(P, add);
     if (level === 19) return buildLevel19(P, add);
     if (level === 20) return buildLevel20(P, add);
+    if (level === 21) return buildLevel21(P, add);
     add('flat', 0, 90, ease.flat(0), 0, 0);
     add('kicker', 90, 108, ease.kicker(0, 2.4, 90, 108), 0, 2.4);               // jump 1
     add('drop', 126, 152, ease.drop(0.8, 0, 126, 152), 0.8, 0);
@@ -459,6 +461,32 @@ const Phys = (function () {
     add('flat', 2290, 2600, ease.flat(0), 0, 0);
     return { pieces: P, finishX: 2540, checkpoints: [{ x: 8 }, { x: 290 }, { x: 990 }, { x: 1470 }, { x: 1950 }], length: 2600, boosts: [{ x0: 280, x1: 288 }, { x0: 740, x1: 748 }, { x0: 855, x1: 863 }, { x0: 980, x1: 988 }, { x0: 1940, x1: 1948 }] };
   }
+  function buildLevel21(P, add) {   // SPACE ORBIT (race track, Moon gravity 17%): crater, jump, rolling hills, a spiral tower climb, a tower launch, a long descent, a crater and a final ramp (proven pieces of levels 18/19)
+    add('flat', 0, 100, ease.flat(0), 0, 0);
+    add('crater', 100, 190, ease.crater(3.0, 100, 190), 0, 0);
+    add('flat', 190, 230, ease.flat(0), 0, 0);
+    add('kicker', 230, 254, ease.kicker(0, 3.5, 230, 254), 0, 3.5);              // jump 1 (gap 254-364)
+    add('slope', 364, 420, ease.slope(2.6, 0, 364, 420), 2.6, 0);
+    add('flat', 420, 520, ease.flat(0), 0, 0);                                  // cp1 ~470
+    add('hills', 520, 600, ease.hills(0, 1.2, 40, 520), 0, 0);
+    add('flat', 600, 640, ease.flat(0), 0, 0);
+    add('slope', 640, 730, ease.slope(0, 9, 640, 730), 0, 9);                   // SPIRAL TOWER: three coils, a terrace after each
+    add('flat', 730, 755, ease.flat(9), 9, 9);
+    add('slope', 755, 845, ease.slope(9, 18, 755, 845), 9, 18);
+    add('flat', 845, 870, ease.flat(18), 18, 18);
+    add('slope', 870, 960, ease.slope(18, 27, 870, 960), 18, 27);
+    add('flat', 960, 1020, ease.flat(27), 27, 27);                              // cp2 ~990, tower top
+    add('kicker', 1020, 1052, ease.kicker(27, 31, 1020, 1052), 27, 31);          // launch off the tower
+    add('drop', 1150, 1330, ease.drop(29, 4, 1150, 1330), 29, 4);               // long landing ramp
+    add('slope', 1330, 1420, ease.slope(4, 0, 1330, 1420), 4, 0);
+    add('flat', 1420, 1520, ease.flat(0), 0, 0);                                // cp3 ~1470
+    add('crater', 1520, 1640, ease.crater(3.2, 1520, 1640), 0, 0);
+    add('flat', 1640, 1700, ease.flat(0), 0, 0);
+    add('kicker', 1700, 1726, ease.kicker(0, 4.2, 1700, 1726), 0, 4.2);          // final ramp (gap 1726-1850)
+    add('slope', 1850, 1950, ease.slope(3.4, 0, 1850, 1950), 3.4, 0);
+    add('flat', 1950, 2050, ease.flat(0), 0, 0);
+    return { pieces: P, finishX: 2000, checkpoints: [{ x: 8 }, { x: 470 }, { x: 990 }, { x: 1470 }], length: 2050, boosts: [{ x0: 460, x1: 468 }, { x0: 740, x1: 748 }, { x0: 855, x1: 863 }, { x0: 980, x1: 988 }, { x0: 1460, x1: 1468 }] };
+  }
   function buildLevel20(P, add) {   // MOON COLLAPSE (Moon gravity 17% + heavy meteor storm, hardest): the Moon is breaking apart; two spiral towers, chained ramps, craters and a final giant launch to the Hover pad
     add('flat', 0, 90, ease.flat(0), 0, 0);
     add('crater', 90, 180, ease.crater(3.0, 90, 180), 0, 0);
@@ -585,7 +613,7 @@ const Phys = (function () {
       const P = this.p, cold = this.coldK * (1 - P.coldGuard), vmax = VMAX * P.vmax * (1 + 0.15 * P.coldBoost * this.coldK), eOn = !this.engineOff;
       this.tw += dt;
       const eMul = (1 + P.coldBoost * this.coldK) * (1 - 0.3 * cold * (0.55 + 0.45 * Math.sin(this.tw * 2.1)));   // Mars cold: the engine stutters, Hover spools up faster
-      let Fx = 0, Fy = -this.g, tau = 0, flip = 0, groundedNow = false, impact = 0, relAngle = 0;
+      let Fx = 0, Fy = -this.g * P.gScale, tau = 0, flip = 0, groundedNow = false, impact = 0, relAngle = 0;
       const cth = Math.cos(this.th), sth = Math.sin(this.th);
       const wheels = [-HALF_BASE, HALF_BASE];
       for (let i = 0; i < 2; i++) {

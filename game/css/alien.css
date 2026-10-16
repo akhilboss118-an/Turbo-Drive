@@ -1,0 +1,22 @@
+#alienBanner{position:absolute;left:0;right:0;top:20vh;text-align:center;pointer-events:none;z-index:40;display:flex;flex-direction:column;align-items:center;gap:6px}
+#alienBanner.hidden{display:none}
+#alienBanner .abMain{font-family:'Big Shoulders Display',sans-serif;font-weight:900;letter-spacing:.06em;font-size:clamp(26px,5vw,56px);color:#7dff6a;text-shadow:0 0 14px #2eff5a,0 0 40px #19c43c,0 3px 0 #04210c}
+#alienBanner .abSub{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:clamp(12px,1.6vw,18px);color:#e9ffe4;text-shadow:0 2px 6px #000;letter-spacing:.04em}
+#alienBanner.warn .abMain{font-size:clamp(20px,3.4vw,38px)}
+#alienBanner.caught .abMain{color:#8dff72;font-size:clamp(34px,7vw,84px)}
+#alienBanner.pop{animation:alienPop .45s cubic-bezier(.2,1.4,.4,1)}
+#alienBanner.caught .abMain{animation:alienFlicker 1s steps(2,end) infinite}
+@keyframes alienPop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes alienFlicker{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+#crashMenu h2{color:#7dff6a;text-shadow:0 0 14px #2eff5a,0 0 36px #19c43c;font-size:clamp(26px,5vw,48px);letter-spacing:.05em;animation:alienFlicker 1s steps(2,end) infinite}
+#crashMenu #crashReason{color:#e9ffe4}
+#alienBanner.warn{top:auto;bottom:16vh}
+#alienRadar{position:absolute;left:12px;top:96px;display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:rgba(10,8,34,.62);border:1px solid rgba(125,255,106,.45);pointer-events:none;z-index:30;backdrop-filter:blur(6px)}
+#alienRadar.hidden{display:none}
+#alienRadar .arLab{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em;color:#7dff6a}
+#alienRadar .arBar{width:84px;height:8px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden}
+#alienRadar .arBar i{display:block;height:100%;width:8%;border-radius:6px;transition:width .2s linear}
+#alienRadar b{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11px;color:#e9ffe4;min-width:34px;text-align:right}
+#alienRadar.danger{border-color:#ff4a4a;animation:radarPulse .6s ease-in-out infinite alternate}
+#alienRadar.danger .arLab{color:#ff6a6a}
+@keyframes radarPulse{from{box-shadow:0 0 0 rgba(255,60,60,0)}to{box-shadow:0 0 14px rgba(255,60,60,.8)}}

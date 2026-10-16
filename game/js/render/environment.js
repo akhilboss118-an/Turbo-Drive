@@ -49,12 +49,13 @@ function windowTexture(cols) {
 const tintC = (hexv, k) => new THREE.Color(hexv).multiplyScalar(k);
 
 function buildEnvironment(L) {
-  envGroup = new THREE.Group(); levelGroup.add(envGroup); auroraMats.length = 0;
+  envGroup = new THREE.Group(); levelGroup.add(envGroup); auroraMats.length = 0; issPivot = null; issBody = null;
   const E = ENV[level], low = settings.quality === 'low', len = track.length;
   seed = L.seed + 100; envT = 0;
   const gAt = (x) => { const v = ground(x); return v === null ? 0 : v; };
 
   skyFollow = new THREE.Group(); envGroup.add(skyFollow);
+  if (ISS_LEVELS.includes(level)) addIssLandmark(skyFollow, new THREE.Vector3(430, 40, -190), new THREE.Vector3(0.9, 0.35, -0.39));
   if (E.sun) {
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(E.sun.concat(['rgba(0,0,0,0)'])), fog: false, depthWrite: false, transparent: true }));
     sp.scale.set(E.sunSize, E.sunSize, 1); sp.position.set(E.sunPos[0], E.sunPos[1], E.sunPos[2]); skyFollow.add(sp);
@@ -144,7 +145,7 @@ function buildEnvironment(L) {
 
 function envUpdate() {
   if (!envGroup) return;
-  envT += 1 / 60;
+  envT += 1 / 60; issUpdate(1 / 60);
   skyFollow.position.set(camera.position.x, camera.position.y * 0.5 - levelGroup.position.y, track.path ? camera.position.z : 0);
   motes.material.opacity = 0.55 + 0.3 * Math.sin(envT * 2.1);
   motes.position.y = Math.sin(envT * 0.6) * 1.2;

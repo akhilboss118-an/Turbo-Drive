@@ -34,3 +34,5 @@
 #warp #warpName{font-weight:900;font-style:italic;font-size:clamp(30px,10vh,76px);letter-spacing:.08em;text-shadow:3px 3px 0 rgba(255,138,61,.85),0 0 30px rgba(255,255,255,.3)}
 #warp[data-to="moon"] #warpName{text-shadow:3px 3px 0 rgba(120,140,220,.9),0 0 30px rgba(200,215,255,.4)}
 @media (prefers-reduced-motion:reduce){#warp{display:none !important}}
+#warp[data-to="space"]{background:radial-gradient(ellipse at 50% 120%,#2a1a6a,#01020a 70%)}
+#warp[data-to="space"] #warpName{text-shadow:3px 3px 0 rgba(53,230,255,.85),0 0 30px rgba(157,255,234,.45)}

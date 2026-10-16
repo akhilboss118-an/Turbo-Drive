@@ -8,7 +8,7 @@ const Snd = (function () {
   const MUSIC = ['menu_theme', 'race_theme'];
   const VOL = { music: 0.45, amb: 0.35 };
   const buf = {}, last = {};
-  let ctx = null, master, sfxBus, musBus, eng, filt, eg, idleG, revG, idleS, revS;
+  let sir = null, ctx = null, master, sfxBus, musBus, eng, filt, eg, idleG, revG, idleS, revS;
   let scene = '', duck = 1, layers = {};
   function load(name, dir) {
     return fetch(BASE + dir + '/' + name + '.mp3').then((r) => { if (!r.ok || /html/.test(r.headers.get('content-type') || '')) throw 0; return r.arrayBuffer(); })
@@ -67,8 +67,24 @@ const Snd = (function () {
     setLayer('menu_theme', race ? 0 : VOL.music); setLayer('race_theme', race ? VOL.music : 0);
     setLayer('space_ambience', race ? (space ? VOL.amb : 0) : VOL.amb * 0.6); setLayer('scifi_hum', space ? VOL.amb * 0.5 : 0);
   }
+  let hum = null;
+  function alienHum(vol, k) {
+    if (!ctx || !settings.sound) vol = 0;
+    if (vol > 0 && !hum) {
+      const g = ctx.createGain(), o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), l = ctx.createOscillator(), lg = ctx.createGain(), l2 = ctx.createOscillator(), lg2 = ctx.createGain(), f = ctx.createBiquadFilter();
+      g.gain.value = 0; o1.type = 'sine'; o2.type = 'triangle'; o1.frequency.value = 130; o2.frequency.value = 134;
+      l.frequency.value = 5.5; lg.gain.value = 0.35; l.connect(lg); lg.connect(g.gain);
+      l2.frequency.value = 0.4; lg2.gain.value = 14; l2.connect(lg2); lg2.connect(o1.frequency); lg2.connect(o2.frequency);
+      f.type = 'lowpass'; f.frequency.value = 900; o1.connect(f); o2.connect(f); f.connect(g); g.connect(sfxBus);
+      o1.start(); o2.start(); l.start(); l2.start(); hum = { g, o1, o2, l, l2 };
+    }
+    if (!hum) return; const t = ctx.currentTime;
+    hum.g.gain.setTargetAtTime(vol, t, 0.2); hum.o1.frequency.setTargetAtTime(130 + 70 * (k || 0), t, 0.3); hum.o2.frequency.setTargetAtTime(134 + 72 * (k || 0), t, 0.3);
+    if (vol === 0 && hum.g.gain.value < 0.002) { try { hum.o1.stop(); hum.o2.stop(); hum.l.stop(); hum.l2.stop(); } catch (e) {} hum = null; }
+  }
   return {
-    init, tone, noise, loaded: () => Object.keys(buf),
+    init, tone, noise, alienHum,
+    zap() { if (!ctx || !settings.sound) return; this.tone(1400, 0.55, 'sawtooth', 0.22, 0.04); this.tone(90, 0.7, 'square', 0.18, 2.4); this.noise(0.5, 0.45, 5000); setTimeout(() => this.tone(300, 0.4, 'triangle', 0.16, 3), 120); }, loaded: () => Object.keys(buf),
     scene(s) { if (!ctx) { scene = s; return; } setScene(s); },
     engine(speed, gas, on) {
       if (!ctx) return; const t = ctx.currentTime, live = on && settings.sound;
@@ -96,6 +112,11 @@ const Snd = (function () {
     flip(f) { if (!play('flip', 0.6, 1 + Math.min(f, 5) * 0.06)) this.tone(600 + f * 150, 0.12, 'triangle', 0.15); },
     screech() { play('tire_screech', 0.45, 1, 1.4); },
     whoosh() { play('whoosh', 0.6, 1, 0.4); },
+    siren(on) {
+      if (!ctx || !settings.sound) on = false;
+      if (on && !sir) { const o = ctx.createOscillator(), g = ctx.createGain(), l = ctx.createOscillator(), lg = ctx.createGain(), f = ctx.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.value = 850; l.type = 'triangle'; l.frequency.value = 1.1; lg.gain.value = 320; f.type = 'lowpass'; f.frequency.value = 2200; g.gain.value = 0; l.connect(lg); lg.connect(o.frequency); o.connect(f); f.connect(g); g.connect(sfxBus); o.start(); l.start(); sir = { g, o, l }; }
+      if (sir) { sir.g.gain.setTargetAtTime(on ? 0.05 : 0, ctx.currentTime, 0.08); if (!on && sir.g.gain.value < 0.002) { try { sir.o.stop(); sir.l.stop(); } catch (e) {} sir = null; } }
+    },
   };
 })();
 // browsers only allow audio after a user gesture

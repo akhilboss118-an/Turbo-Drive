@@ -2,8 +2,8 @@
 'use strict';
 /* Coins, nitro, smoke, flames and screen effects */
 /* ================= coins, nitro & juice ================= */
-const LV_MULT = [0, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 13, 14, 15, 16, 17], STAR_COINS = [0, 20, 50, 100];
-let run = { stars: 0, style: 0, flips: 0, flipPts: 0 }, combo = 0, liveFlips = 0, fuel = 1, boostAmt = 0, wasBoost = false, squash = 0, kick = 0;
+const LV_MULT = [0, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 13, 14, 15, 16, 17, 18, 20], STAR_COINS = [0, 20, 50, 100];
+let run = { stars: 0, style: 0, flips: 0, flipPts: 0, crates: 0 }, combo = 0, liveFlips = 0, fuel = 1, boostAmt = 0, wasBoost = false, squash = 0, kick = 0;
 /* Haptics: native app (WebView) -> expo-haptics via postMessage; browsers -> navigator.vibrate */
 const VIBE_PAT = { light: 15, medium: 35, heavy: [70, 40, 110], nitro: [25, 20, 45] };
 const vibe = (ms, kind) => {
@@ -17,10 +17,11 @@ const vibe = (ms, kind) => {
 function refreshCoins() {
   const h = svg('coin', 'coin') + '<span>' + coins + '</span>';
   $('coinTotal').innerHTML = h; $('garCoins').innerHTML = h; $('hudCoins').innerHTML = svg('coin', 'coin') + coins;
+  const ct = $('crateTotal'); if (ct) ct.innerHTML = svg('crate', 'coin') + '<span>' + crates + '</span>'; const oc = $('btnOpenCrate'); if (oc) oc.classList.toggle('hidden', crates < 1);
 }
 function pop(html, cls, ms) { const el = document.createElement('div'); el.className = 'pp ' + cls; el.innerHTML = html; $('pops').appendChild(el); setTimeout(() => el.remove(), ms || 1000); }
 function addCoins(n, why) {
-  n = Math.round(n); if (n <= 0) return; coins += n; run[why] += n; save(); refreshCoins();
+  n = Math.round(n); if (n <= 0 || duelOn) return; coins += n; run[why] += n; save(); refreshCoins();
   pop(svg('coin', 'coin') + '+' + n, 'cn', 1000); Snd.coin(combo);
 }
 function setCombo(n) { const el = $('combo'); combo = n; if (n < 2) { el.classList.add('hidden'); return; } el.textContent = 'COMBO \u00D7' + n; el.classList.remove('hidden', 'pop'); void el.offsetWidth; el.classList.add('pop'); }
@@ -57,7 +58,7 @@ for (let i = 0; i < 4; i++) { const m = new THREE.Mesh(ringGeo, new THREE.MeshBa
 let ringI = 0;
 const _qFlat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
 function ring(x, y, hexc, size) { const r = rings[ringI++ % rings.length]; if (track.path) { toWorld(x, y + 0.08, 0, r.m.position, y); frameQuat(x, r.m.quaternion).multiply(_qFlat); } else { r.m.position.set(x, y + 0.08, 0); r.m.rotation.set(-Math.PI / 2, 0, 0); } r.m.material.color.setHex(hexc); r.t = 0; r.size = size; r.m.visible = true; }
-const TAIL = { car: -2.3, van: -1.85, jeep: -2.0, car5: -1.95, hover: -2.4 };
+const TAIL = { car: -2.3, van: -1.85, jeep: -2.0, car5: -1.95, hover: -2.4, hover2: -2.4 };
 function landFx(e) {
   const gh = ground(car.x) || 0, hard = e.quality === 'HARD LANDING', big = Math.min(1, e.impact / 16);
   ring(car.x, gh, hard ? 0xff8a3d : e.quality === 'PERFECT LANDING' ? 0xffe066 : 0x35e6ff, 2.5 + big * 4);
@@ -73,7 +74,9 @@ function fxUpdate(dt) {
   const live = state === 'playing' || state === 'finishing', mfx = settings.shake ? 1 : 0;
   // nitro fuel + button
   const wantN = live && state === 'playing' && input.nitro && fuel > 0.02;
-  if (wantN) fuel = Math.max(0, fuel - 0.42 * dt / car.p.nitroCap); else if (state === 'playing') fuel = Math.min(1, fuel + 0.05 * dt * (car.grounded ? 1 : 0.5));
+  const rg = car.p.fuelRegen || 0;
+  if (wantN) fuel = Math.min(1, Math.max(0, fuel - 0.42 * dt / car.p.nitroCap + rg * dt)); else if (state === 'playing') fuel = Math.min(1, fuel + (0.05 + rg) * dt * (car.grounded ? 1 : 0.5));
+  { const vm = vehicleById(vehicleId), pl = carMesh.siren; if (pl && pl.visible) { const t = Math.floor(performance.now() / 160) % 2, L = pl.userData.l; L[0].material.color.setHex(t ? 0xff3030 : 0x3a0808); L[1].material.color.setHex(t ? 0x0a1a48 : 0x3a8aff); } Snd.siren(vm.model === 'car' && wantN); }
   input.nitro = wantN;
   if (wantN && !wasBoost) { shake = Math.max(shake, 0.4); Snd.nitro(); vibe(25, 'nitro'); }
   wasBoost = wantN; boostAmt += ((wantN ? 1 : 0) - boostAmt) * (1 - Math.exp(-dt * 7));
@@ -88,7 +91,7 @@ function fxUpdate(dt) {
     if (burn && input.brake) Snd.screech();
     if (burn && Math.random() < dt * 70) { const p = car.local(-1.28, -0.3), z = Math.random() < 0.5 ? -0.7 : 0.7; smoke.emit(p[0], p[1], z, -car.vx * 0.2 - 1, 0.8 + Math.random(), (Math.random() - 0.5) * 1.5, 0.9, 0.7, 2.6, 0.5, [0.9, 0.9, 0.95]); }
   }
-  if (wantN) for (let i = 0; i < 2; i++) { const p = car.local(TAIL[vehicleById(vehicleId).model] || -2.2, 0.15), c = Math.random() < 0.5 ? [1, 0.62, 0.2] : [0.45, 0.9, 1]; flame.emit(p[0], p[1], (Math.random() - 0.5) * 0.6, car.vx - Math.cos(car.th) * 16, car.vy - Math.sin(car.th) * 16 + (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 1.5, 0.3, 0.9, 0.15, 0.9, c); }
+  if (wantN) for (let i = 0; i < 2; i++) { const p = car.local(TAIL[vehicleById(vehicleId).model] || -2.2, 0.15), c = vehicleById(vehicleId).goldTrail ? (Math.random() < 0.5 ? [1, 0.8, 0.2] : [1, 0.95, 0.6]) : Math.random() < 0.5 ? [1, 0.62, 0.2] : [0.45, 0.9, 1]; flame.emit(p[0], p[1], (Math.random() - 0.5) * 0.6, car.vx - Math.cos(car.th) * 16, car.vy - Math.sin(car.th) * 16 + (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 1.5, 0.3, 0.9, 0.15, 0.9, c); }
   smoke.update(dt); flame.update(dt);
   for (const r of rings) if (r.t < 1) { r.t += dt * 2.2; const s = r.size * (0.2 + r.t); r.m.scale.set(s, s, s); r.m.material.opacity = Math.max(0, 0.9 * (1 - r.t)); if (r.t >= 1) r.m.visible = false; }
   squash *= Math.exp(-dt * 7); kick *= Math.exp(-dt * 8);

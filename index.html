@@ -21,9 +21,18 @@
 <link rel="stylesheet" href="game/css/cutscene.css">
 <link rel="stylesheet" href="game/css/warp.css">
 <link rel="stylesheet" href="game/css/intro.css">
+<link rel="stylesheet" href="game/css/duel.css">
+<link rel="stylesheet" href="game/css/premium.css">
+<link rel="stylesheet" href="game/css/rarity.css">
+<link rel="stylesheet" href="game/css/account.css">
+<link rel="stylesheet" href="game/css/crates.css">
+<link rel="stylesheet" href="game/css/space.css">
+<link rel="stylesheet" href="game/css/tutorial.css">
+<link rel="stylesheet" href="game/css/levelcards.css">
+<link rel="stylesheet" href="game/css/alien.css">
 </head>
 <body>
-<div id="stage"></div><canvas id="speedfx"></canvas><div id="vig"></div><div id="grain"></div>
+<div id="stage"></div><canvas id="speedfx"></canvas><div id="vig"></div><div id="grain"></div><div id="cine"></div><div id="impact"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.6v14.8a1 1 0 0 0 1.5.86l12-7.4a1 1 0 0 0 0-1.72l-12-7.4A1 1 0 0 0 7 4.6z"/></symbol>
 <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
@@ -38,26 +47,51 @@
 <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
 <symbol id="i-time" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></symbol>
 <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+<symbol id="i-duel" viewBox="0 0 24 24"><path d="M5 20V4"/><path d="M5 4h10l-2 3.5L15 11H5"/><path d="M19 20V9"/><path d="M19 9h-3"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+<symbol id="i-crate" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z" fill="#c98a1a" stroke="#ffe08a"/><path d="M3 8l9 5 9-5M12 13v8" stroke="#ffe08a"/></symbol>
 <symbol id="i-phone" viewBox="0 0 24 24"><rect width="12" height="20" x="6" y="2" rx="2"/><path d="M11 18h2"/></symbol>
 </defs></svg>
 <div id="ui">
   <div id="menu" class="hidden">
-    <div class="kicker" id="kicker"><span></span>Season 01 &middot; Sky Circuit</div>
+    <div class="kicker" id="kicker"><span></span>Season 01 &middot; Sky Circuit &middot; Deep Space</div>
     <h1 class="title">TURBO<br>DRIVE</h1>
     <p class="tag">Floor it. Jump the gaps. Land it flat.</p>
     <div class="mstack">
       <button class="mbtn play" id="btnPlay" data-testid="menu-play-btn" aria-label="Play"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Play</b><small id="playSub">Level 1</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div class="mrow">
         <button class="mbtn" id="btnGarage" data-testid="menu-garage-btn" aria-label="Garage, choose your vehicle"><span class="ib"><svg class="ico "><use href="#i-car"/></svg></span><span class="lb"><b>Garage</b><small id="garSub">Police Car</small></span></button>
-        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars and Moon"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
+        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
       </div>
+      <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel Race, race a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel Race</b><small>Race a friend online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div id="menuLbSlot"></div>
     </div>
-    <div id="topbar"><div id="authSlot"></div><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
-    <div class="hint"><span class="kbd-only">Up / W / Space = gas &middot; A / D = tilt left / right &middot; Shift = nitro.</span><span class="touch-only">Hold GAS. In the air, use the left / right tilt buttons so your wheels meet the road.</span></div>
+    <div id="topbar"><div id="authSlot"></div><button class="pill crateBtn" id="crateTotal" data-testid="menu-crates-btn" aria-label="Open space crates"></button><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
+    <div class="hint"><span class="kbd-only">Up / W / Space = gas &middot; A / D = tilt left / right (steer in space) &middot; Shift = nitro.</span><span class="touch-only">Hold GAS. In the air, use the left / right tilt buttons so your wheels meet the road.</span></div>
   </div>
-  <div id="stages" class="hidden"><div class="stitle"><button class="rbtn" id="btnStBack" data-testid="stages-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Select Stage</h2><div class="pill" id="stStars"></div></div><div id="worlds" data-testid="stage-cards"></div></div>
-  <div id="levels" class="hidden"><div class="stitle"><button class="rbtn" id="btnLvBack" data-testid="levels-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2 id="lvTitle">Select Level</h2><span id="lvBlurb"></span><div class="pill" id="lvStars"></div></div><div id="cards" data-testid="level-cards"></div></div>
+  <div id="login" class="hidden" data-testid="login-screen">
+    <div class="lgCard">
+      <div class="kicker"><span></span>Welcome, driver</div>
+      <h1 class="title">TURBO<br>DRIVE</h1>
+      <p class="tag">Sign in to save your cars and progress.</p>
+      <button class="lgBtn google" id="btnLgGoogle" data-testid="login-google-btn" aria-label="Continue with Google"><i id="lgGoogleIc"></i><span>Continue with Google</span></button>
+      <div class="lgOr"><i></i><span>or</span><i></i></div>
+      <button class="lgBtn guest" id="btnLgGuest" data-testid="login-guest-btn" aria-label="Play as guest"><svg class="ico"><use href="#i-user"/></svg><span>Play as Guest</span></button>
+      <p class="lgFine">Guest progress is saved on this device only.</p>
+      <p class="lgErr" id="lgErr" data-testid="login-error" role="alert"></p>
+      <p class="lgMode" id="lgMode" data-testid="login-demo-note">Demo mode: Firebase is not connected yet, sign-in is simulated.</p>
+    </div>
+  </div>
+  <div id="profile" class="hidden" data-testid="profile-modal"><div class="pfCard panel"><button class="rbtn pfClose" id="btnPfClose" data-testid="profile-close-btn" aria-label="Close profile">&times;</button><h2>Profile</h2><div id="profBody"></div></div></div>
+  <div id="crateModal" class="hidden" data-testid="crate-modal"><div class="crCard panel">
+    <button class="rbtn pfClose" id="btnCrClose" data-testid="crate-close-btn" aria-label="Close">&times;</button>
+    <h2>Space Crate</h2>
+    <div class="crStage" id="crStage"><div class="crGlow"></div><img id="crImg" alt="Space crate" data-testid="crate-image"><div id="crReward" class="crReward hidden" data-testid="crate-reward"></div></div>
+    <div class="crCount" id="crCount" data-testid="crate-count"></div>
+    <button class="lgBtn google" id="btnCrOpen" data-testid="crate-open-btn"><span>Open crate</span></button>
+  </div></div>
+  <div id="stages" class="hidden"><div class="stitle"><button class="rbtn" id="btnStBack" data-testid="stages-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Select Stage</h2><button class="uabtn" type="button" data-testid="unlock-all-btn" aria-pressed="false"><svg class="ico "><use href="#i-lock"/></svg><span>Unlock all levels: OFF</span></button><div class="pill" id="stStars"></div></div><div id="worlds" data-testid="stage-cards"></div></div>
+  <div id="levels" class="hidden" data-testid="levels-screen"><div class="stitle"><button class="rbtn" id="btnLvBack" data-testid="levels-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><div class="lvhead"><h2 id="lvTitle">Select Level</h2><span id="lvBlurb"></span></div><button class="uabtn" type="button" data-testid="unlock-all-btn-levels" aria-pressed="false"><svg class="ico "><use href="#i-lock"/></svg><span>Unlock all levels: OFF</span></button><div class="pill" id="lvStars"></div></div><div class="lvwrap"><button class="lvnav prev" id="lvPrev" data-testid="levels-prev-btn" aria-label="Previous level"><svg class="ico"><use href="#i-chev"/></svg></button><div id="cards" data-testid="level-cards" role="listbox" aria-label="Levels"></div><button class="lvnav next" id="lvNext" data-testid="levels-next-btn" aria-label="Next level"><svg class="ico"><use href="#i-chev"/></svg></button></div><div id="lvDots" data-testid="level-dots"></div></div>
   <div id="garage" class="hidden">
     <div class="stitle"><button class="rbtn" id="btnGarBack" data-testid="garage-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Garage</h2></div><div class="pill" id="garCoins"></div>
     <div class="gStage" id="gStage">
@@ -83,6 +117,36 @@
     <div class="row"><span>Motion FX</span><button class="btn" id="optShake" data-testid="settings-shake-btn">On</button></div>
     <div class="row"><span>Graphics</span><button class="btn" id="optQuality" data-testid="settings-quality-btn">High</button></div>
   </div>
+  <div id="duelHome" class="hidden duelScr" data-testid="duel-home">
+    <div class="dTop"><button class="rbtn" id="btnDuelBack" data-testid="duel-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Duel Race</h2></div>
+    <div class="dHomeBox">
+      <div class="dLabel">Your nickname</div>
+      <input class="dInput" id="duelNick" data-testid="duel-nickname-input" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Nickname">
+      <div class="dRow"><button class="dbtn go" id="btnDuelCreate" data-testid="duel-create-room-btn">Create Room</button><button class="dbtn" id="btnDuelJoin" data-testid="duel-join-room-btn">Join Room</button></div>
+      <div class="dJoin" id="duelJoinBox"><div class="dLabel">Friend's 5-character code</div><div class="dRow"><input class="dInput code" id="duelCode" data-testid="duel-code-input" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCDE"><button class="dbtn go" id="btnDuelJoinGo" data-testid="duel-join-submit-btn">Join</button></div></div>
+      <div class="dErr" id="duelErr" data-testid="duel-error"></div>
+    </div>
+  </div>
+  <div id="duelLobby" class="hidden duelScr" data-testid="duel-lobby">
+    <div class="dTop"><button class="rbtn" id="btnLobbyLeave" data-testid="lobby-leave-btn" aria-label="Leave room"><svg class="ico "><use href="#i-back"/></svg></button><h2>Lobby</h2></div>
+    <div class="lobGrid">
+      <div class="lobCol">
+        <div class="codeBox panel"><div class="dLabel">Room code</div><div class="codeVal" id="lobCode" data-testid="lobby-room-code"></div><div class="dRow"><button class="dbtn sm" id="btnDuelCopy" data-testid="lobby-copy-btn">Copy</button><button class="dbtn sm" id="btnDuelShare" data-testid="lobby-share-btn">Share</button></div></div>
+        <div class="lvlSel panel modeSel"><div class="dLabel" id="lobModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnModeDuel" data-testid="lobby-mode-duel-btn">Duel</button><button class="dbtn sm" id="btnModeRace" data-testid="lobby-mode-race-btn">Race &middot; 3 Laps</button></div></div>
+        <div class="lvlSel panel"><div class="dLabel" id="lobLevelLab"></div><div class="nm"><button class="dbtn sm arr" id="lobPrev" data-testid="lobby-level-prev-btn" aria-label="Previous level">&#10094;</button><b id="lobLevelName" data-testid="lobby-level-name"></b><button class="dbtn sm arr" id="lobNext" data-testid="lobby-level-next-btn" aria-label="Next level">&#10095;</button></div></div>
+      </div>
+      <div class="lobCol">
+        <div class="pCards" id="lobCards"></div>
+        <button class="dbtn go" id="btnDuelReady" data-testid="lobby-ready-btn">Ready</button>
+        <div class="lobHint" id="lobHint" data-testid="lobby-hint"></div>
+        <div class="mapBox panel"><div class="dLabel">Track map</div><canvas id="lobMap" width="420" height="170" data-testid="lobby-track-map"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div id="duelResult" class="hidden duelScr" data-testid="duel-result">
+    <div class="drBox panel"><div class="drHead" id="drHead" data-testid="duel-result-head"></div><div class="drSub" id="drSub" data-testid="duel-result-reason"></div><div class="drRows" id="drRows"></div><div class="drNote" id="drNote" data-testid="duel-rematch-note"></div>
+      <div class="drBtns"><button class="dbtn go" id="btnDuelRematch" data-testid="duel-rematch-btn">Rematch</button><button class="dbtn" id="btnDuelLeave" data-testid="duel-leave-btn">Leave</button></div></div>
+  </div>
   <div id="hud" class="hidden">
     <button id="btnPause" data-testid="hud-pause-btn" aria-label="Pause"><i></i><i></i></button>
     <div id="lvlName"></div>
@@ -93,9 +157,12 @@
       <div id="chasmBox" class="hidden" data-testid="hud-chasm"><span id="chasmTxt" data-testid="hud-chasm-text"></span><div id="chasmBar"><b></b></div></div>
       <div id="coldBox" class="hidden" data-testid="hud-cold"><span id="coldTxt" data-testid="hud-cold-text"></span><div id="coldBar"><b></b></div></div>
     </div>
-    <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="cp">Checkpoint 0/3</div><div id="bar"><div id="progress"></div></div></div>
+    <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="lapHud" class="hidden" data-testid="hud-lap">Lap 1/3</div><div id="cp" data-testid="hud-checkpoint">Next checkpoint 1 / 3</div><div id="bestHud" data-testid="hud-best-lap">Best lap --:--.-</div><div id="bar"><div id="progress"></div></div></div>
     <div class="hudr panel"><div class="hlab">Speed</div><div class="spdrow"><div id="speed" data-testid="hud-speed">0</div><small>km/h</small></div><div id="spdbar"><i></i></div><div class="sc">Style <span id="score" data-testid="hud-score">0</span></div><div class="sc flipsc lowg-only">Flip bonus <span id="flipPts" data-testid="hud-flip-bonus">0</span></div><div class="sc cn" id="hudCoins"></div></div>
-    <div id="kbHint" class="kbd-only">W gas &middot; S brake &middot; A/D tilt<span class="lowg-only">/flip</span> &middot; Shift nitro &middot; Esc pause</div>
+    <canvas id="duelMap" width="220" height="120" data-testid="duel-minimap"></canvas>
+    <div id="duelBar" data-testid="duel-progress-bar"><div class="dbTrack"><b class="dbMk me" id="dbMe"><span id="dbMeNm" data-testid="duel-bar-me-nick"></span></b><b class="dbMk opp" id="dbOpp"><span id="dbOppNm" data-testid="duel-bar-opp-nick"></span></b></div></div>
+    <div id="duelBanner" class="hidden" data-testid="duel-banner"><span id="duelBannerTxt" data-testid="duel-banner-text"></span><button class="dbtn sm" id="btnDuelShowRes" data-testid="duel-show-result-btn">Result</button></div>
+    <div id="kbHint" class="kbd-only">W gas &middot; S brake &middot; A/D tilt<span class="lowg-only">/flip</span><span class="space-only"> steer left / right</span> &middot; Shift nitro &middot; Esc pause</div>
   </div>
   <div id="controls" class="hidden">
     <button class="ctl" id="tiltUp" data-act="tiltUp" data-testid="touch-tilt-up" aria-label="Tilt left (nose up)"><span class="ic">&#9664;</span><small>TILT LEFT</small></button>
@@ -104,6 +171,12 @@
     <button class="ctl" id="nitro" data-act="nitro" data-testid="touch-nitro" aria-label="Nitro"><span class="ic"><svg class="ico fill"><use href="#i-bolt"/></svg></span><small>NITRO</small></button>
     <button class="ctl" id="gas" data-act="gas" data-testid="touch-gas" aria-label="Gas"><span class="ic" style="font-size:38px">&#9650;</span><span style="font-size:22px">GAS</span></button>
   </div>
+  <div id="spaceCtl" data-testid="space-controls">
+    <button class="sbtn" id="spLeft" data-act="spL" data-testid="space-left-btn" aria-label="Steer left"><span class="ic">&#9664;</span><small>LEFT</small></button>
+    <button class="sbtn" id="spRight" data-act="spR" data-testid="space-right-btn" aria-label="Steer right"><span class="ic">&#9654;</span><small>RIGHT</small></button>
+  </div>
+  <div id="offCourse" data-testid="space-off-course">LEAVING THE FLIGHT CORRIDOR</div>
+  <div id="duelLeaveModal" class="hidden"><div class="modal panel" data-testid="duel-leave-modal"><h2>Leave race?</h2><p>Leaving mid-race counts as a loss.</p><button class="btn primary" id="btnDuelKeep" data-testid="duel-keep-racing-btn">Keep racing</button><button class="btn" id="btnDuelQuit" data-testid="duel-quit-btn">Leave race</button></div></div>
   <div id="toast" class="hidden"></div><div id="pops"></div><div id="combo" class="hidden"></div>
   <div id="countdown" class="hidden" data-testid="countdown"></div>
   <div id="pauseMenu" class="hidden"><div class="modal panel"><h2>Paused</h2>
@@ -119,35 +192,41 @@
     <div class="resLab">Your time</div>
     <div id="resTime" data-testid="results-time"></div>
     <div id="resTrophy" class="hidden" data-testid="results-hover-trophy"></div>
+    <div id="resLap" data-testid="results-lap-summary"></div>
     <div id="resBadge" class="hidden" data-testid="results-new-best">New best</div>
     <div id="resStats"></div>
     <div id="resCoins"></div>
     <div id="resOnline"></div>
     <div class="resBtns">
-      <button class="btn primary hidden" id="btnNext" data-testid="results-next-btn">Next level</button><button class="btn hidden" id="btnEnding" data-testid="results-ending-btn">Watch ending</button><button class="btn" id="btnAgain" data-testid="results-again-btn">Race again</button><button class="btn" id="btnLvl2" data-testid="results-levels-btn">Levels</button><button class="btn" id="btnMenu2" data-testid="results-menu-btn">Main menu</button>
+      <button class="btn hidden" id="btnOpenCrate" data-testid="results-open-crate-btn">Open crate</button><button class="btn primary hidden" id="btnNext" data-testid="results-next-btn">Next level</button><button class="btn hidden" id="btnEnding" data-testid="results-ending-btn">Watch ending</button><button class="btn" id="btnAgain" data-testid="results-again-btn">Race again</button><button class="btn" id="btnLvl2" data-testid="results-levels-btn">Levels</button><button class="btn" id="btnMenu2" data-testid="results-menu-btn">Main menu</button>
     </div></div></div>
 </div>
 <div id="cutscene" class="hidden" data-testid="ending-cutscene">
   <div id="csFade"></div>
   <div id="csCap" data-testid="cutscene-caption"></div>
   <div id="csCredits"><div class="csRoll">
-    <h2>MISSION COMPLETE</h2><p class="big">YOU ESCAPED THE COLLAPSING MOON</p>
-    <p><small>PILOT</small><br>YOU</p><p><small>VEHICLE</small><br>MARS HOVER</p><p><small>MISSION</small><br>EARTH &middot; MARS &middot; MOON &middot; SPACE</p>
+    <h2>MISSION COMPLETE</h2><p class="big">FROM THE MOON TO SATURN</p>
+    <p><small>PILOT</small><br>YOU</p><p><small>VEHICLE</small><br>YOUR HOVER</p><p><small>MISSION</small><br>EARTH &middot; MARS &middot; MOON &middot; SPACE</p>
     <p><small>ENGINE</small><br>THREE.JS</p><p class="big">THANKS FOR PLAYING</p><h1>TURBO DRIVE</h1>
   </div></div>
   <button class="btn" id="btnCsSkip" data-testid="cutscene-skip-btn">Skip</button>
   <button class="btn primary hidden" id="btnCsDone" data-testid="cutscene-continue-btn">Continue</button>
 </div>
 <div id="warp" class="hidden" aria-hidden="true" data-testid="stage-transition"><div class="wstars"></div><div class="wtop"><small id="warpFrom">EARTH</small><span class="wline"><i></i></span><small id="warpTo">MARS</small></div><div class="rocket"><svg viewBox="0 0 64 128" width="100%" height="100%"><defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#b9c2e6"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#8f9ac8"/></linearGradient></defs><path d="M32 2C46 22 50 44 48 76H16C14 44 18 22 32 2Z" fill="url(#rg)"/><path d="M16 76 4 100l12-6zM48 76l12 24-12-6z" fill="#ff5a3d"/><path d="M32 2C40 12 44 22 45 32H19C20 22 24 12 32 2Z" fill="#ff5a3d"/><circle cx="32" cy="52" r="8" fill="#35e6ff" stroke="#5a6aa8" stroke-width="3"/><path d="M22 76h20l-3 8H25z" fill="#5a6aa8"/></svg><div class="flame"><b></b><b></b><b></b></div></div><div id="warpTxt"><b>LAUNCHING</b><span id="warpName">TO MARS</span></div></div>
+<div id="spaceFade" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:70"></div>
 <div id="root"></div>
 <div id="intro" aria-hidden="true" data-testid="intro-splash"><div class="iwrap"><img id="introLogo" src="game/assets/logo.png" alt="Little Hearts logo" data-testid="intro-logo"><div id="introTitle" data-testid="intro-title">A LITTLE HEARTS PRODUCTION</div><div id="introSub" data-testid="intro-subtitle"><span id="introType"></span><i class="caret"></i></div></div></div>
 <div id="loading"><h1 class="title">TURBO<br>DRIVE</h1><div id="loadmsg">Building the track&hellip;</div><div id="loadbar"><i></i></div></div>
 <div id="rotate"><div class="ph"><svg class="ico"><use href="#i-phone"/></svg></div><b>Rotate your phone</b><div>Turbo Drive plays in landscape only.<br>Turn your phone sideways to continue.</div></div>
+<script src="game/js/core/server-config.js"></script>
 <script src="game/js/lib/three.min.js"></script>
+<script src="game/js/lib/GLTFLoader.js"></script>
 <script src="game/js/data/models.js"></script>
 <script src="game/js/data/car5.js"></script>
 <script src="game/js/data/thumbs.js"></script>
 <script src="game/js/data/hover.js"></script>
+<script src="game/js/data/hover2.js"></script>
+<script src="game/js/data/crate.js"></script>
 <script src="game/js/physics.js"></script>
 <script src="game/js/core/storm.js"></script>
 <script src="game/js/core/config.js"></script>
@@ -161,22 +240,34 @@
 <script src="game/js/render/lava.js"></script>
 <script src="game/js/render/environment.js"></script>
 <script src="game/js/render/obstacles.js"></script>
+<script src="game/js/render/raceobjs.js"></script>
 <script src="game/js/render/meteors.js"></script>
 <script src="game/js/render/cold.js"></script>
 <script src="game/js/render/chasm.js"></script>
+<script src="game/js/render/iss.js"></script>
 <script src="game/js/render/level.js"></script>
 <script src="game/js/render/vehicle.js"></script>
 <script src="game/js/render/particles.js"></script>
 <script src="game/js/core/audio.js"></script>
+<script src="game/js/core/auth.js"></script>
 <script src="game/js/core/input.js"></script>
 <script src="game/js/game/game.js"></script>
 <script src="game/js/game/effects.js"></script>
 <script src="game/js/game/cosmetics.js"></script>
+<script src="game/js/render/crates.js"></script>
 <script src="game/js/game/loop.js"></script>
+<script src="game/js/render/premium.js"></script>
 <script src="game/js/ui/ui.js"></script>
 <script src="game/js/ui/shop.js"></script>
+<script src="game/js/ui/account.js"></script>
+<script src="game/js/ui/crates.js"></script>
+<script src="game/js/duel/duel.js"></script>
 <script src="game/js/game/cutscene.js"></script>
+<script src="game/js/render/space.js"></script>
+<script src="game/js/game/spaceflight.js"></script>
+<script src="game/js/render/alien.js"></script>
 <script src="game/js/core/intro.js"></script>
+<script src="game/js/core/tutorial.js"></script>
 <script src="game/js/core/orientation.js"></script>
 <script src="game/js/main.js"></script>
 <script src="game/js/core/pwa.js"></script>

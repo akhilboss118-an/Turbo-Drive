@@ -8,8 +8,8 @@
     "build": "node scripts/prepare-www.js",
     "cap:add": "npx cap add android",
     "cap:sync": "npm run prepare-www && npx cap sync android",
-    "start": "npx --yes serve -l 3000 .",
-    "dev": "npx --yes serve -l 3000 ."
+    "start": "node scripts/dev-server.js",
+    "dev": "node scripts/dev-server.js"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.3",

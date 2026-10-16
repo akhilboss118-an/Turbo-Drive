@@ -1,0 +1,93 @@
+/* Online duel race: home, lobby, HUD bar, result */
+#duelHome,#duelLobby,#duelResult{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;pointer-events:none;padding:max(8px,env(safe-area-inset-top)) max(4vw,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(4vw,env(safe-area-inset-left));background:linear-gradient(90deg,rgba(21,12,58,.88) 0%,rgba(21,12,58,.6) 55%,rgba(21,12,58,.25) 100%)}
+.duelScr>*{pointer-events:auto}
+.dTop{display:flex;align-items:center;gap:12px;margin-bottom:clamp(6px,2vh,14px);pointer-events:auto}
+.dTop h2{margin:0;font-size:clamp(20px,5.6vh,34px);font-style:italic;font-weight:900;letter-spacing:.07em;text-transform:uppercase;text-shadow:3px 3px 0 rgba(255,138,61,.85)}
+.dTop .rbtn{flex:none;min-width:44px;min-height:44px}
+.dHomeBox{width:min(470px,62vw);display:flex;flex-direction:column;gap:clamp(7px,1.8vh,12px)}
+.dLabel{font-size:clamp(10px,2.4vh,13px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+.dInput{width:100%;height:clamp(44px,11vh,54px);border-radius:12px;border:2px solid var(--line);background:rgba(10,8,44,.85);color:var(--cream);font-family:inherit;font-weight:800;font-size:clamp(16px,4vh,22px);padding:0 14px;outline:none;pointer-events:auto;-webkit-user-select:text;user-select:text}
+.dInput:focus{border-color:var(--cyan);box-shadow:0 0 14px rgba(53,230,255,.4)}
+.dInput.code{text-align:center;letter-spacing:.35em;text-transform:uppercase;font-size:clamp(20px,5vh,28px)}
+.dRow{display:flex;gap:clamp(7px,1.8vh,12px);align-items:stretch}
+.dRow>*{flex:1 1 0;min-width:0}
+.dbtn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;height:clamp(48px,12vh,60px);padding:0 14px;border-radius:12px;border:2px solid rgba(53,230,255,.6);background:linear-gradient(180deg,rgba(52,74,168,.92),rgba(20,26,92,.94));color:var(--cream);font-family:inherit;font-weight:900;font-style:italic;letter-spacing:.08em;text-transform:uppercase;font-size:clamp(13px,3.4vh,19px);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 4px 0 rgba(6,8,40,.9);-webkit-tap-highlight-color:transparent}
+.dbtn:active{transform:translateY(2px)}
+.dbtn.go{border-color:#ffe6b8;background:linear-gradient(180deg,#ffe066,#ffb33a 50%,#ff7a2e);color:#2a1200;box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 4px 0 #b4561a}
+.dbtn.sm{min-height:44px;height:44px;font-size:clamp(12px,3vh,15px);padding:0 12px}
+.dbtn.off{opacity:.45;filter:grayscale(.6);pointer-events:none}
+.dbtn.on{border-color:#7dffb0;background:linear-gradient(180deg,rgba(40,160,110,.95),rgba(14,80,70,.95));color:#eafff3}
+.dErr{min-height:1.3em;color:#ff8a8a;font-weight:800;font-size:clamp(11px,2.8vh,15px);letter-spacing:.03em}
+.dJoin{display:none;flex-direction:column;gap:clamp(6px,1.6vh,10px)}
+.dJoin.open{display:flex}
+/* lobby */
+.lobGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:clamp(10px,2.6vw,26px);align-items:stretch;max-height:calc(100% - 56px)}
+.lobCol{display:flex;flex-direction:column;gap:clamp(7px,1.8vh,12px);min-width:0}
+.codeBox{padding:clamp(8px,2vh,14px);text-align:center}
+.codeBox .dLabel{margin-bottom:4px}
+.codeVal{display:flex;justify-content:center;gap:clamp(4px,1vw,9px);margin-bottom:clamp(6px,1.6vh,10px)}
+.codeVal span{width:clamp(30px,8vw,52px);height:clamp(40px,12vh,62px);display:grid;place-items:center;border-radius:10px;background:rgba(10,8,44,.9);border:2px solid var(--cyan);color:#fff;font-weight:900;font-size:clamp(24px,7.5vh,40px);text-shadow:0 0 12px rgba(53,230,255,.8)}
+.lvlSel{padding:clamp(7px,1.6vh,12px)}
+.lvlSel .nm{display:flex;align-items:center;gap:8px}
+.lvlSel .nm b{flex:1;text-align:center;font-weight:900;font-style:italic;font-size:clamp(12px,3.2vh,17px);letter-spacing:.05em;text-transform:uppercase;min-height:2.4em;display:flex;align-items:center;justify-content:center}
+.lvlSel .arr{flex:none;width:48px;min-height:44px;padding:0}
+.pCards{display:flex;gap:clamp(8px,1.8vw,14px)}
+.pCard{flex:1 1 0;min-width:0;padding:clamp(6px,1.6vh,12px);text-align:center;border-radius:14px;position:relative}
+.pCard.empty{opacity:.6;border-style:dashed}
+.pCard .role{font-size:clamp(9px,2.2vh,12px);font-weight:900;letter-spacing:.14em;color:var(--orange);text-transform:uppercase}
+.pCard .nick{font-weight:900;font-style:italic;font-size:clamp(15px,4.2vh,24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pCard img{display:block;width:100%;max-height:clamp(46px,16vh,92px);object-fit:contain;margin:2px auto}
+.pCard .carNm{font-size:clamp(10px,2.5vh,13px);font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+.pCard .st{margin-top:4px;display:inline-block;padding:2px 10px;border-radius:99px;font-weight:900;font-size:clamp(10px,2.4vh,13px);letter-spacing:.08em;background:rgba(255,255,255,.12)}
+.pCard.rdy{border-color:#7dffb0;box-shadow:0 0 16px rgba(125,255,176,.35)}
+.pCard.rdy .st{background:#2fbf7a;color:#041a0e}
+.pCard .dc{color:#ff8a8a}
+.lobHint{font-size:clamp(10px,2.5vh,13px);opacity:.8;font-weight:700;text-align:center;min-height:1.3em}
+/* HUD */
+#duelBar{display:none;position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 86px);left:50%;transform:translateX(-50%);width:min(440px,46vw);height:46px;pointer-events:none}
+body.duel #duelBar{display:block}
+.dbTrack{position:absolute;left:0;right:0;top:20px;height:8px;border-radius:99px;background:rgba(10,8,44,.8);border:1px solid var(--line)}
+.dbTrack:after{content:"";position:absolute;right:-3px;top:-6px;width:6px;height:18px;border-radius:2px;background:repeating-linear-gradient(#fff 0 4px,#111 4px 8px)}
+.dbMk{position:absolute;top:-3px;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:2px solid #fff;transition:left .12s linear}
+.dbMk.me{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.dbMk.opp{background:var(--orange);box-shadow:0 0 10px var(--orange)}
+.dbMk span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-weight:900;font-style:italic;letter-spacing:.04em;text-shadow:0 1px 3px #000,0 0 6px #000}
+.dbMk.me span{bottom:14px;color:var(--cyan)}
+.dbMk.opp span{top:14px;color:#ffb27a}
+#duelBanner{position:absolute;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 140px);transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border-radius:12px;background:rgba(160,40,20,.88);border:2px solid #ffb27a;font-weight:900;font-style:italic;letter-spacing:.05em;font-size:clamp(12px,3.2vh,16px);text-transform:uppercase;pointer-events:auto;max-width:80vw}
+#duelBanner small{display:block;font-size:.78em;opacity:.9;font-style:normal;letter-spacing:.03em}
+#duelBanner .dbtn{min-height:44px;height:44px;flex:none}
+body.duel #toast{top:calc(max(8px,env(safe-area-inset-top)) + 150px)}
+body.duel #btnMenu3{display:none}
+#duelLeaveModal{position:absolute;inset:0;background:rgba(6,4,28,.55);pointer-events:auto;z-index:20}
+#duelLeaveModal .modal{text-align:center}
+#duelLeaveModal p{margin:0 0 14px;opacity:.85;font-weight:700}
+/* result */
+#duelResult{align-items:center;text-align:center;background:radial-gradient(ellipse at 50% 50%,rgba(10,6,40,.55),rgba(10,6,40,.9))}
+.drBox{width:min(520px,80vw);padding:clamp(10px,2.4vh,20px) clamp(14px,3vw,26px)}
+.drHead{font-size:clamp(30px,10vh,58px);font-weight:900;font-style:italic;letter-spacing:.08em;text-shadow:4px 4px 0 var(--orange);line-height:1}
+.drHead.lose{text-shadow:4px 4px 0 #6a2a3a;color:#ffb0b0}
+.drSub{font-weight:800;opacity:.85;font-size:clamp(11px,2.8vh,15px);margin:4px 0 clamp(6px,1.6vh,12px);letter-spacing:.04em}
+.drRows{display:flex;flex-direction:column;gap:6px;margin-bottom:clamp(8px,2vh,14px)}
+.drRow{display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08);font-weight:900;font-style:italic;font-size:clamp(14px,3.8vh,20px)}
+.drRow .nm{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drRow .tm{font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.drRow.me{border:1.5px solid var(--cyan)}.drRow.opp{border:1.5px solid var(--orange)}
+.drRow.win{background:rgba(255,200,60,.2);border-color:#ffd24a}
+.drNote{min-height:1.3em;font-size:clamp(10px,2.6vh,14px);font-weight:800;color:#7dffb0;margin-bottom:6px}
+.drBtns{display:flex;gap:10px}.drBtns>*{flex:1}
+.menuDuel{margin-top:0}
+@media (max-height:340px){.dbtn{height:44px}.codeVal span{height:34px}}
+
+/* race mode (3 laps) */
+.modeSel .dRow{margin-top:4px}
+.modeSel .dbtn{flex:1 1 0}
+#lapHud{font-weight:900;font-style:italic;letter-spacing:.1em;color:var(--orange);font-size:clamp(13px,3.4vh,18px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,138,61,.6)}
+#lapHud.hidden{display:none}
+.dbMk.lapTick{display:none}
+.mapBox{padding:clamp(5px,1.2vh,9px)}
+.mapBox .dLabel{margin-bottom:3px}
+.mapBox canvas{display:block;width:100%;height:clamp(64px,19vh,130px)}
+#duelMap{display:none;position:absolute;top:calc(max(10px,env(safe-area-inset-top)) + 100px);left:max(12px,env(safe-area-inset-left));width:clamp(120px,17vw,190px);height:clamp(66px,10vw,104px);border-radius:10px;background:rgba(10,8,44,.62);border:1px solid rgba(53,230,255,.45);pointer-events:none}
+body.duel #duelMap{display:block}
+@media (max-height:460px){.pCard img,.lobHint,.modeSel .dLabel,.codeBox .dLabel{display:none}.dTop{margin-bottom:4px}.codeVal span{height:34px;font-size:22px}.codeVal{margin-bottom:5px}.lvlSel,.codeBox{padding:6px}.lobCol{gap:6px}.mapBox canvas{height:clamp(60px,22vh,100px)}}

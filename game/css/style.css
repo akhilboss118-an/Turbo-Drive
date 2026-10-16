@@ -141,6 +141,8 @@ button{font:inherit;color:inherit;cursor:pointer;pointer-events:auto;touch-actio
 .hudbox{position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:6px 22px 8px;text-align:center;min-width:170px}
 #timer{font-size:clamp(24px,6vh,38px);font-weight:900;font-style:italic;font-variant-numeric:tabular-nums;line-height:1}
 #cp{font-size:clamp(11px,2.4vh,14px);opacity:.85;margin-top:2px}
+#bestHud{font-size:clamp(9px,2vh,12px);opacity:.75;margin-top:1px;font-weight:700;letter-spacing:.05em}
+#resLap{margin:4px 0 2px;font-weight:700;opacity:.92;letter-spacing:.03em}
 #bar{height:5px;border-radius:3px;background:rgba(255,255,255,.15);margin-top:6px;overflow:hidden}
 #progress{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--orange))}
 .hudr{position:absolute;top:10px;right:max(12px,env(safe-area-inset-right));padding:6px 14px 8px;text-align:right}

@@ -26,6 +26,10 @@
 #levels[data-world="mars"] .card.cur{border-color:#ffd24a}
 #levels[data-world="mars"] .card .pv{border-bottom-color:rgba(255,140,70,.4)}
 #stStars{margin-left:auto}
+.uabtn{margin-left:auto;display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;border:2px solid rgba(255,255,255,.55);background:rgba(20,20,40,.7);color:#fff;font:inherit;font-weight:900;font-size:clamp(10px,2.4vh,14px);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.uabtn .ico{width:14px;height:14px}
+.uabtn.on{background:linear-gradient(90deg,#b8ffd0,#3ddc84);color:#06260f;border-color:#fff}
+#stStars{margin-left:10px}
 
 .wcard.moon{border-color:rgba(190,205,255,.6);background:linear-gradient(180deg,rgba(54,60,96,.92),rgba(14,16,34,.96));animation-delay:.2s}
 @media (hover:hover){.wcard.moon:not(.locked):hover{box-shadow:0 12px 0 rgba(8,10,24,.5),0 0 30px rgba(190,210,255,.5)}}

@@ -1,0 +1,31 @@
+#tutorial{position:fixed;inset:0;z-index:9000;font-family:'Chakra Petch',system-ui,sans-serif;color:#fff;opacity:0;pointer-events:none;transition:opacity .3s ease}
+#tutorial.show{opacity:1;pointer-events:auto}
+#tutorial .tshade{position:absolute;inset:0;background:rgba(3,4,20,.78)}
+#tutorial.spot .tshade{background:none}
+#tutorial .tspot{position:absolute;left:0;top:0;width:0;height:0;border-radius:16px;border:3px solid #ffd24a;box-shadow:0 0 0 9999px rgba(3,4,20,.78),0 0 26px 4px rgba(255,210,74,.7);pointer-events:none;opacity:0;transition:left .35s cubic-bezier(.2,.9,.3,1),top .35s cubic-bezier(.2,.9,.3,1),width .35s cubic-bezier(.2,.9,.3,1),height .35s cubic-bezier(.2,.9,.3,1),opacity .2s;animation:tutPulse 1.4s ease-in-out infinite}
+#tutorial.spot .tspot{opacity:1}
+@keyframes tutPulse{50%{border-color:#35e6ff;box-shadow:0 0 0 9999px rgba(3,4,20,.78),0 0 34px 8px rgba(53,230,255,.65)}}
+#tutorial .thand{position:absolute;left:0;top:0;width:58px;height:58px;pointer-events:none;opacity:0;transition:left .35s cubic-bezier(.2,.9,.3,1),top .35s cubic-bezier(.2,.9,.3,1),opacity .2s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+#tutorial.spot .thand{opacity:1}
+#tutorial .thand svg{width:100%;height:100%;animation:tutTap 1s ease-in-out infinite;transform-origin:40% 10%}
+@keyframes tutTap{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-5px,-9px) scale(.9)}}
+#tutorial .tcard{position:absolute;left:0;top:0;width:min(380px,calc(100vw - 24px));border-radius:20px;border:2px solid rgba(53,230,255,.65);background:linear-gradient(180deg,rgba(30,40,120,.97),rgba(10,12,52,.99));box-shadow:0 7px 0 rgba(6,8,40,.6),0 0 34px rgba(53,230,255,.3);padding:clamp(12px,2.2vh,20px) clamp(14px,2vw,22px);transition:left .35s cubic-bezier(.2,.9,.3,1),top .35s cubic-bezier(.2,.9,.3,1)}
+#tutorial.center .tcard{width:min(520px,calc(100vw - 24px))}
+#tutorial .tstep{font-weight:700;font-size:11px;letter-spacing:.16em;color:#35e6ff;text-transform:uppercase}
+#tutorial h2{font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:clamp(22px,4.4vh,32px);line-height:1;margin:4px 0 8px;text-transform:uppercase;text-shadow:2px 2px 0 #ff8a3d}
+#tutorial .tbody{font-size:clamp(12px,2.2vh,15px);line-height:1.5;color:#dfe6ff}
+#tutorial .tbody p{margin:0 0 8px}
+#tutorial .tbody b{color:#ffd24a}
+#tutorial kbd{display:inline-block;padding:0 6px;border-radius:6px;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);font:inherit;font-weight:700;font-size:.92em}
+#tutorial .tfoot{display:flex;align-items:center;gap:8px;margin-top:12px}
+#tutorial .tdots{display:flex;gap:4px;margin-right:auto;flex-wrap:wrap;max-width:120px}
+#tutorial .tdots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.25)}
+#tutorial .tdots i.on{background:#ffd24a}
+#tutorial button{font:inherit;font-weight:900;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:8px 16px;cursor:pointer;border:2px solid rgba(255,255,255,.5);background:rgba(20,20,40,.6);color:#fff;transition:transform .15s ease}
+#tutorial button:hover{transform:translateY(-2px)}
+#tutorial button.tnext{background:linear-gradient(90deg,#ffe066,#ff8a3d);color:#2a1400;border-color:#fff}
+#tutorial button.tskip{border-color:transparent;background:none;color:#aab4e8;padding:8px 6px}
+#tutorial button[hidden]{display:none}
+#btnHowTo{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));z-index:60;display:none;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;border:2px solid rgba(255,255,255,.55);background:rgba(20,20,40,.75);color:#fff;font:700 13px 'Chakra Petch',sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+body[data-state="menu"] #btnHowTo{display:flex}
+@media (prefers-reduced-motion:reduce){#tutorial *{animation:none!important;transition:none!important}}

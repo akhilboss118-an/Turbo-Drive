@@ -1,0 +1,22 @@
+/* Rarity colour patterns: Normal = silver, Famous = blue, Legendary = yellow/gold */
+.gcard.r-normal{border-color:rgba(201,206,216,.75)}
+.gcard.r-famous{border-color:#3aa0ff;background:linear-gradient(180deg,rgba(24,70,170,.9),rgba(8,16,60,.95));box-shadow:0 0 12px rgba(58,160,255,.45)}
+.gcard.r-legendary{border-color:#ffc83a;background:linear-gradient(180deg,rgba(150,98,10,.92),rgba(40,22,2,.96));box-shadow:0 0 16px rgba(255,200,58,.6);animation:legPulse 2.2s ease-in-out infinite}
+.gcard.sel.r-famous{border-color:#8fd0ff;box-shadow:0 4px 0 rgba(10,50,120,.6),0 0 0 2px rgba(58,160,255,.4),0 0 18px rgba(58,160,255,.8)}
+.gcard.sel.r-legendary{border-color:#fff2a8}
+.gcard .rb{font-size:clamp(6px,1.4vh,8px);font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:0 5px;border-radius:999px;margin-top:1px;background:#8a93a8;color:#10131c}
+.gcard.r-famous .rb{background:#3aa0ff;color:#04132e}
+.gcard.r-legendary .rb{background:linear-gradient(180deg,#fff2a8,#ffc83a 55%,#e0881a);color:#2a1200}
+@keyframes legPulse{0%,100%{box-shadow:0 0 10px rgba(255,200,58,.45)}50%{box-shadow:0 0 22px rgba(255,214,90,.95)}}
+#gName[data-rarity="famous"]{color:#bfe3ff;text-shadow:2px 2px 0 rgba(30,110,230,.95),0 0 16px rgba(58,160,255,.55)}
+#gName[data-rarity="legendary"]{color:#fff2a8;text-shadow:2px 2px 0 rgba(200,120,10,.95),0 0 18px rgba(255,200,58,.7)}
+#gKind[data-rarity="famous"]{color:#7fc4ff}
+#gKind[data-rarity="legendary"]{color:#ffd24a}
+.chip.rar.r-normal{background:rgba(201,206,216,.15);border-color:#c9ced8;color:#e8ebf2}
+.chip.rar.r-famous{background:#3aa0ff;border-color:#8fd0ff;color:#04132e;font-weight:900}
+.chip.rar.r-legendary{background:linear-gradient(180deg,#fff2a8,#ffc83a 55%,#e0881a);border-color:#ffe9a0;color:#2a1200;font-weight:900}
+.chip.abil{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.35);color:#fff}
+.abilityBox{padding:6px 10px;margin-bottom:8px;border-radius:8px;font-size:12px;font-weight:700;border:1.5px solid #c9ced8;background:rgba(201,206,216,.1)}
+.abilityBox b{letter-spacing:.1em;margin-right:6px}
+.abilityBox.r-famous{border-color:#3aa0ff;background:rgba(58,160,255,.14);color:#bfe3ff}
+.abilityBox.r-legendary{border-color:#ffc83a;background:rgba(255,200,58,.16);color:#fff2a8}

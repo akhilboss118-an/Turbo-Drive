@@ -3,9 +3,11 @@
 /* Cosmetics rendering: neon underglow, trails and wheel sparks (per car) */
 const cosPrev = {};                              // garage-only preview of items that are not bought yet
 const itemOf = (k, id) => (id ? COSMETICS[k].items.find((i) => i.id === id) || null : null);
+const GOLD_TRAIL = { id: 'gold-auto', name: 'Gold', color: '#ffc83a' };
 function cosView() {
   const garage = state === 'garage', c = cosOf(garage ? previewId : vehicleId), r = {};
   for (const k of COS_KEYS) r[k] = itemOf(k, garage && cosPrev[k] !== undefined ? cosPrev[k] : c.eq[k]);
+  const vv = vehicleById(garage ? previewId : vehicleId); if (!r.trail && vv.goldTrail) r.trail = GOLD_TRAIL;
   return r;
 }
 function hsl(h) {

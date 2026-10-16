@@ -1,0 +1,29 @@
+/* Space crates */
+.crateBtn{cursor:pointer;border-color:rgba(255,200,58,.7);color:#ffe08a;pointer-events:auto}
+.crateBtn:empty{display:none}
+@media (hover:hover){.crateBtn:hover{border-color:#ffe08a;box-shadow:0 0 14px rgba(255,200,58,.5)}}
+#crateModal{position:absolute;inset:0;z-index:41;display:grid;place-items:center;background:rgba(8,5,30,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto;padding:12px;overflow:auto}
+.crCard{position:relative;width:min(380px,94vw);padding:clamp(14px,3vh,22px);display:flex;flex-direction:column;gap:clamp(8px,1.6vh,14px);align-items:stretch;text-align:center;animation:lgIn .35s cubic-bezier(.2,.8,.2,1) both;border-color:rgba(255,200,58,.6)}
+.crCard h2{margin:0;font-family:var(--disp,inherit);font-style:italic;font-size:clamp(20px,4.4vh,26px);letter-spacing:.04em;text-transform:uppercase;color:#ffe08a}
+.crStage{position:relative;height:clamp(150px,34vh,230px);display:grid;place-items:center}
+.crStage img{height:100%;max-width:100%;object-fit:contain;position:relative;z-index:1;animation:crFloat 2.4s ease-in-out infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.55))}
+.crGlow{position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(255,200,58,.55),rgba(255,200,58,0) 68%);opacity:.7}
+@keyframes crFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.crStage.shake img{animation:crShake .12s linear infinite}
+.crStage.shake .crGlow{opacity:1;transform:scale(1.25);transition:transform 1s,opacity 1s}
+@keyframes crShake{0%{transform:translate(-3px,1px) rotate(-4deg)}50%{transform:translate(3px,-1px) rotate(4deg)}100%{transform:translate(-3px,1px) rotate(-4deg)}}
+.crStage.burst .crGlow{animation:crBurst .8s ease-out both}
+@keyframes crBurst{from{transform:scale(.4);opacity:1}to{transform:scale(1.5);opacity:.5}}
+.crStage.r-famous .crGlow{background:radial-gradient(circle,rgba(58,160,255,.65),rgba(58,160,255,0) 68%)}
+.crStage.r-normal .crGlow{background:radial-gradient(circle,rgba(201,206,216,.5),rgba(201,206,216,0) 68%)}
+.crReward{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 16px;border-radius:14px;border:2px solid #c9ced8;background:rgba(15,12,50,.85);animation:crPop .45s cubic-bezier(.2,1.4,.4,1) both;max-width:100%}
+.crReward .crIc{font-size:34px;display:grid;place-items:center}
+.crReward .crIc .ico{width:1.1em;height:1.1em}
+.crReward .dot{width:30px;height:30px;border-radius:50%;border:2px solid #fff;display:block}
+.crReward b{font-size:clamp(18px,3.8vh,24px);letter-spacing:.08em;font-style:italic}
+.crReward span{font-size:clamp(13px,2.6vh,16px);font-weight:700}
+.crReward small{font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.crReward.r-famous{border-color:#3aa0ff;background:rgba(14,40,110,.9);color:#bfe3ff;box-shadow:0 0 22px rgba(58,160,255,.6)}
+.crReward.r-legendary{border-color:#ffc83a;background:rgba(80,50,4,.92);color:#fff2a8;box-shadow:0 0 28px rgba(255,200,58,.85)}
+@keyframes crPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.crCount{font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,241,220,.75)}

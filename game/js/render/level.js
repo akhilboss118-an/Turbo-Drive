@@ -9,6 +9,7 @@ function disposeGroup(g) {
   });
 }
 function loadLevel(n) {
+  spaceLeave(); const real = n; if (LEVELS[n].space) n = 1;
   level = n; const L = LEVELS[n]; levelGroup.position.set(0, 0, 0);
   for (const c of levelGroup.children.slice()) { levelGroup.remove(c); disposeGroup(c); }
   track = Phys.buildTrack(baseOf(n)); if (L.sideCam) track.path = null; ground = Phys.makeGround(track); car.ground = ground; car.pads = track.boosts || null; car.g = L.gravity || Phys.G; CPS = track.checkpoints;
@@ -17,8 +18,10 @@ function loadLevel(n) {
   levelGroup.add(trackGroup2());
   buildTrackMesh(L); buildScenery(L); buildEnvironment(L); buildGates(); buildHazards(); buildBoostPads();
   if (L.world === 1 && !L.noTint) marsTint(levelGroup);
-  buildStorm(); buildCold(); buildChasm();
-  $('lvlName').textContent = L.name + (L.gravity ? '  \u00B7  LOW GRAVITY ' + Math.round(L.gravity / Phys.G * 100) + '%' : '') + (L.meteors ? '  \u00B7  METEOR STORM' : '') + (L.cold ? '  \u00B7  MARS COLD' : '');
+  buildStorm(); buildCold(); buildChasm(); if (typeof buildCrates === 'function') buildCrates();
+  level = real; const LR = LEVELS[real];
+  if (LR.space) { buildSpace(LR); spaceStart(); }
+  $('lvlName').textContent = LR.name + (LR.space ? '  \u00B7  ZERO-G DEEP SPACE' : '') + (L.gravity ? '  \u00B7  LOW GRAVITY ' + Math.round(L.gravity / Phys.G * 100) + '%' : '') + (L.meteors ? '  \u00B7  METEOR STORM' : '') + (L.cold ? '  \u00B7  MARS COLD' : '');
   refreshMenu();
 }
 function marsTint(g) {

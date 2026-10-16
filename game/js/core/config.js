@@ -35,11 +35,12 @@ const WORLDS = [
   { id: 'earth', name: 'Earth', first: 1, last: 8, blurb: 'Sunset Run to Lava Gauntlet' },
   { id: 'mars', name: 'Mars', first: 9, last: 16, blurb: 'Red dust, thin air, meteors and ice', gravity: '38%', req: 'Finish all 8 Earth levels to unlock', tags: ['Low gravity', 'Meteor storms', 'Freezing cold'], diff: 2 },
   { id: 'moon', name: 'Moon', first: 17, last: 20, blurb: 'Craters, spiral ramps and the final Moon Collapse', gravity: '17%', req: 'Finish all 8 Mars levels to unlock', tags: ['Moon gravity', 'Meteors', 'Lasers & doors', 'Level 20 needs the Hover'], diff: 3 },
+  { id: 'space', name: 'Deep Space', first: 21, last: 22, blurb: 'Zero-G flight to Jupiter and Saturn', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
 ];
 WORLDS[0].gravity = '100%'; WORLDS[0].req = ''; WORLDS[0].tags = ['Neon tracks', 'Lasers', 'Lava']; WORLDS[0].diff = 1;
 WORLDS.forEach((w) => { w.count = w.last - w.first + 1; });
 const baseOf = (n) => ((n >= 9 && n <= 12) || n >= 15 ? n : ((n - 1) % 8) + 1);   // 9-12 are their own low-gravity tracks (11-14 add the meteor storm; 15-16 are their own Mars-cold tracks; 13 and 14 are the low-gravity Mars re-skins of tracks 5 and 6)
-const worldOf = (n) => (n > 16 ? 2 : n > 8 ? 1 : 0);
+const worldOf = (n) => (n > 20 ? 3 : n > 16 ? 2 : n > 8 ? 1 : 0);
 const MARS_NAMES = ['DUST RUNNER', 'CRATER CANYON', 'SPACE ELEVATOR', 'OLYMPUS FINAL', 'VALLES SPIRAL', 'POLAR MEGA RAMP', 'RED OASIS CLIMB', 'MAGMA GAUNTLET'];
 (function () {
   const mixC = (a, b, t) => new THREE.Color(a).lerp(new THREE.Color(b), t);
@@ -69,6 +70,10 @@ LEVELS.push(Object.assign({}, MOONBASE, { name: 'LEVEL 19  MARE ASCENT', base: 1
 LEVELS.push(Object.assign({}, MOONBASE, { name: 'LEVEL 20  MOON COLLAPSE', base: 20, stars: [125, 175], seed: 373, moonSigns: [[70, 'ESCAPE'], [700, 'SPIRAL'], [3640, 'LAUNCH']], spiral: [[740, 1060, 0, 27], [2150, 2470, 0, 36]],
   collapse: true, chasm: true, needHover: true, finale: true, meteors: { v: 34, gapMax: 28, rate: 24 },
   fog: 0x1a0806, sky: ['#030101', '#1a0508', '#5a1410', '#d2481a'], topA: 0x6e6068, topB: 0x7e707a, glow: [0xff4a1a, 0xffd34d], card: ['#5a1410', '#ff8a3d'] }));
+const SPACE_BASE = Object.assign({}, LEVELS[1], { space: true, needLegendary: true, noTint: true, hoops: [], hoopCoins: 0, world: 3, base: 21, stars_bg: true });
+LEVELS[21] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 21  DEEP SPACE TO JUPITER', stars: [58, 78], planet: 'jupiter', seed: 2101, sky: ['#01020a', '#070a22', '#150f3a', '#3a1e5a'], fog: 0x070a22, glow: [0x35e6ff, 0xff8a3d], card: ['#150f3a', '#ff9a5a'] });
+LEVELS[22] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 22  SPACE RINGS OF SATURN', base: 22, stars: [74, 98], planet: 'saturn', seed: 2202, finale2: true, sky: ['#01020a', '#04101e', '#0a2440', '#2a5a7a'], fog: 0x04101e, glow: [0x9dffea, 0xffd88a], card: ['#0a2440', '#ffd88a'] });
+const CAMPAIGN_LEVELS = 22;
 const FROST = { noTint: true, camera: 'side', biome: 'ice', gravity: Phys.MARS_G, hoops: [], hoopCoins: 0, megaJump: undefined };
 Object.assign(LEVELS[15], FROST, { name: 'LEVEL 15  FROSTBITE SPIRAL', base: 15, stars: [58, 72], seed: 271, cold: { k: 1, time: 46, cp: 6, pad: 2, retry: 20 }, spiral: [[200, 570, 0, 27]],
   fog: 0x2a5478, sky: ['#050a1c', '#16345c', '#6aa5c8', '#e4f4ff'], topA: 0x4a86b8, topB: 0x5a9ac8, postColor: 0x2a4a78, island: [0xbfefff, 0x8fd0f0, 0xdff8ff], glow: [0x7affd0, 0x35e6ff], card: ['#16345c', '#e4f4ff'] });
@@ -105,17 +110,24 @@ HAZARDS[20] = [   // Moon Collapse
   { t: 'laser', x: 2990, ph: 0.5 }, { t: 'door', x: 3250, ph: 0.8 }, { t: 'laser', x: 3700, ph: 0.35 }, { t: 'door', x: 3745, ph: 0.9 },
 ];
 const LASER_T = 3.4, PISTON_T = 3.2, PISTON_H = 2.2, DOOR_T = 3.0, DOOR_H = 8.2;
+const RARITY = {
+  normal: { name: 'Normal', color: '#c9ced8', glow: 0xc9ced8, glow2: 0x8a93a8 },
+  famous: { name: 'Famous', color: '#3aa0ff', glow: 0x3aa0ff, glow2: 0x7fd0ff },
+  legendary: { name: 'Legendary', color: '#ffc83a', glow: 0xffc83a, glow2: 0xff9a1a },
+};
 const VEHICLES = [
-  { id: 'gt', name: 'Red Bug', model: 'car5', paint: null, kind: 'Starter car', color: 'Red', hex: '#ff3b2f', tag: 'Your everyday ride. Normal speed, normal nitro, no tricks.' },
-  { id: 'night', name: 'Police Car', model: 'car', paint: null, kind: 'Emergency vehicle', color: 'Black', hex: '#1a1a1a', tag: 'Built for speed. Fastest top speed and sharpest off the line.' },
-  { id: 'van', name: 'Ambulance', model: 'van', paint: null, kind: 'Emergency vehicle', color: 'White', hex: '#f4f4f4', tag: 'Faster nitro. Huge tank and a stronger boost.' },
-  { id: 'hover', name: 'Mars Hover', model: 'hover', paint: null, kind: 'Meteor runner', color: 'Violet', hex: '#a64be0', tag: 'Built for Mars meteor storms. Huge nitro tank, floaty air control and a shield that cuts meteor damage.' },
-  { id: 'jeep', name: 'Jeep', model: 'jeep', paint: null, kind: 'Off-roader', color: 'Rust', hex: '#b5483d', tag: 'The all-rounder. Speed, nitro, air control and landings all boosted.' },
+  { id: 'gt', name: 'Red Bug', model: 'car5', paint: null, rarity: 'normal', kind: 'Starter car', color: 'Red', hex: '#ff3b2f', ability: 'Balanced', tag: 'NORMAL. Your everyday ride. Balanced speed, normal nitro, no tricks.' },
+  { id: 'night', name: 'Police Car', model: 'car', paint: null, rarity: 'famous', kind: 'Emergency vehicle', color: 'Black', hex: '#1a1a1a', ability: 'Siren + fast acceleration', tag: 'FAMOUS. Flashing siren, fastest off the line and a high top speed.' },
+  { id: 'van', name: 'Ambulance', model: 'van', paint: null, rarity: 'famous', kind: 'Emergency vehicle', color: 'White', hex: '#f4f4f4', ability: 'Boost-heal', tag: 'FAMOUS. Boost-heal: nitro tank refills while you drive and boost, plus huge tank and damage resistance.' },
+  { id: 'jeep', name: 'Jeep', model: 'jeep', paint: null, rarity: 'famous', kind: 'Off-roader', color: 'Rust', hex: '#b5483d', ability: 'Off-road grip + durability', tag: 'FAMOUS. Off-road grip and durability: rock-solid landings, less speed lost and tougher against meteors and frost.' },
+  { id: 'hover', name: 'Mars Hover', model: 'hover', paint: null, rarity: 'legendary', goldTrail: true, kind: 'Meteor runner', color: 'Violet', hex: '#a64be0', ability: 'Meteor shield + cold grip', tag: 'LEGENDARY. Built for Mars meteor storms. Huge nitro tank, floaty air control, a shield that cuts meteor damage and a golden trail.' },
+  { id: 'hover2', name: 'Aero Hover', model: 'hover2', paint: null, rarity: 'legendary', goldTrail: true, kind: 'Hover racer', color: 'Gold', hex: '#ffc83a', ability: 'Floats + speed boost + gold trail', tag: 'LEGENDARY. Floats on air (22% less gravity for long glides), monster speed boost and soft landings, leaving a golden trail.' },
 ];
-const PRICE = { gt: 0, night: 600, van: 1000, jeep: 2000, hover: 2500 };
+const PRICE = { gt: 0, night: 600, van: 1000, jeep: 2000, hover: 2500, hover2: 4000 };
 for (const v of VEHICLES) v.price = PRICE[v.id];
 const vehicleById = (id) => VEHICLES.find((v) => v.id === id) || VEHICLES[0];
 let level = 1, unlocked = 1, vehicleId = 'gt', lastLevel = 1;
+let duelOn = false, duelPrevLevel = 1;   // online duel mode: no coins/stars/unlocks are written while it is on
 let track = Phys.buildTrack(level), ground = Phys.makeGround(track);
 const car = new Phys.Car(ground);
 let CPS = track.checkpoints;
@@ -126,8 +138,8 @@ let seed = 7; const rnd = () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let
 const isLowDevice = typeof navigator !== 'undefined' && ((navigator.deviceMemory && navigator.deviceMemory <= 3) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 && window.matchMedia && matchMedia('(pointer:coarse)').matches));
 const settings = { sound: true, quality: isLowDevice ? 'low' : 'high', shake: !(window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches) };
 let best = null, bests = {}, starsBy = {};
-try { const s = JSON.parse(localStorage.getItem('skyleap') || '{}'); if (s.sound === false) settings.sound = false; if (s.quality === 'low') settings.quality = 'low'; else if (s.quality === 'high') settings.quality = 'high'; if (s.best) best = s.best; if (s.bests) bests = s.bests; if (s.starsBy) starsBy = s.starsBy; if (s.unlocked) unlocked = Math.max(1, Math.min(LEVELS.length - 1, s.unlocked)); if (typeof s.vehicle === 'string' && VEHICLES.some((v) => v.id === s.vehicle)) vehicleId = s.vehicle; if (s.lastLevel) lastLevel = Math.max(1, Math.min(unlocked, s.lastLevel)); } catch (e) {}
-let coins = 0, owned = ['gt'], hasOwned = false, trophy = false;
+try { const s = JSON.parse(localStorage.getItem('skyleap') || '{}'); if (s.sound === false) settings.sound = false; if (s.quality === 'low') settings.quality = 'low'; else if (s.quality === 'high') settings.quality = 'high'; if (s.best) best = s.best; if (s.bests) bests = s.bests; if (s.starsBy) starsBy = s.starsBy; if (s.unlocked) unlocked = Math.max(1, Math.min(CAMPAIGN_LEVELS, s.unlocked)); if (typeof s.vehicle === 'string' && VEHICLES.some((v) => v.id === s.vehicle)) vehicleId = s.vehicle; if (s.lastLevel) lastLevel = Math.max(1, Math.min(unlocked, s.lastLevel)); } catch (e) {}
+let coins = 0, crates = 0, owned = ['gt'], hasOwned = false, trophy = false;
 let upg = {}, cos = {};
 try { const s = JSON.parse(localStorage.getItem('skyleap') || '{}'); if (s.upg && typeof s.upg === 'object') upg = s.upg; if (s.cos && typeof s.cos === 'object') cos = s.cos; if (s.trophy === true) trophy = true; } catch (e) {}
 const upgOf = (id) => (upg[id] = upg[id] || {});
@@ -145,8 +157,8 @@ const COSMETICS = {
 };
 const COS_KEYS = ['glow', 'trail', 'spark'];
 const cosOf = (id) => { const c = (cos[id] = cos[id] || {}); c.own = c.own || {}; c.eq = c.eq || {}; for (const k of COS_KEYS) { c.own[k] = (c.own[k] || []).filter((x) => COSMETICS[k].items.some((i) => i.id === x)); if (c.eq[k] && c.own[k].indexOf(c.eq[k]) < 0) c.eq[k] = null; } return c; };
-const save = () => { try { localStorage.setItem('skyleap', JSON.stringify({ sound: settings.sound, quality: settings.quality, best, bests, starsBy, unlocked, coins, owned, shake: settings.shake, vehicle: vehicleId, lastLevel: level, upg, cos, trophy, rev: 2 })); } catch (e) {} };
-try { const s = JSON.parse(localStorage.getItem('skyleap') || '{}'); if (typeof s.coins === 'number') coins = Math.max(0, s.coins | 0); if (Array.isArray(s.owned)) { owned = s.owned.filter((x) => typeof x === 'string'); hasOwned = true; } if (s.shake === false) settings.shake = false; else if (s.shake === true) settings.shake = true; } catch (e) {}
+const save = () => { try { localStorage.setItem('skyleap', JSON.stringify({ sound: settings.sound, quality: settings.quality, best, bests, starsBy, unlocked, coins, crates, owned, shake: settings.shake, vehicle: vehicleId, lastLevel: duelOn ? duelPrevLevel : level, upg, cos, trophy, rev: 2 })); } catch (e) {} if (window.AuthService) window.AuthService.progressChanged(); };
+try { const s = JSON.parse(localStorage.getItem('skyleap') || '{}'); if (typeof s.coins === 'number') coins = Math.max(0, s.coins | 0); if (typeof s.crates === 'number') crates = Math.max(0, s.crates | 0); if (Array.isArray(s.owned)) { owned = s.owned.filter((x) => typeof x === 'string'); hasOwned = true; } if (s.shake === false) settings.shake = false; else if (s.shake === true) settings.shake = true; } catch (e) {}
 try { if ((JSON.parse(localStorage.getItem('skyleap') || '{}').rev | 0) < 2) { owned = ['gt']; hasOwned = true; vehicleId = 'gt'; } } catch (e) {}   // rev 2: Red Bug is the starter, every other car is bought with coins
 owned = owned.filter((x) => PRICE[x] !== undefined);
 if (PRICE[vehicleId] === undefined) vehicleId = 'gt';

@@ -12,11 +12,13 @@ function statBars(p) {
     ['Air control', (p.airTorque / p.inertia) / 2, 'air'],
     ['Meteor shield', p.meteorGuard / 0.8, 'shield'],
     ['Cold grip', p.coldGuard / 0.9, 'cold'],
+    ['Float', (1 - p.gScale) / 0.3, 'float'],
+    ['Nitro regen', p.fuelRegen / 0.1, 'regen'],
   ];
 }
 function ridePane(v) {
   const base = statBars(Phys.statsFor(v.id, {})), cur = statBars(Phys.statsFor(v.id, upgOf(v.id)));
-  let h = '<div class="stats">';
+  let h = '<div class="abilityBox r-' + v.rarity + '" data-testid="ability-box"><b>' + RARITY[v.rarity].name.toUpperCase() + '</b> ' + v.ability + '</div><div class="stats">';
   for (let i = 0; i < base.length; i++) {
     h += '<div class="srow" data-testid="stat-' + base[i][2] + '"><span>' + base[i][0] + '</span><div class="sbar"><i class="b" style="width:' + (clamp01(base[i][1]) * 100).toFixed(0) + '%"></i><i class="u" style="width:' + (clamp01(cur[i][1]) * 100).toFixed(0) + '%"></i></div></div>';
   }

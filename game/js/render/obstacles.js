@@ -21,6 +21,7 @@ function buildGates() {
   for (let i = 1; i < CPS.length; i++) gates.push(makeGate(CPS[i].x, 0xff8a3d, false));
   gates.push(makeGate(track.finishX, 0xffffff, true));
   startLine = makeGate(CPS[0].x - 4, 0x35e6ff, false);
+  attachGateModels();
 }
 
 /* ================= hazards ================= */

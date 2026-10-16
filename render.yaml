@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: turbo-drive
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: ./www
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

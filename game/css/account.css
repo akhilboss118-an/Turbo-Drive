@@ -1,0 +1,55 @@
+/* Sign-in screen + profile */
+#login{position:absolute;inset:0;display:flex;align-items:center;padding:0 7vw;pointer-events:none;background:linear-gradient(90deg,rgba(21,12,58,.9) 0%,rgba(21,12,58,.5) 50%,rgba(21,12,58,0) 78%)}
+.lgCard{width:min(380px,86vw);display:flex;flex-direction:column;gap:clamp(8px,1.8vh,14px);pointer-events:none;animation:lgIn .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes lgIn{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.lgCard .title{font-size:clamp(40px,11vh,84px)}
+.lgCard .tag{margin:0 0 clamp(4px,1.4vh,12px)}
+.lgBtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;height:clamp(44px,9vh,54px);padding:0 18px;border-radius:12px;font-weight:900;letter-spacing:.03em;font-size:clamp(14px,3vh,17px);border:2px solid transparent;transition:transform .15s,filter .15s,box-shadow .15s,background-color .15s;pointer-events:auto}
+.lgBtn:disabled{opacity:.55;pointer-events:none}
+.lgBtn .ico{width:1.3em;height:1.3em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lgBtn.google{background:#fff;color:#1f1f1f;box-shadow:0 4px 0 #b9bfd0,0 8px 22px rgba(0,0,0,.35)}
+.lgBtn.google .gG,#lgGoogleIc svg{width:22px;height:22px;display:block}
+#lgGoogleIc{display:grid;place-items:center}
+.lgBtn.guest{background:linear-gradient(180deg,rgba(52,74,168,.92),rgba(20,26,92,.94));border-color:rgba(53,230,255,.6);color:var(--cream);box-shadow:0 4px 0 rgba(8,10,50,.8)}
+.lgBtn.out{background:rgba(255,80,80,.12);border-color:rgba(255,110,110,.7);color:#ffb4b4;margin-top:6px}
+@media (hover:hover){.lgBtn:hover{transform:translateY(-2px);filter:brightness(1.06)}}
+.lgBtn:active{transform:translateY(2px)}
+.lgBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.lgOr{display:flex;align-items:center;gap:10px;color:rgba(255,241,220,.6);font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.lgOr i{flex:1;height:1px;background:rgba(255,241,220,.25)}
+.lgFine{margin:0;font-size:12px;color:rgba(255,241,220,.7)}
+.lgErr{margin:0;min-height:1em;font-size:12px;font-weight:700;color:#ff9a9a}
+.lgMode{margin:0;font-size:11px;color:#ffd24a;letter-spacing:.03em}
+/* profile icon in the menu top bar */
+#authSlot{display:flex}
+.profBtn{display:flex;align-items:center;gap:8px;height:clamp(32px,7.8vh,40px);padding:0 14px 0 3px;border-radius:999px;border:1.5px solid rgba(53,230,255,.65);background:rgba(14,18,70,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-weight:900;letter-spacing:.03em;font-size:clamp(12px,2.9vh,15px);transition:transform .15s,border-color .15s,box-shadow .15s}
+.profBtn.isGuest{border-color:rgba(255,241,220,.45)}
+@media (hover:hover){.profBtn:hover{border-color:#9ff4ff;transform:scale(1.05);box-shadow:0 0 16px rgba(53,230,255,.45)}}
+.profBtn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.profBtn .av{width:clamp(26px,6.4vh,34px);height:clamp(26px,6.4vh,34px);border-radius:50%;object-fit:cover;display:grid;place-items:center;flex:none;background:linear-gradient(135deg,#ff8a3d,#ff4d8d);color:#fff;font-weight:900}
+.profBtn .av.guest,.pfAv.guest{background:linear-gradient(135deg,#4a5aa8,#2a3070)}
+.profBtn .av .ico,.pfAv .ico{width:60%;height:60%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.profBtn .pn{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){.profBtn .pn{display:none}.profBtn{padding:0 3px}}
+/* profile card */
+#profile{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:rgba(8,5,30,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto;overflow:auto;padding:12px}
+.pfCard{position:relative;width:min(420px,94vw);padding:clamp(14px,3vh,22px);display:flex;flex-direction:column;gap:clamp(8px,1.6vh,14px);animation:lgIn .35s cubic-bezier(.2,.8,.2,1) both}
+.pfCard h2{margin:0;font-family:var(--disp,inherit);font-style:italic;font-size:clamp(20px,4.4vh,26px);letter-spacing:.04em;text-transform:uppercase}
+.pfClose{position:absolute;right:12px;top:12px;width:38px;height:38px;font-size:26px;line-height:1}
+.pfTop{display:flex;gap:14px;align-items:center}
+.pfAv{width:clamp(56px,13vh,76px);height:clamp(56px,13vh,76px);border-radius:50%;object-fit:cover;display:grid;place-items:center;flex:none;font-size:clamp(24px,5.5vh,34px);font-weight:900;color:#fff;background:linear-gradient(135deg,#ff8a3d,#ff4d8d);border:3px solid rgba(255,241,220,.85)}
+.pfWho{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.pfBadge{align-self:flex-start;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:1px 8px;border-radius:999px}
+.pfBadge.g{background:rgba(255,241,220,.18);color:var(--cream)}
+.pfBadge.ok{background:#35e6ff;color:#06222a}
+.pfName{width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(53,230,255,.4);border-radius:8px;color:var(--cream);font:inherit;font-weight:900;font-size:clamp(16px,3.4vh,20px);padding:4px 8px;outline:none;user-select:text;-webkit-user-select:text}
+.pfName:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(53,230,255,.25)}
+.pfMail{font-size:12px;color:rgba(255,241,220,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pfGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pfGrid div{background:rgba(255,255,255,.07);border:1px solid rgba(53,230,255,.25);border-radius:10px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.pfGrid b{font-size:clamp(14px,3vh,18px);color:#ffd24a}
+.pfGrid small{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,241,220,.7)}
+.pfMeta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:rgba(255,241,220,.65);flex-wrap:wrap}
+.pfMeta code{font-family:ui-monospace,monospace;color:var(--cyan)}
+.pfNote{margin:0;font-size:12px;color:rgba(255,241,220,.8)}
+@media (max-height:420px){.pfGrid{display:none}.lgCard .tag,.lgFine{display:none}}

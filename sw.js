@@ -1,9 +1,23 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v5';
+const CACHE = 'turbo-drive-v26';
 const FILES = [
  "game/assets/loading.jpg",
  "game/assets/logo.png",
  "game/css/intro.css",
+ "game/css/space.css",
+ "game/css/tutorial.css",
+ "game/css/levelcards.css",
+ "game/js/core/tutorial.js",
+ "game/js/render/space.js",
+ "game/js/render/alien.js",
+ "game/css/alien.css",
+ "game/assets/models/ufo.glb",
+ "game/js/game/spaceflight.js",
+ "game/css/duel.css",
+ "game/css/premium.css",
+ "game/js/render/premium.js",
+ "game/js/duel/duel.js",
+ "game/js/core/server-config.js",
  "game/js/core/intro.js",
  "game/css/cutscene.css",
  "game/css/shop.css",
@@ -18,6 +32,15 @@ const FILES = [
  "game/js/core/storm.js",
  "game/js/data/car5.js",
  "game/js/data/hover.js",
+ "game/js/data/hover2.js",
+ "game/js/data/crate.js",
+ "game/js/render/crates.js",
+ "game/js/ui/crates.js",
+ "game/css/crates.css",
+ "game/js/core/auth.js",
+ "game/js/ui/account.js",
+ "game/css/account.css",
+ "game/css/rarity.css",
  "game/js/data/models.js",
  "game/js/data/thumbs.js",
  "game/js/game/cosmetics.js",
@@ -29,6 +52,14 @@ const FILES = [
  "game/js/main.js",
  "game/js/physics.js",
  "game/js/render/chasm.js",
+ "game/js/render/iss.js",
+ "game/js/lib/GLTFLoader.js",
+ "game/assets/models/iss.glb",
+ "game/assets/models/saturn_planet.glb",
+ "game/assets/models/asteroids_rocky.glb",
+ "game/assets/models/checkpoint.glb",
+ "game/assets/models/finish_line.glb",
+ "game/js/render/raceobjs.js",
  "game/js/render/cold.js",
  "game/js/render/desert.js",
  "game/js/render/environment.js",
@@ -57,8 +88,8 @@ self.addEventListener('activate', (e) => {
 });
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request).then((res) => {
+  e.respondWith(fetch(e.request).then((res) => {
     if (res && (res.ok || res.type === 'opaque')) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {}); }
     return res;
-  }).catch(() => e.request.mode === 'navigate' ? caches.match('./index.html') : Response.error())));
+  }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || (e.request.mode === 'navigate' ? caches.match('./index.html') : Response.error()))));
 });

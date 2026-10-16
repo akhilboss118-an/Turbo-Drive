@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const MIME = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -14,7 +14,9 @@ const MIME = {
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.mp3': 'audio/mpeg',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.glb': 'model/gltf-binary',
+  '.gltf': 'model/gltf+json'
 };
 
 const server = http.createServer((req, res) => {
@@ -38,6 +40,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Turbo Drive server running at http://127.0.0.1:${PORT}/`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Turbo Drive server running on port ${PORT}`);
 });
