@@ -1,5 +1,5 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v31';
+const CACHE = 'turbo-drive-v32';
 const FILES = [
  "game/assets/loading.jpg",
  "game/assets/logo.png",

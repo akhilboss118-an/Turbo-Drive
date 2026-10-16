@@ -94,6 +94,13 @@
     <div class="crCount" id="crCount" data-testid="crate-count"></div>
     <button class="lgBtn google" id="btnCrOpen" data-testid="crate-open-btn"><span>Open crate</span></button>
   </div></div>
+  <div id="hoverModal" class="hidden" data-testid="hover-modal"><div class="hvCard panel">
+    <button class="rbtn pfClose" id="btnHvClose" data-testid="hover-close-btn" aria-label="Close">&times;</button>
+    <h2 id="hvTitle">Hover needed</h2>
+    <p id="hvSub" class="hvSub" data-testid="hover-sub"></p>
+    <div class="hvList" id="hvList"></div>
+    <button class="dbtn" id="btnHvGo" data-testid="hover-continue-btn">Continue anyway</button>
+  </div></div>
   <div id="stages" class="hidden"><div class="stitle"><button class="rbtn" id="btnStBack" data-testid="stages-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Select Stage</h2><button class="uabtn" type="button" data-testid="unlock-all-btn" aria-pressed="false"><svg class="ico "><use href="#i-lock"/></svg><span>Unlock all levels: OFF</span></button><div class="pill" id="stStars"></div></div><div id="worlds" data-testid="stage-cards"></div></div>
   <div id="levels" class="hidden" data-testid="levels-screen"><div class="stitle"><button class="rbtn" id="btnLvBack" data-testid="levels-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><div class="lvhead"><h2 id="lvTitle">Select Level</h2><span id="lvBlurb"></span></div><button class="uabtn" type="button" data-testid="unlock-all-btn-levels" aria-pressed="false"><svg class="ico "><use href="#i-lock"/></svg><span>Unlock all levels: OFF</span></button><div class="pill" id="lvStars"></div></div><div class="lvwrap"><button class="lvnav prev" id="lvPrev" data-testid="levels-prev-btn" aria-label="Previous level"><svg class="ico"><use href="#i-chev"/></svg></button><div id="cards" data-testid="level-cards" role="listbox" aria-label="Levels"></div><button class="lvnav next" id="lvNext" data-testid="levels-next-btn" aria-label="Next level"><svg class="ico"><use href="#i-chev"/></svg></button></div><div id="lvDots" data-testid="level-dots"></div></div>
   <div id="garage" class="hidden">

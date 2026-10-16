@@ -311,10 +311,40 @@ function hoverBlock(n) {
     toast('LEGENDARY HOVER REQUIRED', has ? 'Open the Garage and SELECT the Mars Hover or Aero Hover to fly in space' : 'Buy a Legendary hover in the Garage (Mars Hover 2500 / Aero Hover 4000 coins)', 'warn'); Snd.click(); return true;
   }
   if (!LEVELS[n].needHover || vehicleId === 'hover') return false;
-  toast('MARS HOVER REQUIRED', owned.indexOf('hover') < 0 ? 'Buy the Mars Hover in the Garage (2500 coins), then select it' : 'Open the Garage and SELECT the Mars Hover to start this level', 'warn'); Snd.click(); return true;
+  hoverPrompt(n, true); return true;
 }
+const isHoverCar = () => vehicleId === 'hover' || vehicleId === 'hover2';
+let hvLevel = 0, hvRequired = false, hvSkip19 = false;
+function hoverPrompt(n, required) {
+  hvLevel = n; hvRequired = required; const ids = required ? ['hover'] : ['hover', 'hover2'];
+  $('hvTitle').textContent = required ? 'Mars Hover required' : 'Get a hover before level 20';
+  $('hvSub').textContent = required ? 'Level ' + n + ' can only be flown in the Mars Hover. Buy or equip it to start.' : 'Level 20 (Moon Collapse) and Deep Space need a hover. Buy or equip one now, or continue with your current ride.';
+  $('btnHvGo').classList.toggle('hidden', required);
+  const list = $('hvList'); list.innerHTML = '';
+  ids.forEach((id) => {
+    const v = vehicleById(id), has = owned.indexOf(id) >= 0, eq = vehicleId === id, d = document.createElement('div'); d.className = 'hvItem';
+    d.innerHTML = '<img alt="" src="' + THUMBS[id] + '"><b>' + v.name + '</b><small>' + v.ability + '</small>';
+    const b = document.createElement('button'); b.className = 'dbtn go' + (eq ? ' on' : ''); b.setAttribute('data-testid', 'hover-action-' + id);
+    b.innerHTML = eq ? 'Equipped' : has ? 'Equip' : svg('coin', 'coin') + ' Buy ' + v.price;
+    b.addEventListener('click', () => hoverAct(id)); d.appendChild(b); list.appendChild(d);
+  });
+  $('hoverModal').classList.remove('hidden'); Snd.click();
+}
+function hoverAct(id) {
+  const v = vehicleById(id);
+  if (owned.indexOf(id) < 0) {
+    if (coins < v.price) { toast('NEED ' + (v.price - coins) + ' MORE', 'Earn coins from stars, style and flips', 'warn'); Snd.click(); return; }
+    coins -= v.price; owned.push(id); Snd.win(); toast('NEW RIDE', v.name + ' is yours', 'good');
+  }
+  vehicleId = id; applyStats(id); applyVehicle(id); save(); refreshMenu(); refreshCoins(); Snd.cp();
+  if (hvRequired && id === 'hover') { $('hoverModal').classList.add('hidden'); pickLevel(hvLevel); return; }
+  hoverPrompt(hvLevel, hvRequired);
+}
+function hoverClose() { $('hoverModal').classList.add('hidden'); Snd.click(); }
 function pickLevel(n) {
   if (n !== 26 && n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
+  if (n === 19 && !isHoverCar() && !hvSkip19) { hoverPrompt(n, false); return; }
+  hvSkip19 = false;
   if (hoverBlock(n)) return;
   stageTravel(n, () => { if (n !== level) loadLevel(n); save(); startRun(); });
 }
@@ -364,6 +394,8 @@ function equip() {
 function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicle(vehicleId); setState('menu'); Snd.click(); }
 const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
+on('btnHvClose', hoverClose);
+on('btnHvGo', () => { $('hoverModal').classList.add('hidden'); hvSkip19 = true; pickLevel(hvLevel); });
 on('btnLoop', () => { Snd.click(); loadLevel(26); startRun(); });
 on('btnStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });
 on('btnReplayStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });

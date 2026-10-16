@@ -27,3 +27,16 @@
 .crReward.r-legendary{border-color:#ffc83a;background:rgba(80,50,4,.92);color:#fff2a8;box-shadow:0 0 28px rgba(255,200,58,.85)}
 @keyframes crPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 .crCount{font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,241,220,.75)}
+
+#hoverModal{position:absolute;inset:0;z-index:42;display:grid;place-items:center;background:rgba(8,5,30,.78);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto;padding:12px;overflow:auto}
+.hvCard{position:relative;width:min(560px,94vw);padding:clamp(14px,3vh,22px);display:flex;flex-direction:column;gap:clamp(8px,1.6vh,14px);text-align:center;border-color:rgba(255,200,58,.6);animation:lgIn .35s cubic-bezier(.2,.8,.2,1) both}
+.hvCard h2{margin:0;font-style:italic;font-size:clamp(20px,4.4vh,26px);letter-spacing:.04em;text-transform:uppercase;color:#ffe08a}
+.hvSub{margin:0;font-size:clamp(12px,2.6vh,15px);opacity:.85}
+.hvList{display:flex;gap:10px;justify-content:center}
+.hvItem{flex:1 1 0;display:flex;flex-direction:column;gap:6px;align-items:center;padding:8px;border-radius:12px;border:2px solid rgba(255,200,58,.45);background:rgba(20,26,92,.7)}
+.hvItem img{width:100%;max-height:clamp(60px,18vh,110px);object-fit:contain}
+.hvItem b{font-size:clamp(13px,2.8vh,16px);text-transform:uppercase}
+.hvItem small{opacity:.75;font-size:clamp(10px,2.2vh,12px)}
+.hvItem .dbtn{width:100%;height:clamp(40px,9vh,48px);min-height:40px}
+.hvItem .dbtn.on{opacity:.7;pointer-events:none}
+
