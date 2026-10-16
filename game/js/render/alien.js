@@ -2,6 +2,7 @@
 'use strict';
 /* Alien saucer that chases the player in every level. Any crash / hit = "ALIEN CAUGHT YOU". */
 const ALIEN_SIZE = 3.2;
+const ALIEN_MAX_HITS = 5;
 const alienRoot = new THREE.Group(); alienRoot.visible = false; scene.add(alienRoot);
 const alienSpin = new THREE.Group(); alienRoot.add(alienSpin);
 const alienBeamMat = new THREE.MeshBasicMaterial({ color: 0x7dff6a, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false });
@@ -10,7 +11,7 @@ const alienGlowMat = new THREE.MeshBasicMaterial({ color: 0x7dff6a, transparent:
 const alienGlow = new THREE.Mesh(new THREE.CircleGeometry(1.3, 24), alienGlowMat); alienGlow.rotation.x = -Math.PI / 2; alienGlow.position.y = -0.45; alienRoot.add(alienGlow);
 const boltGeo = new THREE.BufferGeometry(); boltGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(11 * 3), 3));
 const alienBolt = new THREE.Line(boltGeo, new THREE.LineBasicMaterial({ color: 0xb6ff9a, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); alienBolt.frustumCulled = false; alienBolt.visible = false; scene.add(alienBolt);
-const AL = { idleT: 0, atk: 0, attacking: false, zapT: 0, boltT: 0, rel: new THREE.Vector3(), tgt: new THREE.Vector3(), f: new THREE.Vector3(), side: new THREE.Vector3(), ready: false, t: 0, caught: 0, close: 0, warn: 0, active: false, loaded: false, hideT: 0, bannerT: 0, lastState: '' };
+const AL = { idleT: 0, atk: 0, attacking: false, zapT: 0, boltT: 0, rel: new THREE.Vector3(), tgt: new THREE.Vector3(), f: new THREE.Vector3(), side: new THREE.Vector3(), ready: false, t: 0, caught: 0, hits: 0, close: 0, warn: 0, active: false, loaded: false, hideT: 0, bannerT: 0, lastState: '' };
 const alienEl = document.createElement('div'); alienEl.id = 'alienBanner'; alienEl.className = 'hidden'; alienEl.setAttribute('data-testid', 'alien-banner');
 alienEl.innerHTML = '<div class="abMain" data-testid="alien-banner-main"></div><div class="abSub" data-testid="alien-banner-sub"></div>';
 $('ui').appendChild(alienEl);
@@ -48,16 +49,16 @@ const _alV2 = new THREE.Vector3();
 
 window.addEventListener('td:state', (e) => {
   const s = e.detail, was = AL.lastState; AL.lastState = s;
-  const ok = ALIEN_STATES.indexOf(s) >= 0 && !(typeof duelOn !== 'undefined' && duelOn);
+  const ok = ALIEN_STATES.indexOf(s) >= 0 && !(typeof duelOn !== 'undefined' && duelOn) && !(s === 'finishing' && LEVELS[level].space);
   if (!ok) { radarEl.classList.add('hidden'); Snd.alienHum(0); AL.active = false; alienRoot.visible = false; AL.ready = false; alienEl.classList.add('hidden'); AL.bannerT = 0; return; }
   AL.active = true; radarEl.classList.remove('hidden');
-  if (s === 'countdown' && was !== 'paused') { AL.ready = false; AL.caught = 0; AL.close = 0; AL.warn = 0; AL.idleT = 0; AL.atk = 0; AL.attacking = false; alienBolt.visible = false; alienBanner('ALIEN SHIP IS CHASING YOU', "Don't hit anything!", 'warn', 2600); }
+  if (s === 'countdown' && was !== 'paused') { AL.ready = false; AL.caught = 0; AL.hits = 0; AL.close = 0; AL.warn = 0; AL.idleT = 0; AL.atk = 0; AL.attacking = false; alienBolt.visible = false; alienBanner('ALIEN SHIP IS CHASING YOU', "Don't hit anything!", 'warn', 2600); }
   if (s === 'crashed' && was !== 'crashed') {
     AL.caught = 1; AL.t = 0; Snd.zap();
     $('crashMenu').querySelector('h2').textContent = 'ALIEN CAUGHT YOU!';
     $('crashReason').textContent = 'You ' + $('crashReason').textContent.toLowerCase() + '. The alien got you.';
   }
-  if (s === 'playing' && was === 'crashed') { AL.idleT = 0; AL.atk = 0; AL.attacking = false; AL.caught = 0; alienEl.classList.add('hidden'); AL.bannerT = 0; }
+  if (s === 'playing' && was === 'crashed') { AL.idleT = 0; AL.atk = 0; AL.attacking = false; AL.caught = 0; AL.hits = 0; alienEl.classList.add('hidden'); AL.bannerT = 0; }
 });
 
 function alienUpdate(dt) {
@@ -83,7 +84,7 @@ function alienUpdate(dt) {
   else if (!atkOn && AL.attacking) { AL.attacking = false; alienEl.classList.add('hidden'); AL.bannerT = 0; }
   if (AL.attacking && AL.atk > 0.8 && state === 'playing') {
     AL.zapT -= dt;
-    if (AL.zapT <= 0) { AL.zapT = 0.8 + Math.random() * 0.5; AL.boltT = 0.22; Snd.zap(); shake = Math.max(shake, 0.6); vibe(40, 'heavy'); }
+    if (AL.zapT <= 0) { AL.zapT = 0.8 + Math.random() * 0.5; AL.boltT = 0.22; Snd.zap(); shake = Math.max(shake, 0.6); vibe(40, 'heavy'); AL.hits += 1 - Math.min(0.9, (car.p && car.p.meteorGuard) || 0); if (AL.hits >= ALIEN_MAX_HITS - 1e-6) { AL.hits = 0; const r = 'were zapped to death by the UFO'; if (LEVELS[level].space) spCrash(r); else onCrash(r); return; } }
   }
   if (AL.boltT > 0) {
     AL.boltT -= dt; alienBolt.visible = AL.boltT > 0 && !caught;
@@ -113,6 +114,6 @@ function alienUpdate(dt) {
   alienBeam.visible = alienBeamMat.opacity > 0.01;
   alienBeam.scale.set(1, Math.max(0.4, (alienRoot.position.y - carW.y) / 5), 1); alienBeam.position.y = -(alienRoot.position.y - carW.y) / 2 * 1.0;
   alienGlowMat.opacity = (caught ? 0.9 : 0.5) * pulse;
-  alienRoot.visible = AL.loaded;
+  alienRoot.visible = AL.loaded && !(state === 'finishing' && LEVELS[level].space);
 }
 const _alV = new THREE.Vector3();

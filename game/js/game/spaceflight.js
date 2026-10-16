@@ -47,14 +47,14 @@ function spRingPass(r, ix, iy) {
   }
 }
 function spStep(dt) {
-  const c = SP.course, P = car.p, sm = 1 + (P.vmax - 1) * 0.9, wantN = input.nitro;
+  const c = SP.course, P = car.p, spd = c.spd || 1, sm = (1 + (P.vmax - 1) * 0.9) * spd, wantN = input.nitro;
   const prevS = SF.s, prevX = SF.x, prevY = SF.y;
   let target = (input.brake ? 38 : input.gas ? 100 : 72) * sm; if (wantN) target = 155 * sm * (0.96 + 0.04 * P.nitroPow);
   const k = wantN ? 2.6 : input.brake ? 2.8 : target > SF.fs ? 0.9 * P.engine : 0.7, fs0 = SF.fs;
   SF.fs += (target - SF.fs) * (1 - Math.exp(-dt * k));
   const acc = (SF.fs - fs0) / dt;
   SF.steer += (input.steer - SF.steer) * (1 - Math.exp(-dt * (input.steer ? 8 : 10)));
-  const lat = 85 * (0.85 + 0.3 * Math.min(1.6, SF.fs / 72));
+  const lat = 85 * (0.85 + 0.3 * Math.min(1.6, SF.fs / (72 * spd))) * (0.9 + 0.1 * spd);
   SF.vx += (SF.steer * lat - SF.vx * 2.5) * dt; SF.x += SF.vx * dt;
   spCenter(c, SF.s, _sfC); const dxc = SF.x - _sfC.x;
   SF.off = Math.abs(dxc) > 70 ? 1 : 0; if (Math.abs(dxc) > 80) SF.vx -= Math.sign(dxc) * (Math.abs(dxc) - 80) * 6 * dt;
@@ -79,8 +79,16 @@ function spStep(dt) {
   }
   if (SF.s >= c.len) onFinish();
 }
+const FLYBY_T = 8, FLYBY_INFO = { jupiter: ['JUPITER', 'Gas giant \u00B7 79 moons \u00B7 Great Red Spot'], saturn: ['SATURN', 'Ringed giant \u00B7 146 moons \u00B7 lighter than water'], uranus: ['URANUS', 'Ice giant \u00B7 spins on its side \u00B7 faint rings'], neptune: ['NEPTUNE', 'Ice giant \u00B7 supersonic winds \u00B7 Great Dark Spot'], pluto: ['PLUTO', 'Dwarf planet \u00B7 heart-shaped glacier \u00B7 moon Charon'] };
+let flybyEl = null;
+function spFlybyCap(on) {
+  if (!flybyEl) { flybyEl = document.createElement('div'); flybyEl.id = 'flyby'; flybyEl.setAttribute('data-testid', 'planet-flyby-caption'); flybyEl.innerHTML = '<small>ARRIVING AT</small><b data-testid="planet-flyby-name"></b><span data-testid="planet-flyby-fact"></span>'; $('ui').appendChild(flybyEl); }
+  if (on && !flybyEl.classList.contains('show')) { const i = FLYBY_INFO[LEVELS[level].planet] || ['', '']; flybyEl.querySelector('b').textContent = i[0]; flybyEl.querySelector('span').textContent = i[1]; }
+  flybyEl.classList.toggle('show', on);
+}
 function spaceTick(dt) {
   startLine.group.visible = false; shadowHolder.visible = false; slg.clearRect(0, 0, slc.width, slc.height);
+  const plutoEnd25 = LEVELS[level].planet === 'pluto'; spFlybyCap(state === 'finishing' && finishT > 1 && !plutoEnd25);
   const st = state, live = st === 'playing', mfx = settings.shake ? 1 : 0;
   if (st === 'countdown') {
     countdownT -= dt; const n = Math.min(99, Math.ceil(countdownT - 0.2));
@@ -96,10 +104,10 @@ function spaceTick(dt) {
   const nb = $('nitro'); nb.style.setProperty('--f', fuel.toFixed(3)); nb.classList.toggle('empty', fuel < 0.05); vig.style.opacity = (mfx * boostAmt).toFixed(2);
   if (live) { timeT += dt; spStep(dt); }
   else if (st === 'finishing') {
-    finishT += dt; SF.fs += (26 - SF.fs) * (1 - Math.exp(-dt * 1.4)); spCenter(SP.course, SF.s, _sfC);
+    finishT += dt; SF.fs += (34 - SF.fs) * (1 - Math.exp(-dt * 1.4)); spCenter(SP.course, SF.s, _sfC);
     SF.vx += ((_sfC.x - SF.x) * 1.5 - SF.vx * 2.5) * dt; SF.x += SF.vx * dt; SF.vy += ((_sfC.y - SF.y) * 3 - SF.vy * 3) * dt; SF.y += SF.vy * dt; SF.s += SF.fs * dt;
     SF.roll += (0 - SF.roll) * (1 - Math.exp(-dt * 3)); SF.yaw += (0 - SF.yaw) * (1 - Math.exp(-dt * 3)); SF.pitch += (0 - SF.pitch) * (1 - Math.exp(-dt * 3));
-    if (finishT > 3.6) showResults();
+    if (finishT > (plutoEnd25 ? 1.2 : FLYBY_T)) showResults();
   } else if (st === 'crashed') { crashT += dt; if (crashT > 3.2) retry(); }
   if (st === 'garage') { fxA += (1 - fxA) * (1 - Math.exp(-dt * 7)); } else fxA += (0 - fxA) * (1 - Math.exp(-dt * 7));
   if (fxA > 0.02) { garageFx.position.set(SF.x, SF.y - 1.3, SF.z); spinner.rotation.y -= dt * 0.7; for (const m of fxMats) m.opacity = m.userData.base * fxA; garageFx.visible = true; } else garageFx.visible = false;
@@ -122,7 +130,7 @@ function spaceTick(dt) {
   Snd.engine(Math.min(40, SF.fs * 0.5), input.gas || wantN, live || st === 'finishing' || st === 'countdown');
   SF.hud -= dt; if (SF.hud <= 0) {
     SF.hud = 0.05; const c = SP.course, nc = SP.rings.length - 1;
-    $('timer').textContent = fmt(timeT); $('speed').textContent = Math.round(SF.fs * 4); $('spdbar').style.setProperty('--spd', Math.min(1, SF.fs / 160).toFixed(3));
+    $('timer').textContent = fmt(timeT); $('speed').textContent = Math.round(SF.fs * 4); $('spdbar').style.setProperty('--spd', Math.min(1, SF.fs / (160 * (SP.course.spd || 1))).toFixed(3));
     const nx = SP.rings.find((r) => r.state === 0 && r.s > SF.s - 6), dist = nx ? Math.max(0, Math.round(nx.s - SF.s)) : 0;
     $('cp').textContent = nx ? (nx.fin ? 'Next: Planet orbit \u00B7 ' + dist + ' m' : 'Next ring ' + (SP.rings.indexOf(nx) + 1) + ' / ' + nc + ' \u00B7 ' + dist + ' m') : 'Next: Finish';
     const bl = bests[level]; $('bestHud').textContent = 'Best ' + (bl === undefined || bl === null ? '--:--.-' : fmt(bl));
@@ -133,19 +141,23 @@ function spaceTick(dt) {
 function spaceCamera(dt) {
   const mf = settings.shake ? 1 : 0, st = state;
   const sx = shake > 0 ? (Math.random() - 0.5) * shake * mf : 0, sy = shake > 0 ? (Math.random() - 0.5) * shake * mf : 0; shake = Math.max(0, shake - dt * 1.6);
-  let fov = 64 + Math.max(0, SF.fs - 72) * 0.1 + boostAmt * 7, px, py, pz, lx, ly, lz, roll = 0;
+  const fsp = (SP.course && SP.course.spd) || 1, fn = SF.fs / fsp; let fov = 64 + Math.max(0, fn - 72) * 0.1 + (fsp - 1) * 9 + boostAmt * 7, px, py, pz, lx, ly, lz, roll = 0;
   if (st === 'countdown') {
     const e = smooth01(1 - countdownT / 3.2), a = (1 - e) * 2.4, rad = 12 + 6 * (1 - e);
     px = SF.x + Math.sin(a) * rad; py = SF.y + 3.4 + (1 - e) * 2.4; pz = SF.z + Math.cos(a) * rad; lx = SF.x; ly = SF.y + 0.6; lz = SF.z - 28 * e; SF.camX = SF.x; SF.camY = SF.y + 3.4; fov = 58 + 6 * e;
   } else if (st === 'finishing') {
-    const e = smooth01(finishT / 3.4), a = e * 1.25, rad = 14 + e * 10;
+    const e = smooth01(finishT / 3.4), a = e * 1.25, rad = 14 + e * 10, u = smooth01((finishT - 3) / 4), T = SP.target ? SP.target.position : null;
     px = SF.x + Math.sin(a) * rad; py = SF.y + 3.4 - e * 0.8; pz = SF.z + Math.cos(a) * rad; lx = SF.x + Math.sin(a) * -4; ly = SF.y + 0.6; lz = SF.z - 6; fov = 66 - e * 8;
+    if (u > 0 && T) {
+      px += (SF.x + 11 - px) * u; py += (SF.y + 2.2 - py) * u; pz += (SF.z - 8 - pz) * u;
+      lx += (T.x - lx) * u; ly += (T.y - ly) * u; lz += (T.z - lz) * u; fov -= u * 14;
+    }
   } else if (st === 'cutscene') {
     const a = SP.t * 0.1 + 0.4, rad = 24; px = SF.x + Math.sin(a) * rad; py = SF.y + 5 + Math.sin(SP.t * 0.2) * 2; pz = SF.z + Math.cos(a) * rad; lx = SF.x; ly = SF.y; lz = SF.z - 40; fov = 55;
   } else {
     if (SF.camSnap) { SF.camX = SF.x; SF.camY = SF.y; SF.camSnap = false; }
     SF.camX += (SF.x - SF.camX) * (1 - Math.exp(-dt * 3.4)); SF.camY += (SF.y - SF.camY) * (1 - Math.exp(-dt * 4));
-    px = SF.camX + sx; py = SF.camY + 3.3 - kick * mf + sy; pz = SF.z + 11.5 + boostAmt * 3.2 + Math.max(0, SF.fs - 72) * 0.025;
+    px = SF.camX + sx; py = SF.camY + 3.3 - kick * mf + sy; pz = SF.z + 11.5 + boostAmt * 3.2 + Math.max(0, fn - 72) * 0.025 + (fsp - 1) * 3;
     lx = SF.camX * 0.35 + SF.x * 0.65; ly = SF.y + 0.9; lz = SF.z - 30; roll = SF.roll * 0.3 * mf;
   }
   if (Math.abs(camera.fov - fov) > 0.05) { camera.fov += (fov - camera.fov) * 0.08; camera.updateProjectionMatrix(); }

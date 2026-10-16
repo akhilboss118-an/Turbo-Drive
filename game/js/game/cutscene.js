@@ -6,7 +6,7 @@ const CS_CAPS = [
   [0.2, 'MOON CORE UNSTABLE', 'warn'], [1.7, 'HOVER LAUNCH SEQUENCE', ''], [2.9, '3', 'big'], [3.5, '2', 'big'], [4.1, '1', 'big'],
   [4.8, 'IGNITION', 'go'], [9, 'LEAVING THE MOON', ''], [14, 'ESCAPE VELOCITY REACHED', 'go'], [19, 'THE MOON IS GONE', 'warn'], [22.4, 'ENTERING DEEP SPACE', 'go'], [26.4, '', ''],
 ];
-const CS_SPACE_AT = 27.4, CS_CREDITS_DONE = 12.5;
+const CS_SPACE_AT = 27.4, CS_CREDITS_DONE = 14;
 const csSmooth = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
 function csBuild() {
@@ -37,8 +37,10 @@ function csBurst() {
 }
 
 function startCutscene(mode) {
-  CS.mode = mode || 'launch'; csBuild(); clearInput();
+  CS.mode = mode || 'launch'; if (CS.mode === 'pluto') { plutoStart(); return; } csBuild(); clearInput();
   if (CS.mode === 'credits') {
+    $('csReached').textContent = 'YOU HAVE REACHED ' + String(LEVELS[level].planet || 'NEPTUNE').toUpperCase() + ' PLANET';
+    $('csMission').innerHTML = 'EARTH &middot; MARS &middot; MOON &middot; JUPITER &middot; SATURN &middot; URANUS &middot; NEPTUNE' + (LEVELS[level].secret ? ' &middot; PLUTO' : '');
     CS.t = 0; CS.on = true; CS.done = false; CS.capI = -1; $('csCap').textContent = ''; $('csFade').style.opacity = 0; $('csCredits').classList.remove('roll'); $('btnCsDone').classList.add('hidden'); $('btnCsSkip').classList.remove('hidden');
     setState('cutscene'); Snd.engine(0, false, false); return;
   }
@@ -53,6 +55,10 @@ function startCutscene(mode) {
 
 function endCutscene() {
   if (!CS.on) return; CS.on = false;
+  if (CS.mode === 'pluto') {
+    plutoEnd(); if (CS.after === 'credits') { CS.after = null; startCutscene('credits'); return; }
+    car.spawn(CPS[0].x, 0); settle(300); snapCamera(); setState('results'); Snd.engine(0, false, false); Snd.win && Snd.win(); return;
+  }
   for (const f of CS.flames) f.visible = false;
   CS.rocks.visible = false; CS.streaks.visible = false; CS.earth.visible = false; CS.halo.visible = false;
   levelGroup.position.set(0, 0, 0); carRoot.rotation.set(0, 0, 0);
@@ -74,6 +80,7 @@ function csCaption(t) {
 
 function updateCutscene(dt) {
   if (!CS.on) return;
+  if (CS.mode === 'pluto') { plutoUpdate(dt); return; }
   if (CS.mode === 'credits') { CS.t += dt; if (CS.t > 0.5 && !$('csCredits').classList.contains('roll')) $('csCredits').classList.add('roll'); if (CS.t >= CS_CREDITS_DONE && !CS.done) { CS.done = true; $('btnCsDone').classList.remove('hidden'); $('btnCsSkip').classList.add('hidden'); } return; }
   CS.t += dt; const t = CS.t, u = Math.max(0, t - 5.0), warp = csSmooth((t - 18) / 2.5);
   csCaption(t);
@@ -136,4 +143,4 @@ function updateCutscene(dt) {
 
 on('btnCsSkip', () => endCutscene());
 on('btnCsDone', () => endCutscene());
-on('btnEnding', () => { if (state === 'results') startCutscene('credits'); });
+on('btnEnding', () => { if (state !== 'results') return; if (LEVELS[level].planet === 'pluto') { CS.after = 'credits'; startCutscene('pluto'); } else startCutscene('credits'); });

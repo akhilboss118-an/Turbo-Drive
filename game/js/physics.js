@@ -69,7 +69,7 @@ const Phys = (function () {
     if (level === 18) return buildLevel18(P, add);
     if (level === 19) return buildLevel19(P, add);
     if (level === 20) return buildLevel20(P, add);
-    if (level === 21) return buildLevel21(P, add);
+    if (level === 21 || level === 26) return buildLevel21(P, add);
     add('flat', 0, 90, ease.flat(0), 0, 0);
     add('kicker', 90, 108, ease.kicker(0, 2.4, 90, 108), 0, 2.4);               // jump 1
     add('drop', 126, 152, ease.drop(0.8, 0, 126, 152), 0.8, 0);

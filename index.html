@@ -206,8 +206,8 @@
   <div id="csFade"></div>
   <div id="csCap" data-testid="cutscene-caption"></div>
   <div id="csCredits"><div class="csRoll">
-    <h2>MISSION COMPLETE</h2><p class="big">FROM THE MOON TO SATURN</p>
-    <p><small>PILOT</small><br>YOU</p><p><small>VEHICLE</small><br>YOUR HOVER</p><p><small>MISSION</small><br>EARTH &middot; MARS &middot; MOON &middot; SPACE</p>
+    <h2>MISSION COMPLETE</h2><p class="big" id="csReached" data-testid="credits-planet-reached">YOU HAVE REACHED NEPTUNE PLANET</p>
+    <p><small>PILOT</small><br>YOU</p><p><small>VEHICLE</small><br>YOUR HOVER</p><p><small>MISSION</small><br><span id="csMission">EARTH &middot; MARS &middot; MOON &middot; JUPITER &middot; SATURN &middot; URANUS &middot; NEPTUNE</span></p>
     <p><small>ENGINE</small><br>THREE.JS</p><p class="big">THANKS FOR PLAYING</p><h1>TURBO DRIVE</h1>
   </div></div>
   <button class="btn" id="btnCsSkip" data-testid="cutscene-skip-btn">Skip</button>
@@ -266,6 +266,7 @@
 <script src="game/js/ui/crates.js"></script>
 <script src="game/js/duel/duel.js"></script>
 <script src="game/js/game/cutscene.js"></script>
+<script src="game/js/game/plutoscene.js"></script>
 <script src="game/js/render/space.js"></script>
 <script src="game/js/game/spaceflight.js"></script>
 <script src="game/js/render/alien.js"></script>

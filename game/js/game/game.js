@@ -86,21 +86,22 @@ function showResults() {
   const isBest = prev === null || timeT < prev; if (isBest) { bests[level] = timeT; best = timeT; }
   const prevStars = starsBy[level] || 0; if (!starsBy[level] || stars > starsBy[level]) starsBy[level] = stars;
   addCoins(Math.round(STAR_COINS[stars] * LV_MULT[baseOf(level)] * (level > 16 ? 2 : level > 8 ? 1.5 : 1)) + 40 * Math.max(0, stars - prevStars), 'stars');
-  const hasNext = level < CAMPAIGN_LEVELS, nw = WORLDS.find((w) => w.first === level + 1), newWorld = nw && unlocked < level + 1 ? nw : null; if (hasNext && unlocked < level + 1) unlocked = level + 1;
+  const hasNext = level < CAMPAIGN_LEVELS, nw = WORLDS.find((w) => w.first === level + 1), newWorld = nw && unlocked < level + 1 ? nw : null; const secretNew = hasNext && LEVELS[level + 1] && LEVELS[level + 1].secret && unlocked < level + 1; if (hasNext && unlocked < level + 1) unlocked = level + 1;
   let newTrophy = false; if (LEVELS[level].finale && stars === 3 && !trophy) { trophy = true; newTrophy = true; coins += TROPHY_COINS; refreshCoins(); Snd.win(); }
   save(); refreshMenu();
   const tr = $('resTrophy'); tr.classList.toggle('hidden', !(LEVELS[level].finale && trophy)); tr.textContent = newTrophy ? 'GOLD HOVER TROPHY  +' + TROPHY_COINS + ' COINS' : 'GOLD HOVER TROPHY';
-  $('btnNext').classList.toggle('hidden', !hasNext); $('btnNext').textContent = nw ? 'Go to ' + nw.name : 'Next level';
+  $('btnNext').classList.toggle('hidden', !hasNext); $('btnNext').textContent = nw ? 'Go to ' + nw.name : LEVELS[level + 1] && LEVELS[level + 1].secret ? 'SECRET LEVEL: PLUTO' : 'Next level';
   $('resLevel').textContent = LEVELS[level].name.replace('  ', ' \u00B7 ');
   $('resStars').innerHTML = [0, 1, 2].map((i) => '<i class="' + (i < stars ? 'on' : '') + '">\u2605</i>').join('');
   $('resBadge').classList.toggle('hidden', !isBest);
   $('resLap').textContent = 'Lap time ' + fmt(timeT) + '   \u00B7   Best lap ' + fmt(bests[level]);
-  $('resStats').textContent = 'Crashes ' + crashes + '   \u00B7   Style ' + score + (LEVELS[level].gravity ? '   \u00B7   Flip bonus ' + run.flipPts : '') + (isBest ? '' : '   \u00B7   Best ' + fmt(prev)) + (newWorld ? '   \u00B7   ' + newWorld.name.toUpperCase() + ' UNLOCKED' : '');
+  $('resStats').textContent = 'Crashes ' + crashes + '   \u00B7   Style ' + score + (LEVELS[level].gravity ? '   \u00B7   Flip bonus ' + run.flipPts : '') + (isBest ? '' : '   \u00B7   Best ' + fmt(prev)) + (newWorld ? '   \u00B7   ' + newWorld.name.toUpperCase() + ' UNLOCKED' : '') + (secretNew ? '   \u00B7   SECRET LEVEL UNLOCKED' : '');
   countUp($('resTime'), timeT, fmt, 900);
   window.dispatchEvent(new CustomEvent('td:result', { detail: { level, time: timeT, style: score, stars, isBest } }));
   $('resCoins').innerHTML = svg('coin', 'coin') + ' +' + (run.stars + run.style + run.flips) + ' coins<small>Stars ' + run.stars + '  \u00B7  Style ' + run.style + '  \u00B7  Flips ' + run.flips + (run.crates ? '  \u00B7  Crates ' + run.crates : '') + '</small>';
   $('btnEnding').classList.toggle('hidden', !LEVELS[level].finale2);
   if (LEVELS[level].finale) { startCutscene('launch'); return; }
+  if (LEVELS[level].space && LEVELS[level].planet === 'pluto') { CS.after = null; startCutscene('pluto'); return; }
   setState('results'); Snd.engine(0, false, false);
 }
 

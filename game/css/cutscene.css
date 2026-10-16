@@ -11,8 +11,8 @@
 #csCredits{position:absolute;inset:0;overflow:hidden;opacity:0;text-align:center;color:var(--cream)}
 #csCredits.roll{opacity:1}
 .csRoll{position:absolute;left:0;right:0;top:100%;display:flex;flex-direction:column;align-items:center;gap:clamp(14px,4vh,34px);padding-bottom:30vh}
-#csCredits.roll .csRoll{animation:csRoll 10s linear forwards}
-@keyframes csRoll{to{transform:translateY(-135vh)}}
+#csCredits.roll .csRoll{animation:csRoll 13s linear forwards}
+@keyframes csRoll{to{transform:translateY(-175vh)}}
 .csRoll h1{margin:0;font-size:clamp(44px,13vh,96px);font-style:italic;font-weight:900;transform:skewX(-6deg);text-shadow:4px 4px 0 var(--orange)}
 .csRoll h2{margin:0;font-size:clamp(26px,8vh,58px);font-style:italic;font-weight:900;letter-spacing:.12em;color:#ffe066;text-shadow:0 0 24px rgba(255,170,40,.8)}
 .csRoll p{margin:0;font-size:clamp(18px,4.6vh,32px);font-weight:900;letter-spacing:.1em}
@@ -31,3 +31,9 @@
 #chasmBox.danger{color:#fff;border-color:#ff3b2a;background:rgba(150,20,10,.8);animation:stormPulse .45s ease-in-out infinite alternate}
 #chasmBar{height:4px;border-radius:2px;background:rgba(255,255,255,.18);margin-top:4px;overflow:hidden}
 #chasmBar b{display:block;height:100%;width:calc(var(--g,0)*100%);background:linear-gradient(90deg,#ff3b2a,#ffd34d,#6dff8a)}
+#cutscene.pluto::before,#cutscene.pluto::after{content:'';position:absolute;left:0;right:0;height:9vh;background:#000;z-index:2}
+#cutscene.pluto::before{top:0}
+#cutscene.pluto::after{bottom:0}
+#cutscene.pluto #csCap{top:12vh;z-index:3}
+#cutscene.pluto #csFade{z-index:4}
+#cutscene.pluto #btnCsSkip{z-index:5}

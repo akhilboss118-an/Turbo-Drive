@@ -4,7 +4,7 @@
 const DUEL = { ws: null, role: '', pid: '', code: '', room: null, off: 0, bestRtt: 1e9, pingT: 0, result: null, oppFinish: null, ghost: null, samples: [], lastPos: 0, wantClose: false, reconnecting: false, rematchOn: false, modeJoin: false, lastLevelSent: 0, raceLaps: 1 };
 const DUEL_PROTO = 2;                            // v2 = lap-aware client (server refuses race mode with older clients)
 let duelRs = 0;
-const RACE_LEVELS = [21, 1, 5, 7];                // race-mode tracks: Infinite Loop (5 laps) + three existing levels (3 laps)
+const RACE_LEVELS = [26, 1, 5, 7];                // race-mode tracks: Infinite Loop (5 laps) + three existing levels (3 laps)
 const DUEL_MAX_LEVEL = 19;                       // level 20 needs the Mars Hover
 const serverNow = () => Date.now() + DUEL.off;
 const dName = (n) => LEVELS[n].name.replace('  ', ' \u00B7 ');

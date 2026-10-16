@@ -2,7 +2,7 @@
 'use strict';
 /* Coins, nitro, smoke, flames and screen effects */
 /* ================= coins, nitro & juice ================= */
-const LV_MULT = [0, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 13, 14, 15, 16, 17, 18, 20], STAR_COINS = [0, 20, 50, 100];
+const LV_MULT = [0, 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28], STAR_COINS = [0, 20, 50, 100];
 let run = { stars: 0, style: 0, flips: 0, flipPts: 0, crates: 0 }, combo = 0, liveFlips = 0, fuel = 1, boostAmt = 0, wasBoost = false, squash = 0, kick = 0;
 /* Haptics: native app (WebView) -> expo-haptics via postMessage; browsers -> navigator.vibrate */
 const VIBE_PAT = { light: 15, medium: 35, heavy: [70, 40, 110], nitro: [25, 20, 45] };

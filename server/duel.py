@@ -23,14 +23,15 @@ LOBBY_IDLE_LIMIT = 15 * 60   # lobby rooms with no activity expire
 ROOM_MAX_AGE = 60 * 60       # hard cap for any room
 MIN_LEVEL, MAX_LEVEL = 1, 19  # level 20 needs the Mars Hover, so it is not in duels
 MAX_MSG = 4096
-LOOP_LEVEL = 21              # Infinite Loop circuit (race only)
+LOOP_LEVEL = 26              # Infinite Loop circuit (race only)
+LOOP_LEVELS = (21, 26)       # backward-compatible with 21 and new 26
 RACE_LEVELS = (LOOP_LEVEL, 1, 5, 7)   # race mode tracks: Infinite Loop (5 laps), Sunset Run, Spiral Descent, Sky Climb (3 laps)
 RACE_LAPS = 3
 LOOP_LAPS = 5
 
 
 def race_laps(level: int) -> int:
-    return LOOP_LAPS if level == LOOP_LEVEL else RACE_LAPS
+    return LOOP_LAPS if level in LOOP_LEVELS else RACE_LAPS
 
 
 def now() -> float:

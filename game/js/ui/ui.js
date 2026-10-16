@@ -24,10 +24,12 @@ function spaceBG(g, w, h, n) {
   return r;
 }
 function spacePlanetDraw(g, kind, cx, cy, R, ring) {
-  const pal = kind === 'jupiter' ? ['#e6cfa8', '#c99a68', '#f1e4cc', '#a8643c', '#d9b384'] : ['#f0dfae', '#d9c088', '#f6ecc8', '#c8a96a'];
+  const pal = kind === 'jupiter' ? ['#e6cfa8', '#c99a68', '#f1e4cc', '#a8643c', '#d9b384'] : kind === 'uranus' ? ['#86d6e0', '#6cc4d2', '#a4e4ea', '#5ab8c8'] : kind === 'neptune' ? ['#2a52dc', '#1e3cb4', '#3a6af0', '#16288a', '#4a7aff'] : kind === 'pluto' ? ['#c9a27c', '#a87c5c', '#e8d2b0', '#7a5440'] : ['#f0dfae', '#d9c088', '#f6ecc8', '#c8a96a'];
   if (ring) { g.save(); g.translate(cx, cy); g.rotate(-0.35); g.strokeStyle = 'rgba(230,205,150,.35)'; g.lineWidth = R * 0.5; g.beginPath(); g.ellipse(0, 0, R * 1.75, R * 0.45, 0, Math.PI, 0); g.stroke(); g.restore(); }
   g.save(); g.beginPath(); g.arc(cx, cy, R, 0, 7); g.clip();
   pal.forEach((c, i) => { g.fillStyle = c; g.fillRect(cx - R, cy - R + i * R * 2 / pal.length, R * 2, R * 2 / pal.length + 1); });
+  if (kind === 'pluto') { g.fillStyle = '#f2e6d0'; g.beginPath(); g.moveTo(cx + R * 0.1, cy + R * 0.5); g.bezierCurveTo(cx - R * 0.4, cy + R * 0.1, cx - R * 0.25, cy - R * 0.35, cx + R * 0.1, cy - R * 0.1); g.bezierCurveTo(cx + R * 0.45, cy - R * 0.35, cx + R * 0.6, cy + R * 0.1, cx + R * 0.1, cy + R * 0.5); g.fill(); }
+  if (kind === 'neptune') { g.fillStyle = '#0c1a60'; g.beginPath(); g.ellipse(cx + R * 0.2, cy + R * 0.25, R * 0.2, R * 0.1, 0, 0, 7); g.fill(); }
   if (kind === 'jupiter') { g.fillStyle = '#b8452a'; g.beginPath(); g.ellipse(cx - R * 0.25, cy + R * 0.3, R * 0.22, R * 0.12, 0, 0, 7); g.fill(); }
   const sh = g.createRadialGradient(cx - R * 0.4, cy - R * 0.4, R * 0.2, cx, cy, R * 1.15); sh.addColorStop(0, 'rgba(255,255,255,.18)'); sh.addColorStop(0.6, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,12,.8)'); g.fillStyle = sh; g.fillRect(cx - R, cy - R, R * 2, R * 2); g.restore();
   if (ring) { g.save(); g.translate(cx, cy); g.rotate(-0.35); g.strokeStyle = 'rgba(240,215,160,.75)'; g.lineWidth = R * 0.32; g.beginPath(); g.ellipse(0, 0, R * 1.75, R * 0.45, 0, 0, Math.PI); g.stroke(); g.restore(); }
@@ -35,7 +37,7 @@ function spacePlanetDraw(g, kind, cx, cy, R, ring) {
 function drawSpacePreview(cv, L, n) {
   const w = cv.width = 320, h = cv.height = 420, g = cv.getContext('2d'), r = spaceBG(g, w, h, n), H = h * 0.55;
   neonGrid(g, w, h, h * 0.62, '#9dffea');
-  spacePlanetDraw(g, L.planet, w * 0.72, H * 0.42, H * (L.planet === 'saturn' ? 0.2 : 0.3), L.planet === 'saturn');
+  spacePlanetDraw(g, L.planet, w * 0.72, H * 0.42, H * (L.planet === 'saturn' ? 0.2 : L.planet === 'uranus' ? 0.22 : L.planet === 'pluto' ? 0.2 : 0.3), L.planet === 'saturn' || L.planet === 'uranus');
   for (let i = 0; i < 9; i++) { const x = w * (0.05 + r() * 0.5), y = H * (0.1 + r() * 0.75), s = 3 + r() * 7; g.fillStyle = 'rgba(120,108,100,.9)'; g.beginPath(); g.ellipse(x, y, s, s * 0.75, r() * 3, 0, 7); g.fill(); g.strokeStyle = 'rgba(157,255,234,.35)'; g.lineWidth = 1; g.stroke(); }
   for (const k of [[0.42, 0.52, 26, '#35e6ff'], [0.58, 0.47, 18, '#ff3df0']]) { g.save(); g.shadowColor = k[3]; g.shadowBlur = 16; g.strokeStyle = k[3]; g.lineWidth = 4; g.beginPath(); g.ellipse(w * k[0], H * k[1], k[2] * 0.55, k[2], 0, 0, 7); g.stroke(); g.restore(); }
   g.save(); g.translate(w * 0.27, H * 0.66); g.rotate(-0.12); const fl = g.createLinearGradient(-60, 0, -8, 0); fl.addColorStop(0, 'rgba(53,230,255,0)'); fl.addColorStop(1, 'rgba(120,240,255,.95)'); g.fillStyle = fl; g.fillRect(-60, -3, 52, 6);
@@ -200,8 +202,8 @@ function buildCards() {
   $('lvTitle').textContent = W.name + ' \u00B7 Select Level'; $('lvBlurb').textContent = W.blurb + ' \u00B7 gravity ' + W.gravity; $('levels').dataset.world = W.id; $('levels').dataset.count = W.count;
   $('lvStars').innerHTML = svg('star', 'fill') + worldStars(viewWorld) + '/' + W.count * 3;
   let curIdx = 0;
-  for (let n = W.first; n <= W.last; n++) {
-    const L = LEVELS[n], locked = (n !== 21 && n > unlocked), st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
+  for (let n = W.first; n < W.first + W.count; n++) {
+    const L = LEVELS[n], locked = (n !== 26 && n > unlocked), st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
     if (n === level && !locked) curIdx = idx;
     const c = document.createElement('button'); c.className = 'card' + (locked ? ' locked' : '') + (n === level ? ' cur' : ''); c.style.setProperty('--i', idx);
     c.setAttribute('data-testid', 'level-card-' + n); c.setAttribute('role', 'option'); c.setAttribute('aria-label', 'Level ' + ln + ' ' + name + (locked ? ', locked' : ', ' + st + ' of 3 stars'));
@@ -297,7 +299,7 @@ function hoverBlock(n) {
   toast('MARS HOVER REQUIRED', owned.indexOf('hover') < 0 ? 'Buy the Mars Hover in the Garage (2500 coins), then select it' : 'Open the Garage and SELECT the Mars Hover to start this level', 'warn'); Snd.click(); return true;
 }
 function pickLevel(n) {
-  if (n !== 21 && n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
+  if (n !== 26 && n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
   if (hoverBlock(n)) return;
   stageTravel(n, () => { if (n !== level) loadLevel(n); save(); startRun(); });
 }
@@ -347,7 +349,7 @@ function equip() {
 function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicle(vehicleId); setState('menu'); Snd.click(); }
 const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
-on('btnLoop', () => { Snd.click(); loadLevel(21); startRun(); });
+on('btnLoop', () => { Snd.click(); loadLevel(26); startRun(); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
 on('btnStBack', () => { setState('menu'); Snd.click(); });
 on('btnGarage', () => { setState('garage'); Snd.click(); });

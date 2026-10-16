@@ -8,6 +8,12 @@ const SPACE_COURSES = {
   22: { len: 6000, seed: 2202, ringR: 11.5, ringGap: 400, firstRing: 340, rowGap: 70, rowJit: 14, gapW: 22, gapShift: 10, spacing: 10.5, rockMin: 3, rockVar: 4.5, movers: 1, planet: 'saturn', pr: 520, pdx: 560, pdy: -40, pdz: 1000,
     A1: 34, l1: 1000, A2: 10, l2: 470, Ay: 9, ly: 800, tint: [0.62, 0.7, 0.8], decor: [['ocean', 170, 1200, 700, 160, 0], ['rock', 120, 2600, -620, -100, 0], ['ice', 260, 4300, -1000, 280, 1], ['rock', 110, 5200, 640, 100, 0]] },
 };
+SPACE_COURSES[23] = { len: 7600, seed: 2303, spd: 1.3, ringR: 15, ringGap: 520, firstRing: 420, rowGap: 175, rowJit: 45, gapW: 34, gapShift: 12, spacing: 14, rockMin: 3, rockVar: 3, movers: 0, nd: 40, planet: 'uranus', pr: 560, pdx: 520, pdy: 60, pdz: 1100, moonKind: 'rock',
+    A1: 38, l1: 1500, A2: 10, l2: 700, Ay: 9, ly: 1100, tint: [0.55, 0.78, 0.82], neb: [0x1ac0c8, 0x3affd0, 0x6aa8ff], decor: [['jupiter', 190, 1500, -800, 140, 0], ['rock', 130, 3400, 640, -110, 0], ['saturn', 230, 5200, -1000, 220, 1], ['ice', 120, 6600, 700, 130, 0]] };
+SPACE_COURSES[24] = { len: 9400, seed: 2404, spd: 1.55, ringR: 16, ringGap: 640, firstRing: 480, rowGap: 215, rowJit: 55, gapW: 36, gapShift: 12, spacing: 15, rockMin: 3, rockVar: 3, movers: 1, nd: 32, planet: 'neptune', pr: 600, pdx: -540, pdy: 40, pdz: 1200, moonKind: 'ice',
+    A1: 42, l1: 1700, A2: 11, l2: 800, Ay: 10, ly: 1300, tint: [0.5, 0.6, 0.88], neb: [0x1a3aff, 0x6a3aff, 0x3a9aff], decor: [['uranus', 200, 1700, 820, -120, 1], ['ocean', 150, 3800, -760, 160, 0], ['rock', 140, 5800, 700, 100, 0], ['jupiter', 260, 7600, -1050, 240, 0]] };
+SPACE_COURSES[25] = { len: 10000, seed: 2505, spd: 1.7, ringR: 16.5, ringGap: 700, firstRing: 500, rowGap: 230, rowJit: 60, gapW: 38, gapShift: 13, spacing: 15.5, rockMin: 3, rockVar: 3, movers: 1, nd: 30, planet: 'pluto', pr: 380, pdx: 480, pdy: 30, pdz: 1200, moonKind: 'charon', moonR: 190,
+    A1: 44, l1: 1800, A2: 12, l2: 850, Ay: 11, ly: 1400, tint: [0.8, 0.68, 0.62], neb: [0xff9a6a, 0xb86aff, 0x6a8aff], decor: [['neptune', 250, 1800, -900, 150, 0], ['rock', 120, 4000, 650, -100, 0], ['uranus', 220, 6200, 900, 200, 1], ['ice', 110, 8000, -650, 120, 0]] };
 const SPA = { rocks: null, saturn: null, loading: false };
 function spLoadAssets() {
   if (SPA.loading || !THREE.GLTFLoader) return; SPA.loading = true;
@@ -70,17 +76,20 @@ function spCenter(c, s, o) {
 const spGlow = (stops) => glowTexture(stops);
 function spPlanetTex(kind, rng) {
   const cv = document.createElement('canvas'); cv.width = 512; cv.height = 256; const g = cv.getContext('2d');
-  const PAL = { jupiter: ['#e6cfa8', '#c99a68', '#f1e4cc', '#a8643c', '#d9b384', '#8f5a3a'], saturn: ['#f0dfae', '#d9c088', '#f6ecc8', '#c8a96a', '#e5d19a'], rock: ['#b5532e', '#8a3a22', '#d27a4a', '#6a2a18'], ice: ['#bfe6ff', '#8fc8f0', '#e8f6ff', '#6aa8d8'], ocean: ['#1f6fd0', '#2a8a6a', '#3fa65a', '#1a4a9a'] };
-  const pal = PAL[kind], gas = kind === 'jupiter' || kind === 'saturn';
+  const PAL = { jupiter: ['#e6cfa8', '#c99a68', '#f1e4cc', '#a8643c', '#d9b384', '#8f5a3a'], saturn: ['#f0dfae', '#d9c088', '#f6ecc8', '#c8a96a', '#e5d19a'], rock: ['#b5532e', '#8a3a22', '#d27a4a', '#6a2a18'], ice: ['#bfe6ff', '#8fc8f0', '#e8f6ff', '#6aa8d8'], ocean: ['#1f6fd0', '#2a8a6a', '#3fa65a', '#1a4a9a'], uranus: ['#86d6e0', '#6cc4d2', '#a4e4ea', '#5ab8c8', '#92dce6'], pluto: ['#c9a27c', '#a87c5c', '#e8d2b0', '#7a5440'], charon: ['#9a9aa4', '#82828e', '#b4b4be', '#6a6a76'], neptune: ['#2a52dc', '#1e3cb4', '#3a6af0', '#16288a', '#4a7aff'] };
+  const pal = PAL[kind], gas = kind === 'jupiter' || kind === 'saturn' || kind === 'uranus' || kind === 'neptune';
   if (gas) {
-    let y = 0; while (y < 256) { const h = 4 + rng() * (kind === 'jupiter' ? 22 : 15); g.fillStyle = pal[(rng() * pal.length) | 0]; g.fillRect(0, y, 512, h + 1); y += h; }
+    let y = 0; while (y < 256) { const h = kind === 'uranus' ? 16 + rng() * 40 : kind === 'neptune' ? 8 + rng() * 26 : 4 + rng() * (kind === 'jupiter' ? 22 : 15); g.fillStyle = pal[(rng() * pal.length) | 0]; g.fillRect(0, y, 512, h + 1); y += h; }
     g.globalAlpha = 0.35; for (let i = 0; i < 70; i++) { const yy = rng() * 256, amp = 2 + rng() * 6, ph = rng() * 6, ln = 40 + rng() * 140, x0 = rng() * 512; g.strokeStyle = pal[(rng() * pal.length) | 0]; g.lineWidth = 1 + rng() * 3; g.beginPath(); for (let x = 0; x <= ln; x += 6) { const y2 = yy + Math.sin(x * 0.08 + ph) * amp; if (x === 0) g.moveTo(x0, y2); else g.lineTo(x0 + x, y2); } g.stroke(); }
     g.globalAlpha = 1;
+    if (kind === 'neptune') { g.fillStyle = '#0c1a60'; g.beginPath(); g.ellipse(330, 150, 40, 20, 0, 0, 7); g.fill(); g.globalAlpha = 0.8; g.strokeStyle = '#fff'; g.lineWidth = 3; for (let i = 0; i < 9; i++) { const y0 = 60 + rng() * 150, x0 = rng() * 440; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + 30 + rng() * 60, y0 - 4 + rng() * 8); g.stroke(); } g.globalAlpha = 1; }
     if (kind === 'jupiter') { g.fillStyle = '#7a2e1c'; g.beginPath(); g.ellipse(160, 168, 44, 23, 0, 0, 7); g.fill(); g.fillStyle = '#c4572f'; g.beginPath(); g.ellipse(160, 168, 36, 17, 0, 0, 7); g.fill(); g.fillStyle = '#e08a58'; g.beginPath(); g.ellipse(158, 166, 16, 7, 0, 0, 7); g.fill(); }
   } else {
     g.fillStyle = pal[0]; g.fillRect(0, 0, 512, 256);
     for (let i = 0; i < 90; i++) { g.globalAlpha = 0.25 + rng() * 0.45; g.fillStyle = pal[1 + ((rng() * (pal.length - 1)) | 0)]; g.beginPath(); g.ellipse(rng() * 512, rng() * 256, 8 + rng() * 46, 5 + rng() * 22, rng() * 3, 0, 7); g.fill(); }
     if (kind === 'ocean') { g.globalAlpha = 0.55; g.fillStyle = '#fff'; for (let i = 0; i < 40; i++) { g.beginPath(); g.ellipse(rng() * 512, rng() * 256, 14 + rng() * 40, 3 + rng() * 5, rng() - 0.5, 0, 7); g.fill(); } }
+    g.globalAlpha = 0.9;
+    if (kind === 'pluto') { g.fillStyle = '#f2e6d0'; g.beginPath(); g.moveTo(300, 175); g.bezierCurveTo(235, 130, 258, 72, 300, 108); g.bezierCurveTo(342, 72, 365, 130, 300, 175); g.fill(); }
     g.globalAlpha = 1;
   }
   const gr = g.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(0.2, 'rgba(0,0,0,0)'); gr.addColorStop(0.8, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.45)'); g.fillStyle = gr; g.fillRect(0, 0, 512, 256);
@@ -105,10 +114,10 @@ function spMakePlanet(kind, R, withRing, seed, glowHex) {
     fragmentShader: 'varying vec3 n;uniform vec3 c;void main(){float i=pow(max(0.,0.74-dot(n,vec3(0.,0.,1.))),3.);gl_FragColor=vec4(c*i*1.6,i);}' })); grp.add(atm);
   grp.userData.sph = sph;
   if (withRing) {
-    const inner = R * 1.28, outer = R * 2.3, rg = new THREE.RingGeometry(inner, outer, 160, 1), p = rg.attributes.position, uv = rg.attributes.uv;
+    const ur = withRing === 'uranus', inner = R * (ur ? 1.5 : 1.28), outer = R * (ur ? 2.05 : 2.3), rg = new THREE.RingGeometry(inner, outer, 160, 1), p = rg.attributes.position, uv = rg.attributes.uv;
     for (let i = 0; i < p.count; i++) uv.setXY(i, (Math.hypot(p.getX(i), p.getY(i)) - inner) / (outer - inner), 0.5);
-    const ring = new THREE.Mesh(rg, new THREE.MeshLambertMaterial({ map: spRingTex(), transparent: true, side: THREE.DoubleSide, depthWrite: false, emissive: 0x6a5a3a, emissiveIntensity: 0.5 }));
-    ring.rotation.x = -Math.PI / 2 + 0.38; ring.rotation.y = 0.12; grp.add(ring);
+    const ring = new THREE.Mesh(rg, new THREE.MeshLambertMaterial({ map: spRingTex(), transparent: true, opacity: ur ? 0.5 : 1, side: THREE.DoubleSide, depthWrite: false, emissive: ur ? 0xa0f0f6 : 0x6a5a3a, emissiveIntensity: 0.6 }));
+    if (ur) ring.rotation.set(-0.5, 0.55, 0); else { ring.rotation.x = -Math.PI / 2 + 0.38; ring.rotation.y = 0.12; } grp.add(ring);
   }
   return grp;
 }
@@ -157,7 +166,7 @@ function buildSpace(L) {
     const p = new THREE.Points(g, new THREE.PointsMaterial({ size, sizeAttenuation: false, vertexColors: true, fog: false, transparent: true, opacity: 0.95, depthWrite: false })); p.frustumCulled = false; p.renderOrder = -10; return p;
   };
   sky.add(mkStars(low ? 1800 : 3400, false, 1.8)); sky.add(mkStars(low ? 900 : 1800, true, 1.3));
-  const NEB = [[0x6a3aff, -0.8, 0.2, -0.5], [0x1ac0c8, 0.7, -0.15, -0.7], [0xff4a9a, -0.2, 0.55, -0.8], [0xff9a3a, 0.9, 0.3, 0.2], [0x3a6aff, -0.5, -0.4, 0.75], [0x9a3aff, 0.1, 0.1, -1]];
+  const NEB = [[c.neb ? c.neb[0] : 0x6a3aff, -0.8, 0.2, -0.5], [c.neb ? c.neb[1] : 0x1ac0c8, 0.7, -0.15, -0.7], [c.neb ? c.neb[2] : 0xff4a9a, -0.2, 0.55, -0.8], [0xff9a3a, 0.9, 0.3, 0.2], [0x3a6aff, -0.5, -0.4, 0.75], [0x9a3aff, 0.1, 0.1, -1]];
   for (const n of NEB) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: spGlow(['rgba(255,255,255,.55)', 'rgba(255,255,255,.18)', 'rgba(255,255,255,0)']), color: n[0], transparent: true, opacity: 0.32, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
     const l = Math.hypot(n[1], n[2], n[3]); s.position.set(n[1] / l * 5200, n[2] / l * 5200, n[3] / l * 5200); s.scale.setScalar(3600 + R() * 1800); sky.add(s);
@@ -190,7 +199,7 @@ function buildSpace(L) {
     }
     rowS += c.rowGap + R() * c.rowJit;
   }
-  const nd = low ? 90 : 170;
+  const nd = c.nd ? (low ? Math.ceil(c.nd / 2) : c.nd) : low ? 90 : 170;
   for (let i = 0; i < nd; i++) {
     const s = R() * c.len, side = R() < 0.5 ? -1 : 1; spCenter(c, s, cc);
     addRock(cc.x + side * (80 + R() * 170), cc.y + (R() - 0.5) * 200, -s - R() * 60, 4 + R() * R() * 26, false);
@@ -205,11 +214,11 @@ function buildSpace(L) {
     const bp = new THREE.Points(g, new THREE.PointsMaterial({ size: 2.6, map: spGlow(['rgba(255,255,255,1)', 'rgba(140,235,255,.55)', 'rgba(0,0,0,0)']), color: 0x8cebff, transparent: true, opacity: 0.7, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); bp.frustumCulled = false; grp.add(bp); }
   /* planets: passing decor + the destination */
   let seed = c.seed;
-  for (const d of c.decor) { spCenter(c, d[2], cc); const sat = d[0] === 'saturn', p = sat ? spSaturn(d[1], seed++, 0xffd88a) : spMakePlanet(d[0], d[1], !!d[5], seed++, d[0] === 'ocean' ? 0x4aa0ff : d[0] === 'ice' ? 0x9fe0ff : 0xff8a5a); p.position.set(cc.x + d[3], cc.y + d[4], -d[2]); grp.add(p); SP.planets.push({ g: p, spin: 0.012, sat: sat ? d[1] : 0, model: sat && !!SPA.saturn }); }
+  for (const d of c.decor) { spCenter(c, d[2], cc); const sat = d[0] === 'saturn', p = sat ? spSaturn(d[1], seed++, 0xffd88a) : spMakePlanet(d[0], d[1], d[0] === 'uranus' ? 'uranus' : !!d[5], seed++, d[0] === 'ocean' ? 0x4aa0ff : d[0] === 'ice' || d[0] === 'uranus' ? 0x9fe0ff : 0xff8a5a); p.position.set(cc.x + d[3], cc.y + d[4], -d[2]); grp.add(p); SP.planets.push({ g: p, spin: 0.012, sat: sat ? d[1] : 0, model: sat && !!SPA.saturn }); }
   spCenter(c, c.len, cc);
-  const isSat = c.planet === 'saturn', tp = SP.target = isSat ? spSaturn(c.pr, seed++, 0xffd88a) : spMakePlanet(c.planet, c.pr, false, seed++, 0xffb27a);
+  const isSat = c.planet === 'saturn', GLW = { uranus: 0xa8f4f4, neptune: 0x4a78ff, pluto: 0x7aa8ff }, tp = SP.target = isSat ? spSaturn(c.pr, seed++, 0xffd88a) : spMakePlanet(c.planet, c.pr, c.planet === 'uranus' ? 'uranus' : false, seed++, GLW[c.planet] || 0xffb27a);
   tp.position.set(cc.x + c.pdx, cc.y + c.pdy, -(c.len + c.pdz)); grp.add(tp); SP.planets.push({ g: tp, spin: 0.01, sat: isSat ? c.pr : 0, model: isSat && !!SPA.saturn });
-  const moon = spMakePlanet('rock', 55, false, seed++, 0xcccccc); moon.position.set(tp.position.x - c.pr * 1.5, tp.position.y + c.pr * 0.5, tp.position.z + c.pr * 1.1); grp.add(moon); SP.planets.push({ g: moon, spin: 0.03 });
+  const moon = spMakePlanet(c.moonKind || 'rock', c.moonR || 55, false, seed++, 0xcccccc); moon.position.set(tp.position.x - c.pr * 1.5, tp.position.y + c.pr * 0.5, tp.position.z + c.pr * 1.1); grp.add(moon); SP.planets.push({ g: moon, spin: 0.03 });
   /* speed dust */
   const N = low ? 260 : 520, arr = new Float32Array(N * 6), dust2 = [];
   for (let i = 0; i < N; i++) dust2.push({ ox: R() * 160, oy: R() * 110, oz: R() * 360 });
