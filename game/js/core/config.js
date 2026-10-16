@@ -36,12 +36,11 @@ const WORLDS = [
   { id: 'mars', name: 'Mars', first: 9, last: 16, blurb: 'Red dust, thin air, meteors and ice', gravity: '38%', req: 'Finish all 8 Earth levels to unlock', tags: ['Low gravity', 'Meteor storms', 'Freezing cold'], diff: 2 },
   { id: 'moon', name: 'Moon', first: 17, last: 20, blurb: 'Craters, spiral ramps and the final Moon Collapse', gravity: '17%', req: 'Finish all 8 Mars levels to unlock', tags: ['Moon gravity', 'Meteors', 'Lasers & doors', 'Level 20 needs the Hover'], diff: 3 },
   { id: 'space', name: 'Deep Space', first: 21, last: 25, blurb: 'Zero-G flight to Jupiter, Saturn, Uranus, Neptune & Pluto', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
-  { id: 'circuit', name: 'Loop Circuit', first: 26, last: 26, blurb: '5-Lap Grand Prix circuit with bridge crossing', gravity: '100%', req: '', tags: ['Closed circuit', '5 Laps', 'Oil slicks & mud', 'Boost pads'], diff: 2 },
 ];
 WORLDS[0].gravity = '100%'; WORLDS[0].req = ''; WORLDS[0].tags = ['Neon tracks', 'Lasers', 'Lava']; WORLDS[0].diff = 1;
 WORLDS.forEach((w) => { w.count = w.last - w.first + 1; });
 const baseOf = (n) => (n === 26 ? 26 : (n >= 9 && n <= 12) || n >= 15 ? n : ((n - 1) % 8) + 1);
-const worldOf = (n) => (n === 26 ? 4 : n > 20 ? 3 : n > 16 ? 2 : n > 8 ? 1 : 0);
+const worldOf = (n) => (n > 20 ? 3 : n > 16 ? 2 : n > 8 ? 1 : 0);
 const MARS_NAMES = ['DUST RUNNER', 'CRATER CANYON', 'SPACE ELEVATOR', 'OLYMPUS FINAL', 'VALLES SPIRAL', 'POLAR MEGA RAMP', 'RED OASIS CLIMB', 'MAGMA GAUNTLET'];
 (function () {
   const mixC = (a, b, t) => new THREE.Color(a).lerp(new THREE.Color(b), t);

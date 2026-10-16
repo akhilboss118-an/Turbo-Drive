@@ -10,8 +10,9 @@ function refreshMenu() {
   $('bestTime').innerHTML = b === undefined ? '' : svg('time') + 'Best ' + fmt(b);
   const ts = totalStars(); $('starTotal').innerHTML = svg('star', 'fill') + ts + '/' + (CAMPAIGN_LEVELS) * 3;
   $('playSub').textContent = LEVELS[level].name.replace('  ', ' \u00B7 ');
-  $('lvlSub').textContent = WORLDS[worldOf(level)].name + ' \u00B7 ' + unlocked + '/' + (CAMPAIGN_LEVELS) + ' open';
-  $('kicker').innerHTML = '<span></span>Stage 0' + (worldOf(level) + 1) + ' &middot; ' + WORLDS[worldOf(level)].name;
+  const wi = Math.max(0, Math.min(WORLDS.length - 1, worldOf(level)));
+  $('lvlSub').textContent = (level === 26 ? 'Loop Mode \u00B7 Circuit' : WORLDS[wi].name + ' \u00B7 ' + unlocked + '/' + (CAMPAIGN_LEVELS) + ' open');
+  $('kicker').innerHTML = level === 26 ? '<span></span>Special &middot; Infinite Loop Circuit' : '<span></span>Stage 0' + (wi + 1) + ' &middot; ' + WORLDS[wi].name;
   $('garSub').textContent = vehicleById(vehicleId).name;
 }
 const hexs = (c) => '#' + (0x1000000 + c).toString(16).slice(1);
@@ -125,9 +126,23 @@ const PLANET = {
   mars: { bg: ['#1a0806', '#4a1c10'], halo: 'rgba(255,140,70,.55)', sph: ['#f0985a', '#c2501f', '#5a1c0c'], land: '#6a2410', seed: 4242 },
   moon: { bg: ['#02030a', '#161a2c'], halo: 'rgba(190,205,255,.45)', sph: ['#e8eaf2', '#9a9eac', '#3a3d4a'], land: '#6a6e7c', seed: 1969 },
 };
+function drawCircuitWorld(cv) {
+  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d');
+  const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#0a1030'); bg.addColorStop(0.6, '#2c3a78'); bg.addColorStop(1, '#ffd49a'); g.fillStyle = bg; g.fillRect(0, 0, w, h);
+  neonGrid(g, w, h, h * 0.55, '#ffb03a');
+  neonGlow(g, '#ffb03a', 16, () => {
+    g.strokeStyle = '#ffd480'; g.lineWidth = 4; g.beginPath();
+    g.ellipse(w * 0.38, h * 0.5, 46, 26, -0.2, 0, 7);
+    g.ellipse(w * 0.62, h * 0.5, 46, 26, 0.2, 0, 7);
+    g.stroke();
+  });
+}
 function drawPlanet(cv, id) {
   if (id === 'space') { drawSpaceWorld(cv); return; }
-  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d'), P = PLANET[id], mars = id === 'mars', moon = id === 'moon';
+  if (id === 'circuit') { drawCircuitWorld(cv); return; }
+  const P = PLANET[id];
+  if (!P) { drawCircuitWorld(cv); return; }
+  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d'), mars = id === 'mars', moon = id === 'moon';
   const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, P.bg[0]); bg.addColorStop(1, P.bg[1]); g.fillStyle = bg; g.fillRect(0, 0, w, h);
   let q = P.seed; const r = () => { q = (q * 16807) % 2147483647; return q / 2147483647; };
   for (let i = 0; i < 70; i++) { g.globalAlpha = 0.3 + r() * 0.7; g.fillStyle = '#fff'; g.fillRect(r() * w, r() * h, 1.5, 1.5); } g.globalAlpha = 1;
