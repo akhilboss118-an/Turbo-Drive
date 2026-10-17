@@ -36,3 +36,29 @@
   .shBtn.jump{right:calc(max(18px,env(safe-area-inset-right)) + clamp(92px,28vh,126px));font-size:12px;letter-spacing:.08em}
   .shBtn.on{background:rgba(255,200,60,.8);transform:scale(.93)}
 }
+
+/* 3D duel overlay (Level 27 arena) */
+#d3Hud,#d3Exit,#d3Hit{display:none}
+body.d3[data-state="countdown"] #d3Hud,body.d3[data-state="playing"] #d3Hud{display:flex}
+body.d3[data-state="countdown"] #d3Exit,body.d3[data-state="playing"] #d3Exit{display:block}
+body.d3 #ftLives,body.d3 #ftO2,body.d3 #ftInv>div:nth-child(3),body.d3 #huntStreak{display:none!important}
+body.d3 #ftStats .ftRow:nth-child(2){display:none}
+#d3Hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:26;align-items:center;gap:12px;pointer-events:none;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.05em}
+.d3Bar{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:12px;background:rgba(21,12,58,.78);border:2px solid var(--cyan);min-width:clamp(150px,26vw,300px)}
+.d3Bar.opp{border-color:#ff8a3d;flex-direction:row}
+.d3Bar .nm{font-size:clamp(11px,2.6vh,14px);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d3Bar .bar{flex:1;height:10px;border-radius:99px;background:rgba(0,0,0,.55);overflow:hidden}
+.d3Bar .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#35e6ff,#7dff6a);transition:width .12s linear}
+.d3Bar.opp .bar i{background:linear-gradient(90deg,#ff5a4a,#ff8a3d);margin-left:auto}
+.d3Bar.low .bar i{background:#ff3a3a}
+.d3Bar b{font-size:clamp(15px,3.6vh,20px);min-width:32px;text-align:center;font-variant-numeric:tabular-nums}
+.d3Vs{font-size:14px;color:#ffd24a;text-shadow:0 0 10px rgba(255,210,74,.7)}
+#d3Exit{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));z-index:26;width:auto;height:auto;padding:8px 14px;border-radius:10px;font-size:12px;letter-spacing:.12em;font-weight:900;pointer-events:auto;color:#fff;background:rgba(21,12,58,.78);border:1px solid var(--line)}
+body.touch #d3Exit{bottom:auto;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right))}
+#d3Hit{position:absolute;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);z-index:27;pointer-events:none;opacity:0}
+body.d3 #d3Hit{display:block}
+#d3Hit i{position:absolute;width:12px;height:3px;background:#fff;box-shadow:0 0 6px #ff3a3a}
+#d3Hit i:nth-child(1){left:0;top:4px;transform:rotate(45deg)}#d3Hit i:nth-child(2){right:0;top:4px;transform:rotate(-45deg)}#d3Hit i:nth-child(3){left:0;bottom:4px;transform:rotate(-45deg)}#d3Hit i:nth-child(4){right:0;bottom:4px;transform:rotate(45deg)}
+#d3Hit.on{animation:d3hit .22s ease-out}
+@keyframes d3hit{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+#shootResult{z-index:40}

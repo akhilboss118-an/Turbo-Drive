@@ -141,13 +141,14 @@ function footReset() {
 function footSpawnPlayer() {
   FT.p.set(3.4, footGround(3.4, -30), -29.5); FT.yaw = FT.camYaw = FT.charYaw = Math.PI; FT.camPitch = 0.2; FT.hp = 100; FT.o2 = 100; FT.ammo = MAG; FT.reloading = false; FT.hurtT = 0;
   if (huntOn()) { FT.p.set(6, footGround(6, -4), -4); FT.yaw = FT.camYaw = FT.charYaw = 0; FT.reserve = Math.max(FT.reserve, 90); }
+  if (SH.on) shSpawn();
 }
 function footStart() {
   footBuild(); footPlaceHover();
   if (vehicleById(vehicleId).rarity !== 'legendary') { vehicleId = owned.indexOf('hover2') >= 0 ? 'hover2' : 'hover'; applyStats(vehicleId); applyVehicle(vehicleId); footPlaceHover(); }
   timeT = 0; crashes = 0; score = 0; FT.started = true; footReset();
   astroOnReady(() => { if (!ASTRO.group.parent) FT.world.add(ASTRO.group); ASTRO.group.visible = true; FT.anim = ''; footAnim('idle'); });
-  setTimeout(() => { if (footOn() && (state === 'countdown' || state === 'playing')) if (huntOn()) toast('ALIEN HUNT', 'Hide behind rocks from their lasers - kill all 12 aliens', 'warn'); else toast('PLUTO SURVIVAL', 'Gather crystals, build a base, hold out until the alien returns', 'good'); }, 1500);
+  setTimeout(() => { if (footOn() && !SH.on && (state === 'countdown' || state === 'playing')) if (huntOn()) toast('ALIEN HUNT', 'Hide behind rocks from their lasers - kill all 12 aliens', 'warn'); else toast('PLUTO SURVIVAL', 'Gather crystals, build a base, hold out until the alien returns', 'good'); }, 1500);
 }
 function footRespawn() {
   if (huntOn() && HT.lives <= 0) { timeT = 0; crashes = 0; score = 0; footReset(); const h = $('crashMenu').querySelector('h2'); if (h) h.textContent = 'Crashed'; footAnim('idle'); return; }
@@ -156,6 +157,7 @@ function footRespawn() {
 }
 function footMenuPose() { if (!FT.built) return; footPlaceHover(); if (ASTRO.group) ASTRO.group.visible = false; if (document.pointerLockElement) document.exitPointerLock(); }
 function footDie() {
+  if (SH.on) return;
   if (huntOn() && state === 'crashed') return;
   if (huntOn()) HT.lives = Math.max(0, HT.lives - 1);
   crashes++; crashT = 0; shake = 0.8; Snd.crash && Snd.crash(); vibe && vibe(60, 'heavy'); FT.firing = false;
@@ -184,13 +186,15 @@ function footFire() {
   FT.ammo--; FT.fireT = FIRE_CD; FT.aimT = 0.9; FT.flashT = 0.05; FT.kick += 0.018; shake = Math.max(shake, 0.05); ftSnd('shot');
   camera.getWorldDirection(_ftD); const ro = _ftV.copy(camera.position); const tp = _ftV2.copy(FT.p).setY(FT.p.y + 1.3).sub(ro); ro.addScaledVector(_ftD, Math.max(0, tp.dot(_ftD)));
   let best = null, bt = 90;
-  for (const e of FT.enemies) { if (e.dead) continue; if (e.huntKill && !huntLOS(FT.p.x, FT.p.z, e.g.position.x, e.g.position.z)) continue; _ftR.copy(e.g.position); _ftR.y += e.cy; _ftR.sub(ro); const t = _ftR.dot(_ftD); if (t < 1 || t > bt) continue; const d2 = _ftR.lengthSq() - t * t, rr = e.r + 0.3; if (d2 < rr * rr) { best = e; bt = t; } }
+  for (const e of FT.enemies) { if (e.dead) continue; if ((e.huntKill || e.remote) && !huntLOS(FT.p.x, FT.p.z, e.g.position.x, e.g.position.z)) continue; _ftR.copy(e.g.position); _ftR.y += e.cy; _ftR.sub(ro); const t = _ftR.dot(_ftD); if (t < 1 || t > bt) continue; const d2 = _ftR.lengthSq() - t * t, rr = e.r + 0.3; if (d2 < rr * rr) { best = e; bt = t; } }
   const hit = ro.clone().addScaledVector(_ftD, best ? bt : 70);
   if (!best) { const gy = footGround(hit.x, hit.z); if (hit.y < gy) hit.y = gy; }
   const mz = ASTRO.flash ? ASTRO.flash.getWorldPosition(new THREE.Vector3()) : FT.p.clone().setY(FT.p.y + 1.3);
+  if (SH.on) shSendShot(mz, hit, best);
   const tr = FT.tracers.find((q) => q.t <= 0); if (tr) { const a = tr.l.geometry.attributes.position; a.setXYZ(0, mz.x, mz.y, mz.z); a.setXYZ(1, hit.x, hit.y, hit.z); a.needsUpdate = true; tr.t = 0.06; tr.l.visible = true; }
   for (let i = 0; i < 4; i++) sparks.emit(hit.x, hit.y, hit.z, (Math.random() - 0.5) * 7, 2 + Math.random() * 5, (Math.random() - 0.5) * 7, 0.4);
-  if (best) { best.hp -= 1; best.hitT = 0.12; ftSnd('hit'); const dx = best.g.position.x - FT.p.x, dz = best.g.position.z - FT.p.z, l = Math.hypot(dx, dz) || 1; best.g.position.x += dx / l * 0.12; best.g.position.z += dz / l * 0.12; if (best.hp <= 0) footKill(best); }
+  if (best && best.remote) { shHitOpp(); }
+  else if (best) { best.hp -= 1; best.hitT = 0.12; ftSnd('hit'); const dx = best.g.position.x - FT.p.x, dz = best.g.position.z - FT.p.z, l = Math.hypot(dx, dz) || 1; best.g.position.x += dx / l * 0.12; best.g.position.z += dz / l * 0.12; if (best.hp <= 0) footKill(best); }
   if (FT.ammo === 0 && FT.reserve > 0) setTimeout(() => { if (state === 'playing') footReload(); }, 250);
 }
 function footKill(e) {
@@ -207,12 +211,13 @@ function footHurt(d) { FT.hp -= d; FT.hurtT = 0.35; shake = Math.max(shake, 0.35
 /* ---------- interaction ---------- */
 function footNear(a, r) { return Math.hypot(FT.p.x - a.x, FT.p.z - a.z) < r; }
 function footPrompt() {
+  if (SH.on) return '';
   if (!huntOn() && FT.built3 < 3 && footNear(BASE_AT, 9.5)) { const c = BUILD_COST[FT.built3], n = FT.pieces[FT.built3].userData.name; return FT.mats >= c ? '[E] BUILD ' + n + ' (' + c + ' MATERIALS)' : n + ' NEEDS ' + c + ' MATERIALS (' + FT.mats + '/' + c + ')'; }
   if (footNear(HOVER_AT, 9)) return FT.supplyT <= 0 ? '[E] RESUPPLY AMMO FROM THE HOVER' : 'HOVER SUPPLY READY IN ' + Math.ceil(FT.supplyT) + 's';
   return '';
 }
 function footInteract() {
-  if (state !== 'playing' || !FT.built) return;
+  if (state !== 'playing' || !FT.built || SH.on) return;
   if (!huntOn() && FT.built3 < 3 && footNear(BASE_AT, 9.5)) {
     const c = BUILD_COST[FT.built3]; if (FT.mats < c) { toast('NOT ENOUGH MATERIALS', 'Need ' + c + ' - collect glowing ice crystals', 'warn'); return; }
     FT.mats -= c; const p = FT.pieces[FT.built3]; p.visible = true; FT.pieceT[FT.built3] = 0.001; const k = FT.cols.find((q) => q.piece === FT.built3); if (k) k.off = false; FT.built3++; score += 300; ftSnd('build'); shake = Math.max(shake, 0.25);
@@ -231,7 +236,7 @@ function footMoveInput(o) {
 }
 function footLook(dx, dy) { FT.camYaw -= dx; FT.camPitch = Math.max(-0.55, Math.min(1.0, FT.camPitch - dy)); }
 (function footBindInput() {
-  const cv = renderer.domElement, canPlay = () => footOn() && state === 'playing';
+  const cv = renderer.domElement, canPlay = () => footOn() && state === 'playing' && !(SH.on && SH.phase === 'over');
   const ui = (e) => e.target && e.target.closest && e.target.closest('button, .modal, #pauseMenu, #crashMenu, #footTouch');
   window.addEventListener('mousedown', (e) => {
     if (!canPlay() || ui(e)) return; Snd.init();

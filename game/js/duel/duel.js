@@ -95,9 +95,9 @@ function duelEnd(msg) {
   if (level !== duelPrevLevel) loadLevel(duelPrevLevel);
   applyStats(vehicleId); applyVehicle(vehicleId); toMenu(); if (msg) toast('DUEL', msg, 'warn');
 }
-function duelLeave() { if (/^shoot/.test(state)) { shootLeave(); return; } duelSend({ t: 'leave' }); setTimeout(() => duelEnd(), 30); }
-function duelAskLeave() { if (!duelRacing()) return; $('duelLeaveModal').classList.remove('hidden'); }
-function duelEsc() { if (/^shoot/.test(state)) shootEsc(); else if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
+function duelLeave() { if (SH.on || /^shoot/.test(state)) { shootLeave(); return; } duelSend({ t: 'leave' }); setTimeout(() => duelEnd(), 30); }
+function duelAskLeave() { if (SH.on) { shootAskLeave(); return; } if (!duelRacing()) return; $('duelLeaveModal').classList.remove('hidden'); }
+function duelEsc() { if (SH.on || /^shoot/.test(state)) shootEsc(); else if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
 function duelBusy(b, txt) { for (const id of ['btnDuelCreate', 'btnDuelJoinGo', 'btnDuelJoin']) $(id).classList.toggle('off', b); if (b && txt) duelHomeErr(txt, true); }
 function duelHomeErr(t, info) { const e = $('duelErr'); e.textContent = t || ''; e.style.color = info ? '#9ff4ff' : ''; }
 function duelNick() {
@@ -112,7 +112,7 @@ async function duelConnectAnd(msgFn, busyTxt) {
   try { await duelOpen(); } catch (e) { duelBusy(false); duelHomeErr('Could not reach the game server. Check your internet connection.'); return; }
   duelSend(msgFn(nick));
 }
-function duelCreate() { if (DUEL.kind === 'shoot') { shootCreate(); return; } duelConnectAnd((nick) => ({ t: 'create', nick, car: duelCar(), v: DUEL_PROTO }), 'Creating room\u2026'); }
+function duelCreate() { if (DUEL.kind === 'shoot') { shootFind(); return; } duelConnectAnd((nick) => ({ t: 'create', nick, car: duelCar(), v: DUEL_PROTO }), 'Creating room\u2026'); }
 function duelJoin() {
   if (DUEL.kind === 'shoot') { shootJoin(); return; }
   const c = $('duelCode').value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();

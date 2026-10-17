@@ -150,7 +150,7 @@ function huntReset() {
   for (const n of FT.nodes) { n.got = true; n.g.visible = false; } for (const r of HT.rings) r.visible = false; document.body.classList.remove('huntNoAim'); huntSubHide();
   if (scene.fog) scene.fog.color.setHex(HUNT_FOG); alienRoot.visible = false; alienBeamMat.opacity = 0; alienBeam.visible = false; alienRoot.scale.setScalar(1);
   if (ASTRO.group) { ASTRO.group.scale.set(1, 1, 1); ASTRO.group.rotation.z = 0; } footPlaceHover(); HT.fx = []; huntShowBase();
-  huntSub('THE ALIEN HAS RETURNED', 'His scouts are landing around the base', 3200);
+  if (!SH.on) huntSub('THE ALIEN HAS RETURNED', 'His scouts are landing around the base', 3200);
 }
 function huntSpawnAll() {
   if (!FT.world || HT.aliens.length) return;
@@ -409,6 +409,7 @@ function huntMood(dt) {
 
 /* ---------- main tick / camera / hud ---------- */
 function huntTick(dt) {
+  if (SH.on) { shTick(dt); return; }
   HT.pt += dt; huntMood(dt); FT.firing = HT.phase === 'hunt' ? FT.firing : false; if (HT.phase !== 'hunt') FT.hurtT = Math.max(0, FT.hurtT - dt);
   if (HT.phase === 'hunt') {
     footPlayer(dt); if (state !== 'playing') return; HT.inDome = huntInDome(FT.p.x, FT.p.z); FT.safe = HT.inDome; if (HT.inDome && !HT.domeMsg) { HT.domeMsg = true; toast('DOME SHIELD', 'Aliens cannot hit you inside - shoot them from here!', 'good'); } huntWaves(dt); huntAliens(dt); huntBolts(dt); huntWorld(dt); huntAnimate(dt);
@@ -443,6 +444,7 @@ function huntCamera(dt) {
   return false;
 }
 function huntHud() {
+  if (SH.on) { shHud(); return; }
   const ph = HT.phase, nc = ph !== 'hunt'; document.body.classList.toggle('huntNoAim', nc); let txt = '', tgt = null, brg = 0, fill = 0, num = '';
   const lab = ph !== 'hunt' ? 'ESCAPE' : 'ALIENS KILLED'; if (lab !== HT.lastLabel) { HT.lastLabel = lab; $('ftSignal').querySelector('span').textContent = lab; }
   if (ph === 'hunt') {

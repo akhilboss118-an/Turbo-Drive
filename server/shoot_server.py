@@ -1,81 +1,19 @@
-"""Turbo Drive 1v1 shooting duel: room + relay WebSocket server (first to KILL_TARGET kills wins)."""
+"""Turbo Drive 3D online shooting duel: quick-match queue + server-authoritative health over WebSocket."""
 import json
-import random
-import string
+import math
 import time
 
 from fastapi import APIRouter, FastAPI, WebSocket, WebSocketDisconnect
 
-KILL_TARGET = 40
-ROOM_TTL = 60 * 60
+MAX_HP = 100
+HIT_DMG = 7
+MIN_HIT_GAP = 0.09
+START_GRACE = 3.0
+MAX_RANGE = 130.0
 router = APIRouter()
+QUEUE = []
 ROOMS = {}
-
-
-ROLES = ["host", "guest", "guest2"]
-
-
-def new_code():
-    while True:
-        c = "".join(random.choice("ABCDEFGHJKLMNPQRSTUVWXYZ23456789") for _ in range(5))
-        if c not in ROOMS:
-            return c
-
-
-class Room:
-    def __init__(self, code):
-        self.code = code
-        self.status = "lobby"
-        self.players = {}
-        self.cap = 2
-        self.created = time.time()
-        self.winner = None
-
-    def pub(self):
-        return {
-            "code": self.code,
-            "status": self.status,
-            "target": KILL_TARGET,
-            "cap": self.cap,
-            "winner": self.winner,
-            "players": [
-                {"role": r, "nick": p["nick"], "ready": p["ready"], "kills": p["kills"],
-                 "rematch": p["rematch"], "connected": p["ws"] is not None}
-                for r, p in self.players.items()
-            ],
-        }
-
-    def others(self, role):
-        return [r for r in self.players if r != role]
-
-    async def send(self, role, msg):
-        p = self.players.get(role)
-        if p and p["ws"] is not None:
-            try:
-                await p["ws"].send_text(json.dumps(msg))
-            except Exception:
-                p["ws"] = None
-
-    async def broadcast(self, msg):
-        for r in list(self.players):
-            await self.send(r, msg)
-
-    async def finish(self, winner, reason):
-        self.status = "over"
-        self.winner = winner
-        for p in self.players.values():
-            p["ready"] = False
-            p["rematch"] = False
-        await self.broadcast({"t": "over", "winner": winner, "reason": reason, "room": self.pub()})
-
-    async def begin(self):
-        self.status = "playing"
-        self.winner = None
-        for p in self.players.values():
-            p["kills"] = 0
-            p["ready"] = False
-            p["rematch"] = False
-        await self.broadcast({"t": "start", "room": self.pub(), "target": KILL_TARGET})
+_seq = 0
 
 
 def clean_nick(v):
@@ -83,45 +21,118 @@ def clean_nick(v):
     return v or "Player"
 
 
-async def drop(room, role):
-    p = room.players.get(role)
-    if not p:
+def num(v, d=0.0):
+    try:
+        f = float(v)
+        return f if math.isfinite(f) else d
+    except (TypeError, ValueError):
+        return d
+
+
+class Player:
+    def __init__(self, ws, nick):
+        self.ws = ws
+        self.nick = nick
+        self.role = ""
+        self.room = None
+        self.hp = MAX_HP
+        self.rematch = False
+        self.pos = (0.0, 0.0)
+        self.last_hit = 0.0
+
+    async def send(self, msg):
+        if self.ws is None:
+            return
+        try:
+            await self.ws.send_text(json.dumps(msg))
+        except Exception:
+            self.ws = None
+
+
+class Room:
+    def __init__(self, a, b):
+        global _seq
+        _seq += 1
+        self.id = _seq
+        self.players = {"host": a, "guest": b}
+        a.role, b.role = "host", "guest"
+        a.room = b.room = self
+        self.status = "lobby"
+        self.winner = None
+        self.t0 = 0.0
+
+    def pub(self):
+        return {
+            "id": self.id,
+            "status": self.status,
+            "winner": self.winner,
+            "maxhp": MAX_HP,
+            "players": [
+                {"role": r, "nick": p.nick, "hp": p.hp, "rematch": p.rematch, "connected": p.ws is not None}
+                for r, p in self.players.items()
+            ],
+        }
+
+    def other(self, role):
+        return self.players.get("guest" if role == "host" else "host")
+
+    async def broadcast(self, msg):
+        for p in list(self.players.values()):
+            await p.send(msg)
+
+    async def begin(self):
+        self.status = "playing"
+        self.winner = None
+        self.t0 = time.time()
+        for p in self.players.values():
+            p.hp = MAX_HP
+            p.rematch = False
+            p.last_hit = 0.0
+        for r, p in self.players.items():
+            await p.send({"t": "start", "role": r, "room": self.pub()})
+
+    async def finish(self, winner, reason):
+        if self.status != "playing":
+            return
+        self.status = "over"
+        self.winner = winner
+        for p in self.players.values():
+            p.rematch = False
+        await self.broadcast({"t": "over", "winner": winner, "reason": reason, "room": self.pub()})
+
+
+async def drop(p):
+    if p in QUEUE:
+        QUEUE.remove(p)
+    r = p.room
+    p.ws = None
+    if r is None:
         return
-    if room.status == "playing":
-        room.players.pop(role, None)
-        left = list(room.players)
-        if len(left) < 2:
-            await room.finish(left[0] if left else None, "disconnect")
-        else:
-            await room.broadcast({"t": "opp_left", "r": role, "room": room.pub()})
-        return
-    if room.status == "over":
-        room.players.pop(role, None)
-        if not room.players:
-            ROOMS.pop(room.code, None)
-        else:
-            await room.broadcast({"t": "room", "room": room.pub()})
-            await room.broadcast({"t": "opp_left"})
-        return
-    if role == "host":
-        await room.broadcast({"t": "room_closed", "reason": "host_left"})
-        ROOMS.pop(room.code, None)
+    left = r.other(p.role)
+    if r.status == "playing":
+        await r.finish(left.role if left and left.ws else None, "disconnect")
+    elif left and left.ws:
+        await left.send({"t": "opp_left", "room": r.pub()})
+    if all(q.ws is None for q in r.players.values()):
+        ROOMS.pop(r.id, None)
+
+
+async def try_match(p):
+    QUEUE[:] = [q for q in QUEUE if q.ws is not None and q is not p]
+    if QUEUE:
+        a = QUEUE.pop(0)
+        room = Room(a, p)
+        ROOMS[room.id] = room
+        await room.begin()
     else:
-        room.players.pop(role, None)
-        room.status = "lobby"
-        for p in room.players.values():
-            p["ready"] = False
-            p["rematch"] = False
-        await room.broadcast({"t": "room", "room": room.pub()})
+        QUEUE.append(p)
+        await p.send({"t": "queued", "waiting": len(QUEUE)})
 
 
 @router.websocket("/ws/shoot")
 async def ws_shoot(ws: WebSocket):
     await ws.accept()
-    room = None
-    role = None
-    for k in [k for k, r in ROOMS.items() if time.time() - r.created > ROOM_TTL]:
-        ROOMS.pop(k, None)
+    me = None
     try:
         while True:
             try:
@@ -131,59 +142,46 @@ async def ws_shoot(ws: WebSocket):
             t = m.get("t")
             if t == "ping":
                 await ws.send_text(json.dumps({"t": "pong", "c": m.get("c")}))
-            elif t == "create" and room is None:
-                room = Room(new_code())
-                role = "host"
-                room.players["host"] = {"ws": ws, "nick": clean_nick(m.get("nick")), "ready": False, "kills": 0, "rematch": False}
-                ROOMS[room.code] = room
-                await ws.send_text(json.dumps({"t": "joined", "role": role, "code": room.code, "room": room.pub()}))
-            elif t == "join" and room is None:
-                code = str(m.get("code", "")).upper().strip()
-                r = ROOMS.get(code)
-                if not r:
-                    await ws.send_text(json.dumps({"t": "error", "code": "ROOM_NOT_FOUND", "msg": "Room not found. Check the code."}))
-                elif len(r.players) >= r.cap or r.status != "lobby":
-                    await ws.send_text(json.dumps({"t": "error", "code": "ROOM_FULL", "msg": "That room is full."}))
-                else:
-                    room = r
-                    role = next(x for x in ROLES if x not in r.players)
-                    room.players[role] = {"ws": ws, "nick": clean_nick(m.get("nick")), "ready": False, "kills": 0, "rematch": False}
-                    await ws.send_text(json.dumps({"t": "joined", "role": role, "code": room.code, "room": room.pub()}))
-                    await room.broadcast({"t": "room", "room": room.pub()})
-            elif room is None:
+            elif t == "quick" and me is None:
+                me = Player(ws, clean_nick(m.get("nick")))
+                await try_match(me)
+            elif me is None:
                 continue
-            elif t == "ready" and room.status == "lobby":
-                room.players[role]["ready"] = bool(m.get("ready"))
-                await room.broadcast({"t": "room", "room": room.pub()})
-                if len(room.players) == room.cap and all(p["ready"] for p in room.players.values()):
-                    await room.begin()
-            elif t == "cap" and room.status == "lobby" and role == "host":
-                cap = 3 if m.get("cap") == 3 else 2
-                if len(room.players) <= cap:
-                    room.cap = cap
-                    for p in room.players.values():
-                        p["ready"] = False
-                    await room.broadcast({"t": "room", "room": room.pub()})
-            elif t == "st" and room.status == "playing":
-                for o in room.others(role):
-                    await room.send(o, {"t": "opp", "r": role, "x": m.get("x"), "y": m.get("y"), "vx": m.get("vx"), "vy": m.get("vy"),
-                                              "f": m.get("f"), "a": m.get("a"), "hp": m.get("hp"), "al": m.get("al")})
-            elif t == "shot" and room.status == "playing":
-                for o in room.others(role):
-                    await room.send(o, {"t": "oshot", "r": role, "id": m.get("id"), "x": m.get("x"), "y": m.get("y"), "a": m.get("a")})
-            elif t == "dead" and room.status == "playing":
-                killer = m.get("by")
-                if killer in room.players and killer != role:
-                    room.players[killer]["kills"] += 1
-                    k = room.players[killer]["kills"]
-                    await room.broadcast({"t": "score", "killer": killer, "victim": role, "room": room.pub()})
-                    if k >= KILL_TARGET:
-                        await room.finish(killer, "kills")
-            elif t == "rematch" and room.status == "over":
-                room.players[role]["rematch"] = bool(m.get("on"))
-                await room.broadcast({"t": "room", "room": room.pub()})
-                if len(room.players) == room.cap and all(p["rematch"] for p in room.players.values()):
-                    await room.begin()
+            elif t == "cancel" and me.room is None:
+                if me in QUEUE:
+                    QUEUE.remove(me)
+                me = None
+            elif me.room is None:
+                continue
+            elif t == "st" and me.room.status == "playing":
+                me.pos = (num(m.get("x")), num(m.get("z")))
+                o = me.room.other(me.role)
+                if o:
+                    await o.send({"t": "opp", "x": m.get("x"), "y": m.get("y"), "z": m.get("z"), "yw": m.get("yw"),
+                                  "an": m.get("an"), "sp": m.get("sp")})
+            elif t == "shot" and me.room.status == "playing":
+                o = me.room.other(me.role)
+                if o:
+                    await o.send({"t": "oshot", "f": m.get("f"), "to": m.get("to")})
+            elif t == "hit" and me.room.status == "playing":
+                r = me.room
+                now = time.time()
+                o = r.other(me.role)
+                if o is None or now - r.t0 < START_GRACE or now - me.last_hit < MIN_HIT_GAP or me.hp <= 0 or o.hp <= 0:
+                    continue
+                if math.hypot(me.pos[0] - o.pos[0], me.pos[1] - o.pos[1]) > MAX_RANGE:
+                    continue
+                me.last_hit = now
+                o.hp = max(0, o.hp - HIT_DMG)
+                await r.broadcast({"t": "hp", "by": me.role, "victim": o.role, "room": r.pub()})
+                if o.hp <= 0:
+                    await r.finish(me.role, "ko")
+            elif t == "rematch" and me.room.status == "over":
+                me.rematch = bool(m.get("on"))
+                r = me.room
+                await r.broadcast({"t": "room", "room": r.pub()})
+                if all(q.rematch and q.ws is not None for q in r.players.values()):
+                    await r.begin()
             elif t == "leave":
                 break
     except WebSocketDisconnect:
@@ -191,13 +189,13 @@ async def ws_shoot(ws: WebSocket):
     except Exception:
         pass
     finally:
-        if room is not None and role in room.players and room.players[role]["ws"] is ws:
-            await drop(room, role)
+        if me is not None:
+            await drop(me)
 
 
 @router.get("/shoot/health")
 async def shoot_health():
-    return {"ok": True, "rooms": len(ROOMS), "target": KILL_TARGET}
+    return {"ok": True, "queue": len(QUEUE), "rooms": len(ROOMS), "hp": MAX_HP, "dmg": HIT_DMG}
 
 
 app = FastAPI()

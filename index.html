@@ -162,30 +162,8 @@
     <div class="drBox panel"><div class="drHead" id="drHead" data-testid="duel-result-head"></div><div class="drSub" id="drSub" data-testid="duel-result-reason"></div><div class="drRows" id="drRows"></div><div class="drNote" id="drNote" data-testid="duel-rematch-note"></div>
       <div class="drBtns"><button class="dbtn go" id="btnDuelRematch" data-testid="duel-rematch-btn">Rematch</button><button class="dbtn" id="btnDuelLeave" data-testid="duel-leave-btn">Leave</button></div></div>
   </div>
-  <div id="shootLobby" class="hidden duelScr" data-testid="shoot-lobby">
-    <div class="dTop"><button class="rbtn" id="btnShootLeave" data-testid="shoot-leave-btn" aria-label="Leave room"><svg class="ico "><use href="#i-back"/></svg></button><h2>Shooting Lobby</h2></div>
-    <div class="lobGrid">
-      <div class="lobCol">
-        <div class="codeBox panel"><div class="dLabel">Room code</div><div class="codeVal" id="shCode" data-testid="shoot-room-code"></div><div class="dRow"><button class="dbtn sm" id="btnShootCopy" data-testid="shoot-copy-btn">Copy</button><button class="dbtn sm" id="btnShootShare" data-testid="shoot-share-btn">Share</button></div></div>
-        <div class="lvlSel panel modeSel"><div class="dLabel" id="shModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnShoot2" data-testid="shoot-mode-1v1-btn">1 v 1</button><button class="dbtn sm" id="btnShoot3" data-testid="shoot-mode-1v1v1-btn">1 v 1 v 1</button></div></div>
-        <div class="lvlSel panel shRules"><div class="dLabel">1v1 Shooting</div><div class="shRule">First to <b>40 kills</b> wins. Everyone can shoot everyone (1v1v1 free-for-all).</div><div class="shRule kbd-only">A/D move &middot; W/Space jump &middot; Mouse aim &amp; click (or F) to shoot</div><div class="shRule touch-only">Use the on-screen arrows, jump and fire buttons. Aim is automatic.</div></div>
-      </div>
-      <div class="lobCol">
-        <div class="pCards" id="shCards"></div>
-        <button class="dbtn go" id="btnShootReady" data-testid="shoot-ready-btn">Ready</button>
-        <div class="lobHint" id="shHint" data-testid="shoot-hint"></div>
-      </div>
-    </div>
-  </div>
-  <div id="shootGame" class="hidden" data-testid="shoot-game">
-    <canvas id="shootCv" data-testid="shoot-canvas"></canvas>
-    <div id="shootScore" data-testid="shoot-scoreboard"><div id="shScoreList"></div><div class="tg">FIRST TO <b id="shTarget">40</b></div></div>
-    <div id="shootHp" data-testid="shoot-hp"><i id="shHpFill" data-testid="shoot-hp-bar"></i></div>
-    <div id="shootFeed" data-testid="shoot-killfeed"></div>
-    <button class="rbtn" id="btnShootExit" data-testid="shoot-exit-btn" aria-label="Leave match"><svg class="ico "><use href="#i-back"/></svg></button>
-    <div id="shCount" class="hidden" data-testid="shoot-countdown"></div>
-    <div id="shootTouch"><button class="shBtn" data-act="l" data-testid="shoot-touch-left">&#9664;</button><button class="shBtn" data-act="r" data-testid="shoot-touch-right">&#9654;</button><button class="shBtn jump" data-act="j" data-testid="shoot-touch-jump">JUMP</button><button class="shBtn fire" data-act="f" data-testid="shoot-touch-fire">FIRE</button></div>
-  </div>
+  <div id="shootLobby" class="hidden"></div>
+  <div id="shootGame" class="hidden"></div>
   <div id="shootResult" class="hidden duelScr" data-testid="shoot-result">
     <div class="drBox panel"><div class="drHead" id="shRHead" data-testid="shoot-result-head"></div><div class="drSub" id="shRSub" data-testid="shoot-result-reason"></div><div class="drRows" id="shRRows"></div><div class="drNote" id="shRNote" data-testid="shoot-rematch-note"></div>
       <div class="drBtns"><button class="dbtn go" id="btnShootRematch" data-testid="shoot-rematch-btn">Rematch</button><button class="dbtn" id="btnShootResLeave" data-testid="shoot-result-leave-btn">Leave</button></div></div>

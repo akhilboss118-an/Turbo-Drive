@@ -1,5 +1,5 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v46';
+const CACHE = 'turbo-drive-v47';
 const FILES = [
  "game/js/lib/fflate.min.js",
  "game/js/lib/FBXLoader.js",
