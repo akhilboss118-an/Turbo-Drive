@@ -70,6 +70,7 @@ const Phys = (function () {
     if (level === 19) return buildLevel19(P, add);
     if (level === 20) return buildLevel20(P, add);
     if (level === 21) return buildLevel21(P, add);
+    if (level === 29) return buildLevel29(P, add);
     add('flat', 0, 90, ease.flat(0), 0, 0);
     add('kicker', 90, 108, ease.kicker(0, 2.4, 90, 108), 0, 2.4);               // jump 1
     add('drop', 126, 152, ease.drop(0.8, 0, 126, 152), 0.8, 0);
@@ -85,6 +86,16 @@ const Phys = (function () {
     add('drop', 618, 658, ease.drop(4.4, 0, 618, 658), 4.4, 0);
     add('flat', 658, 760, ease.flat(0), 0, 0);
     return { pieces: P, finishX: 735, checkpoints: [{ x: 8 }, { x: 190 }, { x: 340 }, { x: 535 }], length: 760 };
+  }
+  function buildLevel29(P, add) {   // GRAND OVAL (3-lap duel race): closed circuit, one lap = 972 m, the path ends exactly where it starts
+    const R = 45, ARC = Math.PI * R, N = 28, SL = 60;
+    let s = 0;
+    const seg = (len, turn, r, bank) => { add('flat', s, s + len, ease.flat(0), 0, 0, turn ? { turn, bank: bank || [0, 0], radius: [r, r] } : undefined); s += len; };
+    seg(339.23); seg(ARC, 180, R, [5, 5]); seg(40);
+    seg(SL, N, 60); seg(SL, -N, 60); seg(30); seg(SL, -N, 60); seg(SL, N, 60);   // infield dip (the roundabout kink)
+    seg(40); seg(ARC, 180, R, [5, 5]);
+    const fin = s; add('flat', fin, fin + 4, ease.flat(0), 0, 0);
+    return { pieces: P, finishX: fin, checkpoints: [{ x: 8 }, { x: 410 }, { x: 660 }, { x: 900 }], length: fin + 4, boosts: [{ x0: 140, x1: 148 }, { x0: 250, x1: 258 }, { x0: 800, x1: 808 }] };
   }
   function buildLevel2(P, add) {
     add('flat', 0, 80, ease.flat(0), 0, 0);

@@ -18,6 +18,7 @@ for (let n = 9; n <= 16; n++) {
   const b = ENV[n - 8];
   ENV[n] = Object.assign({}, b, { mote: 0xffa070 }, b.sun ? { sun: ['#ffe6c8', '#ff9a5a', '#a8482a'] } : {}, b.cloud ? { cloud: 0xc2603a, cloud2: 0xe8a070 } : {}, b.mount ? { mount: 0x5a2418 } : {}, b.tower ? { tower: [0xff9a4a, 0xff5a2a, 0xffd34d] } : {}, b.spire ? { spire: [0xff9a4a, 0x7fe8ff] } : {}, { mars: true });
 }
+ENV[29] = { sun: ['#ffffff', '#fff3c0', '#ffd070'], sunSize: 420, sunPos: [420, 260, -380], cloud: 0xffffff, cloud2: 0xdfefff, mount: 0x4a7a4a, mote: 0xffffff, circuit: true };
 ENV[17] = { sun: ['#ffffff', '#fff3d0', '#6a6a78'], sunSize: 300, sunPos: [480, 120, -300], mount: 0x4a4d58, mote: 0xcfd3e0, moon: true };
 ENV[18] = { sun: ['#fff6e0', '#ffc890', '#8a5a4a'], sunSize: 360, sunPos: [-460, 60, -320], mount: 0x3e3a46, mote: 0xe0c8b8, moon: true };
 ENV[19] = { sun: ['#fff0e0', '#ffb890', '#6a4a4a'], sunSize: 380, sunPos: [-440, 70, -330], mount: 0x44424e, mote: 0xd8c8d0, moon: true };
@@ -77,6 +78,7 @@ function buildEnvironment(L) {
     potato(26, 0.8, 0xb09080, -380, 230, -420); potato(11, 0.85, 0x9a8070, 300, 270, -380);
   }
   if (E.moon) { moonEnv(L, E, low); return; }
+  if (E.circuit) { circuitEnv(L, E, low); return; }
   if (E.desert) { desertEnv(L, E, low); return; }
   if (E.ice) { iceEnv(L, E, low); return; }
   if (E.jungle) { jungleEnv(L, E, low); return; }

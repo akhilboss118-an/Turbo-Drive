@@ -81,6 +81,8 @@ LEVELS[26] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 26  PLUTO SURVIVAL', b
 LEVELS[27] = Object.assign({}, LEVELS[26], { name: 'LEVEL 27  ALIEN HUNT', base: 27, hunt: true, stars: [190, 280], seed: 2707, fog: 0x2a1a3c, glow: [0xff3a8a, 0x7dff6a], card: ['#2a1038', '#ff3a8a'] });
 LEVELS[28] = Object.assign({}, LEVELS[26], { name: 'LEVEL 28  SPACE BATTLE', base: 28, onfoot: false, hunt: false, dogfight: true, planet: 'neptune', stars: [70, 120], seed: 2808, fog: 0x01020a, glow: [0x35e6ff, 0xff2a3a], card: ['#0a1030', '#ff2a3a'] });
 const CAMPAIGN_LEVELS = 28;
+const DUEL_RACE_LEVEL = 29, DUEL_RACE_LAPS = 3;   // duel-only closed circuit (not part of the campaign)
+LEVELS[29] = { name: 'RACE  GRAND OVAL', base: 29, world: 0, circuit: true, stars: [95, 130], camera: 'chase', biome: 'circuit', fog: 0xa6d2ee, sky: ['#2f7fd8', '#5aa8ea', '#9ed0f2', '#e6f4ff'], topA: 0x2b2d34, topB: 0x33353d, postColor: 0xc8202a, seed: 291, island: [0x3fa860, 0x2f8a4e, 0x6ac07a], glow: [0xf2f2f2, 0xe0262a], hoops: [], hoopCoins: 0, stars_bg: false, card: ['#2f7a3f', '#e0262a'] };
 const FROST = { noTint: true, camera: 'side', biome: 'ice', gravity: Phys.MARS_G, hoops: [], hoopCoins: 0, megaJump: undefined };
 Object.assign(LEVELS[15], FROST, { name: 'LEVEL 15  FROSTBITE SPIRAL', base: 15, stars: [58, 72], seed: 271, cold: { k: 1, time: 46, cp: 6, pad: 2, retry: 20 }, spiral: [[200, 570, 0, 27]],
   fog: 0x2a5478, sky: ['#050a1c', '#16345c', '#6aa5c8', '#e4f4ff'], topA: 0x4a86b8, topB: 0x5a9ac8, postColor: 0x2a4a78, island: [0xbfefff, 0x8fd0f0, 0xdff8ff], glow: [0x7affd0, 0x35e6ff], card: ['#16345c', '#e4f4ff'] });

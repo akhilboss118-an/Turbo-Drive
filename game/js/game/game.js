@@ -75,7 +75,7 @@ function onCrash(reason) {
 function nextLap() {
   lap++; cpIndex = 0; duelRs++; resetGates();
   car.spawn(CPS[0].x, Math.max(7, Math.min(car.speed(), 30))); snapCamera();
-  toast('LAP ' + lap, 'Endless loop', 'good'); Snd.cp(); duelOnLap();
+  toast('LAP ' + lap + ' / ' + duelLaps(), lap === duelLaps() ? 'Final lap!' : 'Keep pushing', 'good'); Snd.cp(); duelOnLap();
 }
 function onFinish() {
   if (duelOn) duelOnFinish();

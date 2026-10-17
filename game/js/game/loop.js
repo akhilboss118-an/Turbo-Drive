@@ -58,7 +58,7 @@ function tick(dt) {
         const g = gates[i];
         if (!g.passed && car.x > g.x) {
           g.passed = true;
-          if (i === gates.length - 1) { if (duelOn && cpIndex < gates.length - 1) { g.passed = false; } else if (duelOn && duelLaps() > 1) nextLap(); else onFinish(); } else { g.mat.color.setHex(0x35e6ff); gateCleared(g); cpIndex = i + 1; vibe(25); toast('CHECKPOINT CLEARED', (i + 1) + ' / ' + (gates.length - 1) + '  \u00B7  respawn saved', 'good'); Snd.cp(); coldBonus('cp'); }
+          if (i === gates.length - 1) { if (duelOn && cpIndex < gates.length - 1) { g.passed = false; } else if (duelOn && lap < duelLaps()) nextLap(); else onFinish(); } else { g.mat.color.setHex(0x35e6ff); gateCleared(g); cpIndex = i + 1; vibe(25); toast('CHECKPOINT CLEARED', (i + 1) + ' / ' + (gates.length - 1) + '  \u00B7  respawn saved', 'good'); Snd.cp(); coldBonus('cp'); }
         }
       }
     }
@@ -101,7 +101,7 @@ function tick(dt) {
   envUpdate(); updateRaceObjs(dt); if (padObjs.length) updatePads();
   hudSlow -= dt; if (hudSlow <= 0) {
     hudSlow = 0.05; $('timer').textContent = fmt(timeT); $('speed').textContent = Math.round(car.speed() * 3.6); $('spdbar').style.setProperty('--spd', Math.min(1, car.speed() * 3.6 / 160).toFixed(3));
-    if (duelOn) { const lh = $('lapHud'); lh.classList.toggle('hidden', duelLaps() < 2); lh.textContent = 'Lap ' + lap; } { const nc = gates.length - 1; $('cp').textContent = cpIndex >= nc ? 'Next: Finish' : 'Next checkpoint ' + (cpIndex + 1) + ' / ' + nc; const bl = duelOn ? null : bests[level]; $('bestHud').textContent = 'Best lap ' + (bl === undefined || bl === null ? '--:--.-' : fmt(bl)); } $('score').textContent = score; $('flipPts').textContent = run.flipPts;
+    if (duelOn) { const lh = $('lapHud'); lh.classList.toggle('hidden', duelLaps() < 2); lh.textContent = 'Lap ' + lap + ' / ' + duelLaps(); } { const nc = gates.length - 1; $('cp').textContent = cpIndex >= nc ? 'Next: Finish' : 'Next checkpoint ' + (cpIndex + 1) + ' / ' + nc; const bl = duelOn ? null : bests[level]; $('bestHud').textContent = 'Best lap ' + (bl === undefined || bl === null ? '--:--.-' : fmt(bl)); } $('score').textContent = score; $('flipPts').textContent = run.flipPts;
     const pr = duelProgress(car.x, lap); $('progress').style.width = (pr * 100).toFixed(1) + '%';
   }
   if (duelOn) duelTick(dt);

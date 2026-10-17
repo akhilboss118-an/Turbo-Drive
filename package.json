@@ -1,8 +1,8 @@
 {
   "name": "turbo-drive-upgraded",
-  "version": "4.0.0",
+  "version": "4.6.0",
   "private": true,
-  "description": "Turbo Drive v4.0 - 1v1 & 1v1v1 Shooting Duel, Space Battle, Alien Hunt, Pluto Survival, and Online Race Duel.",
+  "description": "Turbo Drive v4.6 - Grand Oval 3-Lap Race, 1v1 & 1v1v1 Shooting Duel, Space Battle, Alien Hunt, and Pluto Survival.",
   "scripts": {
     "prepare-www": "node scripts/prepare-www.js",
     "build": "node scripts/prepare-www.js",
