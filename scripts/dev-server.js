@@ -16,7 +16,9 @@ const MIME = {
   '.mp3': 'audio/mpeg',
   '.ico': 'image/x-icon',
   '.glb': 'model/gltf-binary',
-  '.gltf': 'model/gltf+json'
+  '.gltf': 'model/gltf+json',
+  '.fbx': 'application/octet-stream',
+  '.mp4': 'video/mp4'
 };
 
 const server = http.createServer((req, res) => {

@@ -57,12 +57,23 @@ const Snd = (function () {
     if (vol > 0 && !L) { const n = loopSrc(name, musBus, 0); if (!n) return; layers[name] = n; n.g.gain.setTargetAtTime(vol, t, 0.6); }
     else if (L) { L.g.gain.setTargetAtTime(vol, t, 0.6); if (vol === 0) { delete layers[name]; L.s.stop(t + 3); } }
   }
+  let pad = null;
+  function padSet(on) {
+    if (!ctx) return; const t = ctx.currentTime;
+    if (on && !pad) {
+      const g = ctx.createGain(), f = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain(); g.gain.value = 0; f.type = 'lowpass'; f.frequency.value = 900; lfo.frequency.value = 0.12; lg.gain.value = 250; lfo.connect(lg); lg.connect(f.frequency);
+      const os = [110, 164.81, 220, 277.18, 329.63].map((fr, i) => { const o = ctx.createOscillator(), og = ctx.createGain(); o.type = i % 2 ? 'sine' : 'triangle'; o.frequency.value = fr; o.detune.value = (i - 2) * 4; og.gain.value = 0.2 / (1 + i * 0.3); o.connect(og); og.connect(f); o.start(); return o; });
+      f.connect(g); g.connect(musBus); lfo.start(); pad = { g, os, lfo }; g.gain.setTargetAtTime(0.5, t, 1.4);
+    } else if (!on && pad) { const p = pad; pad = null; p.g.gain.setTargetAtTime(0, t, 0.35); setTimeout(() => { try { p.os.forEach((o) => o.stop()); p.lfo.stop(); } catch (e) {} }, 2500); }
+  }
   function setScene(s) {
-    const race = ['countdown', 'playing', 'finishing', 'crashed', 'paused', 'cutscene'].indexOf(s) >= 0;
+    const race = ['countdown', 'playing', 'finishing', 'crashed', 'paused', 'cutscene', 'victory', 'shootgame'].indexOf(s) >= 0;
+    const ending = ['credits', 'cinematic', 'end'].indexOf(s) >= 0;
     duck = s === 'paused' ? 0.35 : s === 'crashed' ? 0.6 : 1;
-    const want = race ? 'race' : 'menu';
-    if (ctx) { musBus.gain.setTargetAtTime(duck, ctx.currentTime, 0.25); }
+    const want = ending ? 'ending' : race ? 'race' : 'menu';
+    if (ctx) { musBus.gain.setTargetAtTime(duck, ctx.currentTime, 0.25); padSet(ending); }
     if (want === scene) return; scene = want; if (!ctx) return;
+    if (ending) { setLayer('menu_theme', VOL.music * 0.3); setLayer('race_theme', 0); setLayer('space_ambience', VOL.amb); setLayer('scifi_hum', 0); return; }
     const space = race && typeof LEVELS !== 'undefined' && /SPACE/.test((LEVELS[level] || {}).name || '');
     setLayer('menu_theme', race ? 0 : VOL.music); setLayer('race_theme', race ? VOL.music : 0);
     setLayer('space_ambience', race ? (space ? VOL.amb : 0) : VOL.amb * 0.6); setLayer('scifi_hum', space ? VOL.amb * 0.5 : 0);

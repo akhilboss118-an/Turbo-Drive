@@ -49,7 +49,7 @@ const _alV2 = new THREE.Vector3();
 
 window.addEventListener('td:state', (e) => {
   const s = e.detail, was = AL.lastState; AL.lastState = s;
-  const ok = ALIEN_STATES.indexOf(s) >= 0 && !(typeof duelOn !== 'undefined' && duelOn) && !(s === 'finishing' && LEVELS[level].space);
+  const ok = ALIEN_STATES.indexOf(s) >= 0 && !LEVELS[level].onfoot && !LEVELS[level].dogfight && !(typeof duelOn !== 'undefined' && duelOn) && !(s === 'finishing' && LEVELS[level].space);
   if (!ok) { radarEl.classList.add('hidden'); Snd.alienHum(0); AL.active = false; alienRoot.visible = false; AL.ready = false; alienEl.classList.add('hidden'); AL.bannerT = 0; return; }
   AL.active = true; radarEl.classList.remove('hidden');
   if (s === 'countdown' && was !== 'paused') { AL.ready = false; AL.caught = 0; AL.hits = 0; AL.close = 0; AL.warn = 0; AL.idleT = 0; AL.atk = 0; AL.attacking = false; alienBolt.visible = false; alienBanner('ALIEN SHIP IS CHASING YOU', "Don't hit anything!", 'warn', 2600); }
@@ -62,7 +62,7 @@ window.addEventListener('td:state', (e) => {
 });
 
 function alienUpdate(dt) {
-  if (!AL.active) return;
+  if (!AL.active || LEVELS[level].onfoot || LEVELS[level].dogfight) return;
   if (state === 'paused') { Snd.alienHum(0); return; }
   AL.t += dt;
   const prog = LEVELS[level].space ? (SP.course ? SF.s / SP.course.len : 0) : duelProgress(car.x, lap);

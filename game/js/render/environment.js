@@ -22,8 +22,6 @@ ENV[17] = { sun: ['#ffffff', '#fff3d0', '#6a6a78'], sunSize: 300, sunPos: [480, 
 ENV[18] = { sun: ['#fff6e0', '#ffc890', '#8a5a4a'], sunSize: 360, sunPos: [-460, 60, -320], mount: 0x3e3a46, mote: 0xe0c8b8, moon: true };
 ENV[19] = { sun: ['#fff0e0', '#ffb890', '#6a4a4a'], sunSize: 380, sunPos: [-440, 70, -330], mount: 0x44424e, mote: 0xd8c8d0, moon: true };
 ENV[20] = { sun: ['#ffe0b0', '#ff5a2a', '#6a1410'], sunSize: 640, sunPos: [420, 20, -300], mount: 0x3a2a2e, mote: 0xffa070, moon: true };
-ENV[21] = { sun: ['#fff4d0', '#ffb060', '#ff5a5a'], sunSize: 560, sunPos: [-300, 70, -430], mote: 0xffe0a0, circuit: true };
-ENV[26] = { sun: ['#fff4d0', '#ffb060', '#ff5a5a'], sunSize: 560, sunPos: [-300, 70, -430], mote: 0xffe0a0, circuit: true };
 function glowTexture(stops) {
   const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
   const r = g.createRadialGradient(64, 64, 0, 64, 64, 64);
@@ -52,10 +50,8 @@ const tintC = (hexv, k) => new THREE.Color(hexv).multiplyScalar(k);
 
 function buildEnvironment(L) {
   envGroup = new THREE.Group(); levelGroup.add(envGroup); auroraMats.length = 0; issPivot = null; issBody = null;
-  const E = ENV[level] || ENV[baseOf(level)] || ENV[26] || ENV[1];
-  if (!E) return;
-  const low = settings.quality === 'low', len = track.length;
-  seed = (L.seed || 100) + 100; envT = 0;
+  const E = ENV[level], low = settings.quality === 'low', len = track.length;
+  seed = L.seed + 100; envT = 0;
   const gAt = (x) => { const v = ground(x); return v === null ? 0 : v; };
 
   skyFollow = new THREE.Group(); envGroup.add(skyFollow);
@@ -80,7 +76,6 @@ function buildEnvironment(L) {
     const potato = (r, sy, col, x, y, z) => { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), new THREE.MeshBasicMaterial({ color: col, fog: false })); m.scale.set(1.25, sy, 1); m.position.set(x, y, z); skyFollow.add(m); };
     potato(26, 0.8, 0xb09080, -380, 230, -420); potato(11, 0.85, 0x9a8070, 300, 270, -380);
   }
-  if (E.circuit) { circuitEnv(L, E, low); return; }
   if (E.moon) { moonEnv(L, E, low); return; }
   if (E.desert) { desertEnv(L, E, low); return; }
   if (E.ice) { iceEnv(L, E, low); return; }

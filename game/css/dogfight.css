@@ -1,0 +1,51 @@
+/* Level 28 - Space Battle */
+#dfHud,#dfNote{display:none}
+body.dogfight[data-state="countdown"] #dfHud,body.dogfight[data-state="playing"] #dfHud,body.dogfight[data-state="paused"] #dfHud,body.dogfight[data-state="crashed"] #dfHud,body.dogfight[data-state="finishing"] #dfHud,body.dogfight[data-state="victory"] #dfHud{display:block}
+body.dogfight #controls,body.dogfight #spaceCtl,body.dogfight .hudr,body.dogfight #kbHint,body.dogfight #offCourse,body.dogfight #alienRadar,body.dogfight #lvlName,body.dogfight #footHud,body.dogfight #nitro{display:none!important}
+#dfHud{position:absolute;inset:0;pointer-events:none;z-index:12;font-family:'Chakra Petch','Arial Narrow',sans-serif}
+#dfLives{position:absolute;left:max(70px,calc(env(safe-area-inset-left) + 66px));top:16px;display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+#dfLives span{font-size:11px;letter-spacing:.2em;color:#9fdcff;margin-right:4px}
+#dfLives i{display:block;width:26px;height:12px;border-radius:3px;background:#2a1a2e;border:1px solid #ff5a6a55;transform:skewX(-18deg);transition:background-color .2s,box-shadow .2s}
+#dfLives i.on{background:#35e6ff;box-shadow:0 0 10px #35e6ffaa;border-color:#baf6ff}
+#dfBoss{position:absolute;left:0;top:0;width:clamp(150px,22vw,250px);text-align:center;will-change:transform;display:none}
+#dfBoss .dfBn{display:block;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:13px;letter-spacing:.22em;color:#ffb0b8;text-shadow:0 0 8px #ff2a3a,0 2px 0 #000;margin-bottom:3px}
+#dfBoss .dfBt{height:13px;border-radius:3px;background:rgba(10,4,16,.8);border:1px solid #ff5a6a;box-shadow:0 0 12px rgba(255,40,60,.5);padding:2px;transform:skewX(-14deg)}
+#dfBoss .dfBt b{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff2a3a,#ff8a3d);border-radius:1px;transition:width .08s linear}
+#dfBoss.low .dfBt b{background:linear-gradient(90deg,#ff0020,#ff4a2a);animation:dfPulse .5s infinite alternate}
+#dfBoss em{display:block;font-style:normal;font-size:11px;color:#ffd0d4;margin-top:2px;letter-spacing:.1em}
+@keyframes dfPulse{from{opacity:.65}to{opacity:1}}
+#dfLock{position:absolute;left:0;top:0;border:2px solid rgba(255,70,80,.9);border-radius:50%;box-shadow:0 0 14px rgba(255,40,60,.7),inset 0 0 12px rgba(255,40,60,.35);display:none;will-change:transform}
+#dfLock i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#ff4a5a}
+#dfWarn{position:absolute;left:50%;top:15%;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity .1s;white-space:nowrap}
+#dfWarn.on{opacity:1}
+#dfWarn b{display:block;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:clamp(20px,3.6vw,38px);letter-spacing:.14em;color:#ff2a3a;text-shadow:0 0 16px rgba(255,30,50,.9),0 2px 0 #200006;animation:dfBlink .18s steps(2) infinite}
+@keyframes dfBlink{0%{opacity:1}100%{opacity:.35}}
+#dfSubT{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity .25s;white-space:nowrap}
+#dfSubT.on{opacity:1}
+#dfSubT b{display:block;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-size:clamp(26px,5.4vw,56px);letter-spacing:.1em;color:#fff1dc;text-shadow:0 0 18px rgba(53,230,255,.8),0 3px 0 #05102a}
+#dfSubT small{display:block;font-size:14px;letter-spacing:.2em;color:#baf0ff}
+#dfHint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font-size:12px;letter-spacing:.08em;color:#cfe8ff;background:rgba(10,8,28,.55);padding:4px 12px;border-radius:999px;white-space:nowrap;opacity:.85}
+body.touch #dfHint{display:none}
+#dfVigR{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,0,30,0) 45%,rgba(255,0,30,.75) 100%)}
+body.dfWarn #dfVigR{box-shadow:inset 0 0 90px rgba(255,30,40,.35)}
+#dfFlash{position:absolute;inset:0;background:#fff;opacity:0}
+#dfTouch{display:none}
+body.touch.dogfight[data-state="playing"] #dfTouch,body.touch.dogfight[data-state="countdown"] #dfTouch{display:block}
+#dfJoy{position:absolute;left:max(24px,env(safe-area-inset-left));bottom:24px;width:130px;height:130px;border-radius:50%;background:rgba(21,12,58,.45);border:2px solid rgba(53,230,255,.5);pointer-events:auto;touch-action:none}
+#dfKnob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(53,230,255,.55);border:2px solid #baf6ff;pointer-events:none}
+#dfFireBtn{position:absolute;right:max(26px,env(safe-area-inset-right));bottom:30px;width:110px;height:110px;border-radius:50%;background:rgba(255,40,60,.5);border:3px solid #ff8a95;color:#fff;font:900 22px 'Big Shoulders Display',sans-serif;letter-spacing:.12em;pointer-events:auto;touch-action:none;box-shadow:0 0 22px rgba(255,40,60,.5)}
+#dfFireBtn:active{background:rgba(255,40,60,.85)}
+#dfNote{position:absolute;inset:0;z-index:40;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(4,6,20,.55),rgba(0,0,6,.9));pointer-events:auto}
+body.dfNoteOn[data-state="countdown"] #dfNote{display:flex;animation:dfIn .5s ease-out}
+@keyframes dfIn{from{opacity:0}to{opacity:1}}
+.dfPaper{position:relative;width:min(560px,92vw);max-height:92vh;overflow:auto;padding:clamp(16px,3vh,30px) clamp(18px,4vw,40px);background:#f1e6c8;background-image:repeating-linear-gradient(transparent 0 33px,rgba(70,90,150,.22) 33px 34px);color:#14285a;border-radius:3px;box-shadow:0 20px 70px #000,0 0 0 1px #00000040;transform:rotate(-1.2deg);font-family:'Caveat','Segoe Print','Bradley Hand','Comic Sans MS',cursive;text-align:left}
+.dfPaper h2{margin:0 0 6px;font-weight:700;font-size:clamp(26px,5vh,40px);color:#a01828;letter-spacing:.02em}
+.dfPaper p{margin:0;font-size:clamp(20px,3.8vh,28px);line-height:1.22}
+.dfPaper p.sm{font-size:clamp(17px,3.2vh,23px);margin-top:8px}
+.dfPaper u{text-decoration:underline wavy #a01828}
+.dfPaper .sig{text-align:right;font-size:clamp(20px,3.6vh,26px);margin-top:6px}
+.dfPaper .dfKeys{font-family:'Chakra Petch',sans-serif;font-size:11px;letter-spacing:.08em;color:#4a5a86;margin-top:8px;text-align:center}
+.dfPaper .btn{display:block;margin:10px auto 0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;letter-spacing:.16em;font-size:20px;padding:10px 34px;transform:rotate(1.2deg)}
+.dfStamp{position:absolute;right:16px;top:12px;border:3px solid #a01828;color:#a01828;font:900 15px 'Big Shoulders Display',sans-serif;letter-spacing:.2em;padding:2px 10px;transform:rotate(8deg);opacity:.8}
+body.touch .dfKeys{display:none}
+@media (max-height:480px){#dfLives{top:10px}#dfHint{display:none}#dfJoy{width:104px;height:104px;bottom:14px}#dfFireBtn{width:88px;height:88px;bottom:18px}}

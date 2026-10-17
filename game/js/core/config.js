@@ -35,12 +35,12 @@ const WORLDS = [
   { id: 'earth', name: 'Earth', first: 1, last: 8, blurb: 'Sunset Run to Lava Gauntlet' },
   { id: 'mars', name: 'Mars', first: 9, last: 16, blurb: 'Red dust, thin air, meteors and ice', gravity: '38%', req: 'Finish all 8 Earth levels to unlock', tags: ['Low gravity', 'Meteor storms', 'Freezing cold'], diff: 2 },
   { id: 'moon', name: 'Moon', first: 17, last: 20, blurb: 'Craters, spiral ramps and the final Moon Collapse', gravity: '17%', req: 'Finish all 8 Mars levels to unlock', tags: ['Moon gravity', 'Meteors', 'Lasers & doors', 'Level 20 needs the Hover'], diff: 3 },
-  { id: 'space', name: 'Deep Space', first: 21, last: 25, blurb: 'Zero-G flight to Jupiter, Saturn, Uranus, Neptune & Pluto', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
+  { id: 'space', name: 'Deep Space', first: 21, last: 28, blurb: 'Zero-G flight to Jupiter, Saturn, Uranus and Neptune, survive on Pluto, hunt the aliens, then the final space battle', gravity: '0%', req: 'Finish Moon Collapse (level 20) with a Legendary hover to unlock', tags: ['Legendary hovers only', 'Zero gravity', 'Checkpoint rings', 'Left / Right steering'], diff: 3 },
 ];
 WORLDS[0].gravity = '100%'; WORLDS[0].req = ''; WORLDS[0].tags = ['Neon tracks', 'Lasers', 'Lava']; WORLDS[0].diff = 1;
 WORLDS.forEach((w) => { w.count = w.last - w.first + 1; });
-Object.defineProperty(WORLDS[3], 'count', { get() { return this.last - this.first + (LEVELS[this.last].secret && unlocked < this.last ? 0 : 1); } });
-const baseOf = (n) => (n === 26 ? 26 : (n >= 9 && n <= 12) || n >= 15 ? n : ((n - 1) % 8) + 1);
+Object.defineProperty(WORLDS[3], 'count', { get() { let n = this.last; while (n > this.first && LEVELS[n].secret && unlocked < n) n--; return n - this.first + 1; } });
+const baseOf = (n) => ((n >= 9 && n <= 12) || n >= 15 ? n : ((n - 1) % 8) + 1);   // 9-12 are their own low-gravity tracks (11-14 add the meteor storm; 15-16 are their own Mars-cold tracks; 13 and 14 are the low-gravity Mars re-skins of tracks 5 and 6)
 const worldOf = (n) => (n > 20 ? 3 : n > 16 ? 2 : n > 8 ? 1 : 0);
 const MARS_NAMES = ['DUST RUNNER', 'CRATER CANYON', 'SPACE ELEVATOR', 'OLYMPUS FINAL', 'VALLES SPIRAL', 'POLAR MEGA RAMP', 'RED OASIS CLIMB', 'MAGMA GAUNTLET'];
 (function () {
@@ -77,10 +77,10 @@ LEVELS[22] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 22  SPACE RINGS OF SAT
 LEVELS[23] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 23  ICE GIANT URANUS', base: 23, stars: [66, 90], planet: 'uranus', seed: 2303, sky: ['#01040a', '#042030', '#0a4a5a', '#3a8a9a'], fog: 0x042030, glow: [0x9ffff0, 0x7ad8ff], card: ['#0a4a5a', '#bff6f6'] });
 LEVELS[24] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 24  STORM WORLD NEPTUNE', base: 24, stars: [66, 90], planet: 'neptune', seed: 2404, finale2: true, sky: ['#010414', '#06103a', '#0e2a8a', '#2a5ae0'], fog: 0x06103a, glow: [0x4a78ff, 0xffffff], card: ['#0e2a8a', '#6a9aff'] });
 LEVELS[25] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 25  SECRET PLUTO', base: 25, stars: [70, 96], planet: 'pluto', seed: 2505, secret: true, finale2: true, sky: ['#05030a', '#1a0f1e', '#3a2236', '#8a6a64'], fog: 0x1a0f1e, glow: [0xffb27a, 0xb86aff], card: ['#3a2236', '#f4ead8'] });
-LEVELS[26] = { name: 'LEVEL 26  INFINITE LOOP', stars: [300, 420], camera: 'chase', biome: 'circuit', loop: true, depth: 2.5, noTint: true, world: 4, base: 26,
-  fog: 0xc07a82, sky: ['#0a1030', '#2c3a78', '#e0745e', '#ffd49a'], topA: 0x3a3e52, topB: 0x444860, postColor: 0x35304a, seed: 2121,
-  island: [0x2a7a50, 0x358a5a, 0x1f6a4a], glow: [0xffe2b0, 0xff5a3a], hoops: [], hoopCoins: 0, card: ['#2c3a78', '#ffd49a'] };
-const CAMPAIGN_LEVELS = 25;
+LEVELS[26] = Object.assign({}, SPACE_BASE, { name: 'LEVEL 26  PLUTO SURVIVAL', base: 26, space: false, onfoot: true, needLegendary: false, planet: 'pluto', secret: true, finale2: false, stars: [215, 270], seed: 2606, sky: ['#05030a', '#1a0f1e', '#3a2236', '#8a6a64'], fog: 0x2a2444, glow: [0x7af0ff, 0xff7a2e], card: ['#3a2236', '#7af0ff'] });
+LEVELS[27] = Object.assign({}, LEVELS[26], { name: 'LEVEL 27  ALIEN HUNT', base: 27, hunt: true, stars: [190, 280], seed: 2707, fog: 0x2a1a3c, glow: [0xff3a8a, 0x7dff6a], card: ['#2a1038', '#ff3a8a'] });
+LEVELS[28] = Object.assign({}, LEVELS[26], { name: 'LEVEL 28  SPACE BATTLE', base: 28, onfoot: false, hunt: false, dogfight: true, planet: 'neptune', stars: [70, 120], seed: 2808, fog: 0x01020a, glow: [0x35e6ff, 0xff2a3a], card: ['#0a1030', '#ff2a3a'] });
+const CAMPAIGN_LEVELS = 28;
 const FROST = { noTint: true, camera: 'side', biome: 'ice', gravity: Phys.MARS_G, hoops: [], hoopCoins: 0, megaJump: undefined };
 Object.assign(LEVELS[15], FROST, { name: 'LEVEL 15  FROSTBITE SPIRAL', base: 15, stars: [58, 72], seed: 271, cold: { k: 1, time: 46, cp: 6, pad: 2, retry: 20 }, spiral: [[200, 570, 0, 27]],
   fog: 0x2a5478, sky: ['#050a1c', '#16345c', '#6aa5c8', '#e4f4ff'], topA: 0x4a86b8, topB: 0x5a9ac8, postColor: 0x2a4a78, island: [0xbfefff, 0x8fd0f0, 0xdff8ff], glow: [0x7affd0, 0x35e6ff], card: ['#16345c', '#e4f4ff'] });

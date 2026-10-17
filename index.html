@@ -8,7 +8,7 @@
 <title>Turbo Drive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Chakra+Petch:wght@500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,14 +22,19 @@
 <link rel="stylesheet" href="game/css/warp.css">
 <link rel="stylesheet" href="game/css/intro.css">
 <link rel="stylesheet" href="game/css/duel.css">
+<link rel="stylesheet" href="game/css/shoot.css">
 <link rel="stylesheet" href="game/css/premium.css">
 <link rel="stylesheet" href="game/css/rarity.css">
 <link rel="stylesheet" href="game/css/account.css">
 <link rel="stylesheet" href="game/css/crates.css">
 <link rel="stylesheet" href="game/css/space.css">
+<link rel="stylesheet" href="game/css/dogfight.css">
 <link rel="stylesheet" href="game/css/tutorial.css">
 <link rel="stylesheet" href="game/css/levelcards.css">
 <link rel="stylesheet" href="game/css/alien.css">
+<link rel="stylesheet" href="game/css/foot.css">
+<link rel="stylesheet" href="game/css/hunt.css">
+<link rel="stylesheet" href="game/css/ending.css">
 </head>
 <body>
 <div id="stage"></div><canvas id="speedfx"></canvas><div id="vig"></div><div id="grain"></div><div id="cine"></div><div id="impact"></div>
@@ -61,13 +66,9 @@
       <button class="mbtn play" id="btnPlay" data-testid="menu-play-btn" aria-label="Play"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Play</b><small id="playSub">Level 1</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div class="mrow">
         <button class="mbtn" id="btnGarage" data-testid="menu-garage-btn" aria-label="Garage, choose your vehicle"><span class="ib"><svg class="ico "><use href="#i-car"/></svg></span><span class="lb"><b>Garage</b><small id="garSub">Police Car</small></span></button>
-        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Stage Select &middot; 25 Levels</small></span></button>
+        <button class="mbtn" id="btnLevels" data-testid="menu-levels-btn" aria-label="Stage select, Earth, Mars, Moon and Deep Space"><span class="ib"><svg class="ico "><use href="#i-flag"/></svg></span><span class="lb"><b>Stages</b><small id="lvlSub">Earth &middot; 1/18 open</small></span></button>
       </div>
-      <button class="mbtn loop" id="btnLoop" data-testid="menu-loop-btn" aria-label="Loop Mode, 5-lap Grand Prix circuit"><span class="ib"><svg class="ico"><use href="#i-flag"/></svg></span><span class="lb"><b>Loop Mode</b><small>5-Lap Grand Prix &middot; Infinite Loop</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
-      <div class="mrow">
-        <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel Race, race a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel Race</b><small>Race online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
-        <button class="mbtn intro" id="btnStory" data-testid="menu-story-btn" aria-label="Story Intro, watch Alien Attack cinematic"><span class="ib"><svg class="ico fill"><use href="#i-play"/></svg></span><span class="lb"><b>Story Intro</b><small>Alien Attack</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
-      </div>
+      <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel, race or shoot a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel</b><small>Race or shoot a friend online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div id="menuLbSlot"></div>
     </div>
     <div id="topbar"><div id="authSlot"></div><button class="pill crateBtn" id="crateTotal" data-testid="menu-crates-btn" aria-label="Open space crates"></button><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
@@ -127,11 +128,13 @@
     <div class="row"><span>Sound</span><button class="btn" id="optSound" data-testid="settings-sound-btn">On</button></div>
     <div class="row"><span>Motion FX</span><button class="btn" id="optShake" data-testid="settings-shake-btn">On</button></div>
     <div class="row"><span>Graphics</span><button class="btn" id="optQuality" data-testid="settings-quality-btn">High</button></div>
-    <div class="row"><span>Story Intro</span><button class="btn" id="btnReplayStory" data-testid="settings-story-btn">Watch</button></div>
   </div>
   <div id="duelHome" class="hidden duelScr" data-testid="duel-home">
-    <div class="dTop"><button class="rbtn" id="btnDuelBack" data-testid="duel-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Duel Race</h2></div>
+    <div class="dTop"><button class="rbtn" id="btnDuelBack" data-testid="duel-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2 id="duelHomeTitle" data-testid="duel-home-title">Duel · Race</h2></div>
     <div class="dHomeBox">
+      <div class="dLabel">Game mode</div>
+      <div class="dRow kindSel"><button class="dbtn on" id="btnKindRace" data-testid="duel-kind-race-btn">Race</button><button class="dbtn" id="btnKindShoot" data-testid="duel-kind-shoot-btn">Shooting</button></div>
+      <div class="dKindDesc" id="duelKindDesc" data-testid="duel-kind-desc">Race a friend on the same track</div>
       <div class="dLabel">Your nickname</div>
       <input class="dInput" id="duelNick" data-testid="duel-nickname-input" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Nickname">
       <div class="dRow"><button class="dbtn go" id="btnDuelCreate" data-testid="duel-create-room-btn">Create Room</button><button class="dbtn" id="btnDuelJoin" data-testid="duel-join-room-btn">Join Room</button></div>
@@ -144,7 +147,7 @@
     <div class="lobGrid">
       <div class="lobCol">
         <div class="codeBox panel"><div class="dLabel">Room code</div><div class="codeVal" id="lobCode" data-testid="lobby-room-code"></div><div class="dRow"><button class="dbtn sm" id="btnDuelCopy" data-testid="lobby-copy-btn">Copy</button><button class="dbtn sm" id="btnDuelShare" data-testid="lobby-share-btn">Share</button></div></div>
-        <div class="lvlSel panel modeSel"><div class="dLabel" id="lobModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnModeDuel" data-testid="lobby-mode-duel-btn">Duel</button><button class="dbtn sm" id="btnModeRace" data-testid="lobby-mode-race-btn">Race &middot; Laps</button></div></div>
+        <div class="lvlSel panel modeSel"><div class="dLabel" id="lobModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnModeDuel" data-testid="lobby-mode-duel-btn">Duel</button><button class="dbtn sm" id="btnModeRace" data-testid="lobby-mode-race-btn">Race &middot; Endless</button></div></div>
         <div class="lvlSel panel"><div class="dLabel" id="lobLevelLab"></div><div class="nm"><button class="dbtn sm arr" id="lobPrev" data-testid="lobby-level-prev-btn" aria-label="Previous level">&#10094;</button><b id="lobLevelName" data-testid="lobby-level-name"></b><button class="dbtn sm arr" id="lobNext" data-testid="lobby-level-next-btn" aria-label="Next level">&#10095;</button></div></div>
       </div>
       <div class="lobCol">
@@ -159,6 +162,34 @@
     <div class="drBox panel"><div class="drHead" id="drHead" data-testid="duel-result-head"></div><div class="drSub" id="drSub" data-testid="duel-result-reason"></div><div class="drRows" id="drRows"></div><div class="drNote" id="drNote" data-testid="duel-rematch-note"></div>
       <div class="drBtns"><button class="dbtn go" id="btnDuelRematch" data-testid="duel-rematch-btn">Rematch</button><button class="dbtn" id="btnDuelLeave" data-testid="duel-leave-btn">Leave</button></div></div>
   </div>
+  <div id="shootLobby" class="hidden duelScr" data-testid="shoot-lobby">
+    <div class="dTop"><button class="rbtn" id="btnShootLeave" data-testid="shoot-leave-btn" aria-label="Leave room"><svg class="ico "><use href="#i-back"/></svg></button><h2>Shooting Lobby</h2></div>
+    <div class="lobGrid">
+      <div class="lobCol">
+        <div class="codeBox panel"><div class="dLabel">Room code</div><div class="codeVal" id="shCode" data-testid="shoot-room-code"></div><div class="dRow"><button class="dbtn sm" id="btnShootCopy" data-testid="shoot-copy-btn">Copy</button><button class="dbtn sm" id="btnShootShare" data-testid="shoot-share-btn">Share</button></div></div>
+        <div class="lvlSel panel modeSel"><div class="dLabel" id="shModeLab">Mode</div><div class="dRow"><button class="dbtn sm" id="btnShoot2" data-testid="shoot-mode-1v1-btn">1 v 1</button><button class="dbtn sm" id="btnShoot3" data-testid="shoot-mode-1v1v1-btn">1 v 1 v 1</button></div></div>
+        <div class="lvlSel panel shRules"><div class="dLabel">1v1 Shooting</div><div class="shRule">First to <b>40 kills</b> wins. Everyone can shoot everyone (1v1v1 free-for-all).</div><div class="shRule kbd-only">A/D move &middot; W/Space jump &middot; Mouse aim &amp; click (or F) to shoot</div><div class="shRule touch-only">Use the on-screen arrows, jump and fire buttons. Aim is automatic.</div></div>
+      </div>
+      <div class="lobCol">
+        <div class="pCards" id="shCards"></div>
+        <button class="dbtn go" id="btnShootReady" data-testid="shoot-ready-btn">Ready</button>
+        <div class="lobHint" id="shHint" data-testid="shoot-hint"></div>
+      </div>
+    </div>
+  </div>
+  <div id="shootGame" class="hidden" data-testid="shoot-game">
+    <canvas id="shootCv" data-testid="shoot-canvas"></canvas>
+    <div id="shootScore" data-testid="shoot-scoreboard"><div id="shScoreList"></div><div class="tg">FIRST TO <b id="shTarget">40</b></div></div>
+    <div id="shootHp" data-testid="shoot-hp"><i id="shHpFill" data-testid="shoot-hp-bar"></i></div>
+    <div id="shootFeed" data-testid="shoot-killfeed"></div>
+    <button class="rbtn" id="btnShootExit" data-testid="shoot-exit-btn" aria-label="Leave match"><svg class="ico "><use href="#i-back"/></svg></button>
+    <div id="shCount" class="hidden" data-testid="shoot-countdown"></div>
+    <div id="shootTouch"><button class="shBtn" data-act="l" data-testid="shoot-touch-left">&#9664;</button><button class="shBtn" data-act="r" data-testid="shoot-touch-right">&#9654;</button><button class="shBtn jump" data-act="j" data-testid="shoot-touch-jump">JUMP</button><button class="shBtn fire" data-act="f" data-testid="shoot-touch-fire">FIRE</button></div>
+  </div>
+  <div id="shootResult" class="hidden duelScr" data-testid="shoot-result">
+    <div class="drBox panel"><div class="drHead" id="shRHead" data-testid="shoot-result-head"></div><div class="drSub" id="shRSub" data-testid="shoot-result-reason"></div><div class="drRows" id="shRRows"></div><div class="drNote" id="shRNote" data-testid="shoot-rematch-note"></div>
+      <div class="drBtns"><button class="dbtn go" id="btnShootRematch" data-testid="shoot-rematch-btn">Rematch</button><button class="dbtn" id="btnShootResLeave" data-testid="shoot-result-leave-btn">Leave</button></div></div>
+  </div>
   <div id="hud" class="hidden">
     <button id="btnPause" data-testid="hud-pause-btn" aria-label="Pause"><i></i><i></i></button>
     <div id="lvlName"></div>
@@ -169,7 +200,7 @@
       <div id="chasmBox" class="hidden" data-testid="hud-chasm"><span id="chasmTxt" data-testid="hud-chasm-text"></span><div id="chasmBar"><b></b></div></div>
       <div id="coldBox" class="hidden" data-testid="hud-cold"><span id="coldTxt" data-testid="hud-cold-text"></span><div id="coldBar"><b></b></div></div>
     </div>
-    <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="lapHud" class="hidden" data-testid="hud-lap">Lap 1/3</div><div id="cp" data-testid="hud-checkpoint">Next checkpoint 1 / 3</div><div id="bestHud" data-testid="hud-best-lap">Best lap --:--.-</div><div id="bar"><div id="progress"></div></div></div>
+    <div class="hudbox panel"><div class="hlab">Time</div><div id="timer" data-testid="hud-timer">00:00.0</div><div id="lapHud" class="hidden" data-testid="hud-lap">Lap 1</div><div id="cp" data-testid="hud-checkpoint">Next checkpoint 1 / 3</div><div id="bestHud" data-testid="hud-best-lap">Best lap --:--.-</div><div id="bar"><div id="progress"></div></div></div>
     <div class="hudr panel"><div class="hlab">Speed</div><div class="spdrow"><div id="speed" data-testid="hud-speed">0</div><small>km/h</small></div><div id="spdbar"><i></i></div><div class="sc">Style <span id="score" data-testid="hud-score">0</span></div><div class="sc flipsc lowg-only">Flip bonus <span id="flipPts" data-testid="hud-flip-bonus">0</span></div><div class="sc cn" id="hudCoins"></div></div>
     <canvas id="duelMap" width="220" height="120" data-testid="duel-minimap"></canvas>
     <div id="duelBar" data-testid="duel-progress-bar"><div class="dbTrack"><b class="dbMk me" id="dbMe"><span id="dbMeNm" data-testid="duel-bar-me-nick"></span></b><b class="dbMk opp" id="dbOpp"><span id="dbOppNm" data-testid="duel-bar-opp-nick"></span></b></div></div>
@@ -186,6 +217,28 @@
   <div id="spaceCtl" data-testid="space-controls">
     <button class="sbtn" id="spLeft" data-act="spL" data-testid="space-left-btn" aria-label="Steer left"><span class="ic">&#9664;</span><small>LEFT</small></button>
     <button class="sbtn" id="spRight" data-act="spR" data-testid="space-right-btn" aria-label="Steer right"><span class="ic">&#9654;</span><small>RIGHT</small></button>
+  </div>
+  <div id="footHud" data-testid="foot-hud">
+    <div id="ftVig"></div>
+    <div id="ftCross" data-testid="foot-crosshair"><i></i></div>
+    <div id="ftStats" class="panel">
+      <div class="ftRow"><span>HEALTH</span><div class="ftBar hp"><b id="ftHp" data-testid="foot-health-bar"></b></div></div>
+      <div class="ftRow"><span>OXYGEN</span><div class="ftBar o2"><b id="ftO2" data-testid="foot-oxygen-bar"></b></div></div>
+      <div class="ftRow" id="ftLives" data-testid="hunt-health-bars"><span>BARS</span><i class="on" data-testid="hunt-bar-1"></i><i class="on" data-testid="hunt-bar-2"></i><i class="on" data-testid="hunt-bar-3"></i></div>
+      <div id="ftSafe" class="hidden" data-testid="foot-safe-zone">SAFE ZONE &middot; REFILLING</div>
+    </div>
+    <div id="ftSignal" class="panel" data-testid="foot-alien-signal"><span>ALIEN SIGNAL</span><div class="ftBar sig"><b id="ftSigFill"></b></div><em id="ftSigN">0%</em></div>
+    <div id="ftObjBox"><i id="ftArrow">&#9650;</i><span id="ftObj" data-testid="foot-objective"></span></div>
+    <div id="ftInv" class="panel"><div><small>AMMO</small><b id="ftAmmoN" data-testid="foot-ammo">30 / 90</b></div><div><small>MATERIALS</small><b id="ftMatsN" data-testid="foot-materials">0</b></div><div><small>KILLS</small><b id="ftKills" data-testid="foot-kills">0</b></div><div><small>WAVE</small><b id="ftWave" data-testid="foot-wave">0</b></div><div id="ftPieces"><i title="Shelter"></i><i title="Power"></i><i title="Beacon"></i></div></div>
+    <div id="ftPrompt" class="hidden" data-testid="foot-prompt"></div>
+    <div id="ftLockHint" class="hidden" data-testid="foot-lock-hint">CLICK TO AIM &middot; WASD move &middot; Click fire &middot; R reload &middot; E use &middot; Shift sprint</div>
+    <div id="ftTouch">
+      <div id="ftLook" data-testid="foot-look-zone"></div>
+      <div id="ftJoy" data-testid="foot-joystick"><i id="ftKnob"></i></div>
+      <button class="ftBtn" id="ftFire" data-testid="foot-fire-btn" aria-label="Fire">FIRE</button>
+      <button class="ftBtn sm" id="ftReload" data-testid="foot-reload-btn" aria-label="Reload">RELOAD</button>
+      <button class="ftBtn sm" id="ftUse" data-testid="foot-use-btn" aria-label="Interact">USE</button>
+    </div>
   </div>
   <div id="offCourse" data-testid="space-off-course">LEAVING THE FLIGHT CORRIDOR</div>
   <div id="duelLeaveModal" class="hidden"><div class="modal panel" data-testid="duel-leave-modal"><h2>Leave race?</h2><p>Leaving mid-race counts as a loss.</p><button class="btn primary" id="btnDuelKeep" data-testid="duel-keep-racing-btn">Keep racing</button><button class="btn" id="btnDuelQuit" data-testid="duel-quit-btn">Leave race</button></div></div>
@@ -233,18 +286,18 @@
 <script src="game/js/core/server-config.js"></script>
 <script src="game/js/lib/three.min.js"></script>
 <script src="game/js/lib/GLTFLoader.js"></script>
+<script src="game/js/lib/fflate.min.js"></script>
+<script src="game/js/lib/FBXLoader.js"></script>
 <script src="game/js/data/models.js"></script>
 <script src="game/js/data/car5.js"></script>
 <script src="game/js/data/thumbs.js"></script>
 <script src="game/js/data/hover.js"></script>
 <script src="game/js/data/hover2.js"></script>
 <script src="game/js/data/crate.js"></script>
-<script src="game/js/loop-track.js"></script>
 <script src="game/js/physics.js"></script>
 <script src="game/js/core/storm.js"></script>
 <script src="game/js/core/config.js"></script>
 <script src="game/js/render/renderer.js"></script>
-<script src="game/js/render/circuit.js"></script>
 <script src="game/js/render/path.js"></script>
 <script src="game/js/render/track.js"></script>
 <script src="game/js/render/desert.js"></script>
@@ -276,11 +329,17 @@
 <script src="game/js/ui/account.js"></script>
 <script src="game/js/ui/crates.js"></script>
 <script src="game/js/duel/duel.js"></script>
+<script src="game/js/duel/shoot.js"></script>
 <script src="game/js/game/cutscene.js"></script>
 <script src="game/js/game/plutoscene.js"></script>
 <script src="game/js/render/space.js"></script>
 <script src="game/js/game/spaceflight.js"></script>
 <script src="game/js/render/alien.js"></script>
+<script src="game/js/game/astro.js"></script>
+<script src="game/js/game/onfoot.js"></script>
+<script src="game/js/game/hunt.js"></script>
+<script src="game/js/game/dogfight.js"></script>
+<script src="game/js/game/ending.js"></script>
 <script src="game/js/core/intro.js"></script>
 <script src="game/js/core/tutorial.js"></script>
 <script src="game/js/core/orientation.js"></script>

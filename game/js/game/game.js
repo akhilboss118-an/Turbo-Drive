@@ -5,7 +5,7 @@
 let lap = 1, state = 'menu', timeT = 0, crashes = 0, score = 0, cpIndex = 0, countdownT = 0, lastCount = -1, crashT = 0, finishT = 0, shake = 0, menuAngle = 0;
 const camPos = { x: 0, y: 3, fy: 0 };
 let zoomF = 1;                                   // camera distance factor: 1.0 normal, 0.7 on gas
-const UI = { login: $('login'), stages: $('stages'), levels: $('levels'), garage: $('garage'), menu: $('menu'), settings: $('settings'), hud: $('hud'), controls: $('controls'), countdown: $('countdown'), pause: $('pauseMenu'), crash: $('crashMenu'), results: $('results'), cutscene: $('cutscene'), duel: $('duelHome'), lobby: $('duelLobby'), duelResult: $('duelResult') };
+const UI = { login: $('login'), stages: $('stages'), levels: $('levels'), garage: $('garage'), menu: $('menu'), settings: $('settings'), hud: $('hud'), controls: $('controls'), countdown: $('countdown'), pause: $('pauseMenu'), crash: $('crashMenu'), results: $('results'), cutscene: $('cutscene'), duel: $('duelHome'), lobby: $('duelLobby'), duelResult: $('duelResult'), shootLobby: $('shootLobby'), shootGame: $('shootGame'), shootResult: $('shootResult') };
 const show = (names) => { for (const k in UI) UI[k].classList.toggle('hidden', names.indexOf(k) < 0); };
 function setState(s) {
   state = s; Snd.scene(s);
@@ -21,9 +21,13 @@ function setState(s) {
   else if (s === 'crashed') show(['hud', 'controls', 'crash']);
   else if (s === 'results') show(['results']);
   else if (s === 'cutscene') show(['cutscene']);
+  else if (s === 'victory' || s === 'credits' || s === 'cinematic' || s === 'end') show([]);
   else if (s === 'duel') show(['duel']);
   else if (s === 'lobby') show(['lobby']);
   else if (s === 'duelresult') show(['duelResult']);
+  else if (s === 'shootlobby') show(['shootLobby']);
+  else if (s === 'shootgame') show(['shootGame']);
+  else if (s === 'shootresult') show(['shootResult']);
   document.body.dataset.state = s;
   window.dispatchEvent(new CustomEvent('td:state', { detail: s }));
 }
@@ -39,20 +43,22 @@ function countUp(el, to, f, ms) {
   requestAnimationFrame(step);
 }
 function settle(n) { for (let i = 0; i < n; i++) car.step(DT, { gas: false }); car.events.length = 0; car.vx = car.vy = car.w = 0; }
-function resetGates() { resetHoops(); if (typeof resetObstacles === 'function') resetObstacles(); for (const h of hazards) h.warned = false; hzT = 0; for (const g of gates) { g.passed = false; g.mat.color.setHex(g === gates[gates.length - 1] ? 0xffffff : 0xff8a3d); } resetGateModels(); }
+function resetGates() { resetHoops(); for (const h of hazards) h.warned = false; hzT = 0; for (const g of gates) { g.passed = false; g.mat.color.setHex(g === gates[gates.length - 1] ? 0xffffff : 0xff8a3d); } resetGateModels(); }
 function applyStats(id) { car.setStats(Phys.statsFor(id, upgOf(id))); }
 function startRun(cd) {
   applyStats(vehicleId);
   Snd.init(); try { const el = document.documentElement; if (el.requestFullscreen && !document.fullscreenElement) { const p = el.requestFullscreen(); if (p && p.catch) p.catch(() => {}); } if (screen.orientation && screen.orientation.lock) { const p = screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {}); } } catch (e) {}
   timeT = 0; crashes = 0; score = 0; cpIndex = 0; lap = 1; resetGates(); resetCrates(); clearInput();
   run = { stars: 0, style: 0, flips: 0, flipPts: 0, crates: 0 }; setCombo(0); fuel = 1; resetCold(true);
-  car.spawn(CPS[0].x, 0); settle(300); snapCamera(); if (LEVELS[level].space) { spaceStart(); setTimeout(() => { if (state === 'countdown' || state === 'playing') toast('DEEP SPACE', 'Steer LEFT / RIGHT through the rings. Dodge the asteroids!', 'good'); }, 2400); }
-  countdownT = cd || 3.2; lastCount = -1; setState('countdown');
+  car.spawn(CPS[0].x, 0); settle(300); snapCamera(); if (LEVELS[level].onfoot) footStart(); if (LEVELS[level].dogfight) dfStart(); if (LEVELS[level].space) { spaceStart(); setTimeout(() => { if (state === 'countdown' || state === 'playing') toast('DEEP SPACE', 'Steer LEFT / RIGHT through the rings. Dodge the asteroids!', 'good'); }, 2400); }
+  countdownT = cd || (LEVELS[level].onfoot ? 1.6 : 3.2); lastCount = -1; setState('countdown');
   if (LEVELS[level].collapse) setTimeout(() => { if (state === 'countdown' || state === 'playing') toast('THE MOON IS COLLAPSING', 'Reach the launch pad and escape!', 'warn'); }, 2600);
 }
 function retry() {
   if (state !== 'crashed') return;
   if (duelOn) duelRs++;
+  if (LEVELS[level].dogfight) { dfRespawn(); clearInput(); setState('playing'); Snd.click(); return; }
+  if (LEVELS[level].onfoot) { footRespawn(); clearInput(); setState('playing'); Snd.click(); return; }
   if (LEVELS[level].space) { spaceRespawn(); clearInput(); fuel = Math.max(fuel, 0.5); setState('playing'); Snd.click(); return; }
   car.spawn(CPS[cpIndex].x, 8); resetCold(false); clearInput(); snapCamera(); fuel = Math.max(fuel, 0.5); setState('playing'); Snd.click();
 }
@@ -60,19 +66,16 @@ function pause() { if (duelOn) return; if (state !== 'playing' && state !== 'cou
 let pausedFrom = 'playing', settingsFromPause = false;
 function closePauseSettings() { settingsFromPause = false; show(['hud', 'pause']); Snd.click(); }
 function resume() { if (state !== 'paused') return; clearInput(); setState(pausedFrom); Snd.click(); }
-function toMenu() { clearInput(); refreshMenu(); car.spawn(CPS[0].x, 0); settle(300); if (LEVELS[level].space) spaceStart(); setState('menu'); Snd.click(); }
+function toMenu() { clearInput(); refreshMenu(); car.spawn(CPS[0].x, 0); settle(300); if (LEVELS[level].onfoot) footMenuPose(); if (LEVELS[level].dogfight) dfMenuPose(); if (LEVELS[level].space) spaceStart(); setState('menu'); Snd.click(); }
 function onCrash(reason) {
   setCombo(0); vibe(60, 'heavy');
   crashes++; crashT = 0; shake = 0.7; burst(50, 12); Snd.crash();
   $('crashReason').textContent = reason.charAt(0).toUpperCase() + reason.slice(1); setState('crashed');
 }
 function nextLap() {
-  lap++; cpIndex = 0; if (duelOn) duelRs++; resetGates();
+  lap++; cpIndex = 0; duelRs++; resetGates();
   car.spawn(CPS[0].x, Math.max(7, Math.min(car.speed(), 30))); snapCamera();
-  const totalLaps = duelOn ? duelLaps() : (LEVELS[level].loop ? 5 : 1);
-  toast(lap === totalLaps ? 'FINAL LAP' : 'LAP ' + lap + '/' + totalLaps, lap === totalLaps ? 'Lap ' + lap + ' of ' + totalLaps : null, 'good');
-  Snd.cp();
-  if (duelOn) duelOnLap();
+  toast('LAP ' + lap, 'Endless loop', 'good'); Snd.cp(); duelOnLap();
 }
 function onFinish() {
   if (duelOn) duelOnFinish();
@@ -86,16 +89,16 @@ function showResults() {
   const isBest = prev === null || timeT < prev; if (isBest) { bests[level] = timeT; best = timeT; }
   const prevStars = starsBy[level] || 0; if (!starsBy[level] || stars > starsBy[level]) starsBy[level] = stars;
   addCoins(Math.round(STAR_COINS[stars] * LV_MULT[baseOf(level)] * (level > 16 ? 2 : level > 8 ? 1.5 : 1)) + 40 * Math.max(0, stars - prevStars), 'stars');
-  const hasNext = level < CAMPAIGN_LEVELS, nw = WORLDS.find((w) => w.first === level + 1), newWorld = nw && unlocked < level + 1 ? nw : null; const secretNew = hasNext && LEVELS[level + 1] && LEVELS[level + 1].secret && unlocked < level + 1; if (hasNext && unlocked < level + 1) unlocked = level + 1;
+  const hasNext = level < CAMPAIGN_LEVELS, nw = WORLDS.find((w) => w.first === level + 1), newWorld = nw && unlocked < level + 1 ? nw : null; const secretNew = hasNext && LEVELS[level + 1].secret && unlocked < level + 1; if (hasNext && unlocked < level + 1) unlocked = level + 1;
   let newTrophy = false; if (LEVELS[level].finale && stars === 3 && !trophy) { trophy = true; newTrophy = true; coins += TROPHY_COINS; refreshCoins(); Snd.win(); }
   save(); refreshMenu();
   const tr = $('resTrophy'); tr.classList.toggle('hidden', !(LEVELS[level].finale && trophy)); tr.textContent = newTrophy ? 'GOLD HOVER TROPHY  +' + TROPHY_COINS + ' COINS' : 'GOLD HOVER TROPHY';
-  $('btnNext').classList.toggle('hidden', !hasNext); $('btnNext').textContent = nw ? 'Go to ' + nw.name : LEVELS[level + 1] && LEVELS[level + 1].secret ? 'SECRET LEVEL: PLUTO' : 'Next level';
+  $('btnNext').classList.toggle('hidden', !hasNext); $('btnNext').textContent = nw ? 'Go to ' + nw.name : LEVELS[level + 1] && LEVELS[level + 1].dogfight ? 'LEVEL 28: SPACE BATTLE' : LEVELS[level + 1] && LEVELS[level + 1].hunt ? 'LEVEL 27: ALIEN HUNT' : LEVELS[level + 1] && LEVELS[level + 1].onfoot ? 'LEVEL 26: SURVIVE ON PLUTO' : LEVELS[level + 1] && LEVELS[level + 1].secret ? 'SECRET LEVEL: PLUTO' : 'Next level';
   $('resLevel').textContent = LEVELS[level].name.replace('  ', ' \u00B7 ');
   $('resStars').innerHTML = [0, 1, 2].map((i) => '<i class="' + (i < stars ? 'on' : '') + '">\u2605</i>').join('');
   $('resBadge').classList.toggle('hidden', !isBest);
   $('resLap').textContent = 'Lap time ' + fmt(timeT) + '   \u00B7   Best lap ' + fmt(bests[level]);
-  $('resStats').textContent = 'Crashes ' + crashes + '   \u00B7   Style ' + score + (LEVELS[level].gravity ? '   \u00B7   Flip bonus ' + run.flipPts : '') + (isBest ? '' : '   \u00B7   Best ' + fmt(prev)) + (newWorld ? '   \u00B7   ' + newWorld.name.toUpperCase() + ' UNLOCKED' : '') + (secretNew ? '   \u00B7   SECRET LEVEL UNLOCKED' : '');
+  $('resStats').textContent = 'Crashes ' + crashes + '   \u00B7   Style ' + score + (LEVELS[level].gravity ? '   \u00B7   Flip bonus ' + run.flipPts : '') + (isBest ? '' : '   \u00B7   Best ' + fmt(prev)) + (newWorld ? '   \u00B7   ' + newWorld.name.toUpperCase() + ' UNLOCKED' : '') + (secretNew ? '   \u00B7   SECRET LEVEL UNLOCKED' : '') + (LEVELS[level].dogfight ? '   \u00B7   UFO DESTROYED   \u00B7   Hull hits ' + DF.hits + '/3   \u00B7   EARTH IS SAFE' : LEVELS[level].hunt ? '   \u00B7   Aliens killed ' + FT.kills + '/12   \u00B7   YOU ESCAPED THE ALIEN... FOR NOW' : LEVELS[level].onfoot ? '   \u00B7   Kills ' + FT.kills + '   \u00B7   THE ALIEN IS COMING BACK... TO BE CONTINUED' : '');
   countUp($('resTime'), timeT, fmt, 900);
   window.dispatchEvent(new CustomEvent('td:result', { detail: { level, time: timeT, style: score, stars, isBest } }));
   $('resCoins').innerHTML = svg('coin', 'coin') + ' +' + (run.stars + run.style + run.flips) + ' coins<small>Stars ' + run.stars + '  \u00B7  Style ' + run.style + '  \u00B7  Flips ' + run.flips + (run.crates ? '  \u00B7  Crates ' + run.crates : '') + '</small>';
@@ -109,7 +112,7 @@ function showResults() {
 let camRoll = 0, vista = 0, camLat = 0, camTight = 0, chaseReady = false;
 function snapCamera() { camPos.x = car.x - (track.path ? 13 : 11); camPos.fy = car.y; camPos.y = car.y + 4; camRoll = 0; vista = 0; camLat = 0; camTight = 0; chaseReady = false; }
 function updateCamera(dt) {
-  if (state === 'login' || state === 'menu' || state === 'settings' || state === 'results' || state === 'levels' || state === 'stages' || state === 'garage' || state === 'duel' || state === 'lobby' || state === 'duelresult') {
+  if (state === 'login' || state === 'menu' || state === 'settings' || state === 'results' || state === 'levels' || state === 'stages' || state === 'garage' || state === 'duel' || state === 'lobby' || state === 'duelresult' || state === 'shootlobby' || state === 'shootgame' || state === 'shootresult') {
     menuAngle += dt * (state === 'garage' ? 0.42 : 0.25); const a = menuAngle, r = state === 'garage' ? 7.4 : 8.5;
     camera.fov = 52; camera.updateProjectionMatrix();
     // slide the car into the free part of the screen: right of the buttons in the menu, left of the info card in the garage
@@ -122,6 +125,8 @@ function updateCamera(dt) {
     camera.lookAt(carW.x + 0.4, carW.y + 0.5, carW.z); return;
   }
   if (shiftOn) { camera.clearViewOffset(); shiftOn = false; viewShift = 0; }
+  if (LEVELS[level].dogfight) { dfCamera(dt); return; }
+  if (LEVELS[level].onfoot) { footCamera(dt); return; }
   if (LEVELS[level].space) { spaceCamera(dt); return; }
   if (track.path) { chaseCamera(dt); return; }
   camera.up.set(0, 1, 0);

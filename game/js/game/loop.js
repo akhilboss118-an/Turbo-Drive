@@ -18,9 +18,7 @@ function handleEvents() {
       if (hard) shake = Math.max(shake, 0.25);
       addCoins(pts - e.flips * 500 * mult * mega > 0 ? (pts - e.flips * 500 * mult * mega) / 10 : 0, 'style');
       if (e.flips > 0 && !hard) addCoins(e.flips * 20 * mult * mega, 'flips');
-    } else if (e.type === 'slow') {
-      if (typeof COL_LABEL !== 'undefined' && COL_LABEL[e.kind]) toast(COL_LABEL[e.kind][0], 'Slowing down!', 'warn');
-      shake = Math.max(shake, 0.2); vibe(15);
+      toast(head, sub, hard ? 'warn' : 'good');
     } else if (e.type === 'boost') {
       fuel = Math.min(1, fuel + 0.12); coldBonus('pad'); if (state === 'playing') { Snd.whoosh(); vibe(12); }
       for (let i = 0; i < 12; i++) flame.emit(car.x - 1.6, car.y + 0.2, (Math.random() - 0.5) * 2, -car.vx * 0.3 - 3 * Math.random(), 0.6 + Math.random(), (Math.random() - 0.5) * 2, 0.45, 0.8, 0.2, 0.9, [0.4, 1, 0.8]);
@@ -35,9 +33,11 @@ function frame(now) {
 }
 function tick(dt) {
   readInput();
+  if (LEVELS[level].dogfight) { dfTick(dt); return; }
+  if (LEVELS[level].onfoot) { footTick(dt); return; }
   if (LEVELS[level].space) { spaceTick(dt); return; }
   if (state === 'countdown' || state === 'playing' || state === 'finishing' || state === 'crashed') { hzT += dt; if (typeof updateLava === 'function') updateLava(dt); }
-  updateHazards(); if (typeof updateObstacles === 'function') updateObstacles(dt); if (typeof slowFx === 'function') slowFx(dt); updateStorm(dt); updateCold(dt); updateChasm(dt);
+  updateHazards(); updateStorm(dt); updateCold(dt); updateChasm(dt);
   if (state === 'countdown') {
     countdownT -= dt; const n = Math.min(duelOn ? 3 : 99, Math.ceil(countdownT - 0.2));
     if (n !== lastCount) { lastCount = n; const el = UI.countdown; el.textContent = n > 0 ? String(n) : 'GO!'; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); if (n > 0) Snd.beep(); else Snd.go(); }
@@ -49,7 +49,7 @@ function tick(dt) {
     while (acc >= DT && n < 24) { car.step(DT, inp); acc -= DT; n++; if (car.crashed) { acc = 0; break; } }
     if (n >= 24) acc = 0;
     if (state === 'playing') timeT += dt; else { finishT += dt; if (finishT > 2.4) showResults(); }
-    if (state === 'playing' && !car.crashed) { checkHazards(); announceHazards(); if (typeof checkObstacles === 'function') { checkObstacles(); announceObstacles(); } }
+    if (state === 'playing' && !car.crashed) { checkHazards(); announceHazards(); }
     if (state === 'playing' && hoopObjs.length) checkHoops();
     if (state === 'playing' && crateObjs.length && !duelOn) checkCrates();
     handleEvents();
@@ -58,13 +58,7 @@ function tick(dt) {
         const g = gates[i];
         if (!g.passed && car.x > g.x) {
           g.passed = true;
-          if (i === gates.length - 1) {
-            const isLoop = !!LEVELS[level].loop;
-            const targetLaps = duelOn ? duelLaps() : (isLoop ? 5 : 1);
-            if ((duelOn || isLoop) && cpIndex < gates.length - 1) { g.passed = false; }
-            else if ((duelOn || isLoop) && lap < targetLaps) nextLap();
-            else onFinish();
-          } else { g.mat.color.setHex(0x35e6ff); gateCleared(g); cpIndex = i + 1; vibe(25); toast('CHECKPOINT CLEARED', (i + 1) + ' / ' + (gates.length - 1) + '  \u00B7  respawn saved', 'good'); Snd.cp(); coldBonus('cp'); }
+          if (i === gates.length - 1) { if (duelOn && cpIndex < gates.length - 1) { g.passed = false; } else if (duelOn && duelLaps() > 1) nextLap(); else onFinish(); } else { g.mat.color.setHex(0x35e6ff); gateCleared(g); cpIndex = i + 1; vibe(25); toast('CHECKPOINT CLEARED', (i + 1) + ' / ' + (gates.length - 1) + '  \u00B7  respawn saved', 'good'); Snd.cp(); coldBonus('cp'); }
         }
       }
     }
@@ -99,7 +93,7 @@ function tick(dt) {
     else { shadowHolder.position.set(car.x, gh + 0.06, 0); shadowHolder.rotation.set(0, 0, Math.atan(Phys.slopeAt(ground, car.x))); }
     const hgt = Math.max(0, car.y - gh); shadow.scale.setScalar(Math.max(0.5, 1 - hgt * 0.04)); shadow.material.opacity = Math.max(0.1, 0.42 - hgt * 0.03);
   }
-  startLine.group.visible = !LEVELS[level].loop;
+  startLine.group.visible = true;
   updateCamera(dt);
   if (state === 'cutscene') updateCutscene(dt);
   else if (LEVELS[level].collapse) { updateCollapse(dt); if (state === 'playing') { shake = Math.max(shake, 0.14); const b = Math.floor(timeT / 7); if (b !== tremorN) { tremorN = b; if (b > 0) { shake = 0.65; Snd.land('HARD LANDING'); } } } }
@@ -107,9 +101,7 @@ function tick(dt) {
   envUpdate(); updateRaceObjs(dt); if (padObjs.length) updatePads();
   hudSlow -= dt; if (hudSlow <= 0) {
     hudSlow = 0.05; $('timer').textContent = fmt(timeT); $('speed').textContent = Math.round(car.speed() * 3.6); $('spdbar').style.setProperty('--spd', Math.min(1, car.speed() * 3.6 / 160).toFixed(3));
-    const isLoop = !!LEVELS[level].loop; const totalLaps = duelOn ? duelLaps() : (isLoop ? 5 : 1);
-    const lh = $('lapHud'); lh.classList.toggle('hidden', totalLaps < 2); lh.textContent = 'Lap ' + lap + '/' + totalLaps;
-    { const nc = gates.length - 1; $('cp').textContent = cpIndex >= nc ? 'Next: Finish' : 'Next checkpoint ' + (cpIndex + 1) + ' / ' + nc; const bl = duelOn ? null : bests[level]; $('bestHud').textContent = 'Best lap ' + (bl === undefined || bl === null ? '--:--.-' : fmt(bl)); } $('score').textContent = score; $('flipPts').textContent = run.flipPts;
+    if (duelOn) { const lh = $('lapHud'); lh.classList.toggle('hidden', duelLaps() < 2); lh.textContent = 'Lap ' + lap; } { const nc = gates.length - 1; $('cp').textContent = cpIndex >= nc ? 'Next: Finish' : 'Next checkpoint ' + (cpIndex + 1) + ' / ' + nc; const bl = duelOn ? null : bests[level]; $('bestHud').textContent = 'Best lap ' + (bl === undefined || bl === null ? '--:--.-' : fmt(bl)); } $('score').textContent = score; $('flipPts').textContent = run.flipPts;
     const pr = duelProgress(car.x, lap); $('progress').style.width = (pr * 100).toFixed(1) + '%';
   }
   if (duelOn) duelTick(dt);

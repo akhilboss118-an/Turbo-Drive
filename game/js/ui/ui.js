@@ -10,9 +10,8 @@ function refreshMenu() {
   $('bestTime').innerHTML = b === undefined ? '' : svg('time') + 'Best ' + fmt(b);
   const ts = totalStars(); $('starTotal').innerHTML = svg('star', 'fill') + ts + '/' + (CAMPAIGN_LEVELS) * 3;
   $('playSub').textContent = LEVELS[level].name.replace('  ', ' \u00B7 ');
-  const wi = Math.max(0, Math.min(WORLDS.length - 1, worldOf(level)));
-  $('lvlSub').textContent = (level === 26 ? 'Loop Mode \u00B7 Circuit' : WORLDS[wi].name + ' \u00B7 ' + unlocked + '/' + (CAMPAIGN_LEVELS) + ' open');
-  $('kicker').innerHTML = level === 26 ? '<span></span>Special &middot; Infinite Loop Circuit' : '<span></span>Stage 0' + (wi + 1) + ' &middot; ' + WORLDS[wi].name;
+  $('lvlSub').textContent = WORLDS[worldOf(level)].name + ' \u00B7 ' + unlocked + '/' + (CAMPAIGN_LEVELS) + ' open';
+  $('kicker').innerHTML = '<span></span>Stage 0' + (worldOf(level) + 1) + ' &middot; ' + WORLDS[worldOf(level)].name;
   $('garSub').textContent = vehicleById(vehicleId).name;
 }
 const hexs = (c) => '#' + (0x1000000 + c).toString(16).slice(1);
@@ -69,7 +68,8 @@ function neonSun(g, w, cx, cy, R, c1, c2, yClip, h) {
   g.save(); g.shadowColor = c2; g.shadowBlur = 36; g.drawImage(oc, 0, 0); g.restore();
 }
 function drawPreview(cv, L, n) {
-  if (L.space) { drawSpacePreview(cv, L, n); return; }
+  if (L.dogfight) { drawDogPreview(cv, L, n); return; }
+  if (L.space || L.onfoot) { drawSpacePreview(cv, L, n); return; }
   const w = cv.width = 320, h = cv.height = 420, g = cv.getContext('2d');
   const A = hexs(L.glow[0]), B = hexs(L.glow[1]), T = hexs(L.topB), yH = h * 0.4, moon = L.biome === 'moon';
   let q = n * 977 + 13; const r = () => { q = (q * 16807) % 2147483647; return q / 2147483647; };
@@ -126,23 +126,9 @@ const PLANET = {
   mars: { bg: ['#1a0806', '#4a1c10'], halo: 'rgba(255,140,70,.55)', sph: ['#f0985a', '#c2501f', '#5a1c0c'], land: '#6a2410', seed: 4242 },
   moon: { bg: ['#02030a', '#161a2c'], halo: 'rgba(190,205,255,.45)', sph: ['#e8eaf2', '#9a9eac', '#3a3d4a'], land: '#6a6e7c', seed: 1969 },
 };
-function drawCircuitWorld(cv) {
-  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d');
-  const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#0a1030'); bg.addColorStop(0.6, '#2c3a78'); bg.addColorStop(1, '#ffd49a'); g.fillStyle = bg; g.fillRect(0, 0, w, h);
-  neonGrid(g, w, h, h * 0.55, '#ffb03a');
-  neonGlow(g, '#ffb03a', 16, () => {
-    g.strokeStyle = '#ffd480'; g.lineWidth = 4; g.beginPath();
-    g.ellipse(w * 0.38, h * 0.5, 46, 26, -0.2, 0, 7);
-    g.ellipse(w * 0.62, h * 0.5, 46, 26, 0.2, 0, 7);
-    g.stroke();
-  });
-}
 function drawPlanet(cv, id) {
   if (id === 'space') { drawSpaceWorld(cv); return; }
-  if (id === 'circuit') { drawCircuitWorld(cv); return; }
-  const P = PLANET[id];
-  if (!P) { drawCircuitWorld(cv); return; }
-  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d'), mars = id === 'mars', moon = id === 'moon';
+  const w = cv.width = 360, h = cv.height = 220, g = cv.getContext('2d'), P = PLANET[id], mars = id === 'mars', moon = id === 'moon';
   const bg = g.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, P.bg[0]); bg.addColorStop(1, P.bg[1]); g.fillStyle = bg; g.fillRect(0, 0, w, h);
   let q = P.seed; const r = () => { q = (q * 16807) % 2147483647; return q / 2147483647; };
   for (let i = 0; i < 70; i++) { g.globalAlpha = 0.3 + r() * 0.7; g.fillStyle = '#fff'; g.fillRect(r() * w, r() * h, 1.5, 1.5); } g.globalAlpha = 1;
@@ -182,7 +168,7 @@ function toggleUnlockAll() {
 }
 document.querySelectorAll('.uabtn').forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); toggleUnlockAll(); }));
 syncUnlockAll();
-const worldOpen = (i) => i === 4 || !WORLDS[i].req || WORLDS[i].first <= unlocked;
+const worldOpen = (i) => WORLDS[i].first <= unlocked;
 const worldNext = (i) => { const W = WORLDS[i]; for (let n = W.first; n <= W.last; n++) if (!starsBy[n]) return n; return W.last; };
 function buildStages() {
   const box = $('worlds'); box.innerHTML = '';
@@ -218,7 +204,7 @@ function buildCards() {
   $('lvStars').innerHTML = svg('star', 'fill') + worldStars(viewWorld) + '/' + W.count * 3;
   let curIdx = 0;
   for (let n = W.first; n < W.first + W.count; n++) {
-    const L = LEVELS[n], locked = (n !== 26 && n > unlocked), st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
+    const L = LEVELS[n], locked = n > unlocked, st = starsBy[n] || 0, ln = n - W.first + 1, idx = ln - 1, name = L.name.split('  ')[1];
     if (n === level && !locked) curIdx = idx;
     const c = document.createElement('button'); c.className = 'card' + (locked ? ' locked' : '') + (n === level ? ' cur' : ''); c.style.setProperty('--i', idx);
     c.setAttribute('data-testid', 'level-card-' + n); c.setAttribute('role', 'option'); c.setAttribute('aria-label', 'Level ' + ln + ' ' + name + (locked ? ', locked' : ', ' + st + ' of 3 stars'));
@@ -230,7 +216,7 @@ function buildCards() {
     const info = document.createElement('div'); info.className = 'info';
     const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = name; nm.title = name;
     const tg = document.createElement('div'); tg.className = 'ctags';
-    [[L.gravity && L.gravity >= Phys.MARS_G, 'Low G'], [L.gravity && L.gravity < Phys.MARS_G, 'Moon G'], [L.meteors, 'Meteors'], [n > 16 && HAZARDS[n] && HAZARDS[n].length, 'Hazards'], [L.cold, 'Freeze'], [L.needHover, 'Hover only'], [L.needLegendary, 'Legendary hover']].forEach(([on, t]) => { if (on) { const e = document.createElement('span'); e.textContent = t; tg.appendChild(e); } });
+    [[L.dogfight, 'Space battle'], [L.gravity && L.gravity >= Phys.MARS_G, 'Low G'], [L.gravity && L.gravity < Phys.MARS_G, 'Moon G'], [L.meteors, 'Meteors'], [n > 16 && HAZARDS[n] && HAZARDS[n].length, 'Hazards'], [L.cold, 'Freeze'], [L.needHover, 'Hover only'], [L.needLegendary, 'Legendary hover']].forEach(([on, t]) => { if (on) { const e = document.createElement('span'); e.textContent = t; tg.appendChild(e); } });
     const row = document.createElement('div'); row.className = 'row';
     const sr = document.createElement('div'); sr.className = 'st'; sr.setAttribute('data-testid', 'level-stars-' + n); sr.innerHTML = [0, 1, 2].map((i) => svg('star', 'fill' + (i < st ? ' on' : ' off'))).join('');
     const bt = document.createElement('div'); bt.className = 'bt'; bt.setAttribute('data-testid', 'level-best-' + n); bt.textContent = locked ? (n === W.first ? 'Clear ' + WORLDS[viewWorld - 1].name : 'Finish level ' + (ln - 1)) : (bests[n] !== undefined ? 'Best ' + fmt(bests[n]) : 'Not played');
@@ -342,7 +328,7 @@ function hoverAct(id) {
 }
 function hoverClose() { $('hoverModal').classList.add('hidden'); Snd.click(); }
 function pickLevel(n) {
-  if (n !== 26 && n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
+  if (n > unlocked) { { const wi = worldOf(n), Wd = WORLDS[wi]; toast('LOCKED', n === Wd.first ? Wd.req : 'Finish level ' + (n - Wd.first) + ' first', 'warn'); }; Snd.click(); return; }
   if (n === 19 && !isHoverCar() && !hvSkip19) { hoverPrompt(n, false); return; }
   hvSkip19 = false;
   if (hoverBlock(n)) return;
@@ -396,9 +382,6 @@ const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', 
 on('btnPlay', () => { Snd.click(); pickLevel(level); });
 on('btnHvClose', hoverClose);
 on('btnHvGo', () => { $('hoverModal').classList.add('hidden'); hvSkip19 = true; pickLevel(hvLevel); });
-on('btnLoop', () => { Snd.click(); loadLevel(26); startRun(); });
-on('btnStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });
-on('btnReplayStory', () => { Snd.click(); if (typeof window.playAlienIntro === 'function') window.playAlienIntro(); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
 on('btnStBack', () => { setState('menu'); Snd.click(); });
 on('btnGarage', () => { setState('garage'); Snd.click(); });
@@ -451,7 +434,7 @@ on('btnPauseSettings', () => { if (state !== 'paused') return; settingsFromPause
 on('btnMenu3', toMenu);
 on('btnPause', () => { Snd.click(); if (duelOn) duelAskLeave(); else pause(); });
 on('btnResume', resume);
-on('btnRestartCp', () => { if (state !== 'paused') return; if (LEVELS[level].space) { spaceRespawn(); clearInput(); setState('playing'); Snd.click(); return; } car.spawn(CPS[cpIndex].x, cpIndex === 0 ? 0 : 8); if (cpIndex === 0) { settle(300); } clearInput(); snapCamera(); setState('playing'); Snd.click(); });
+on('btnRestartCp', () => { if (state !== 'paused') return; if (LEVELS[level].dogfight) { dfRespawn(); clearInput(); setState('playing'); Snd.click(); return; } if (LEVELS[level].onfoot) { footRespawn(); clearInput(); setState('playing'); Snd.click(); return; } if (LEVELS[level].space) { spaceRespawn(); clearInput(); setState('playing'); Snd.click(); return; } car.spawn(CPS[cpIndex].x, cpIndex === 0 ? 0 : 8); if (cpIndex === 0) { settle(300); } clearInput(); snapCamera(); setState('playing'); Snd.click(); });
 on('btnRestartLevel', () => { startRun(); });
 on('btnMenu1', toMenu);
 on('btnRetry', retry);

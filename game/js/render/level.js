@@ -9,10 +9,10 @@ function disposeGroup(g) {
   });
 }
 function loadLevel(n) {
-  spaceLeave(); const real = n; if (LEVELS[n].space) n = 1;
+  spaceLeave(); footLeave(); dfLeave(); const real = n; if (LEVELS[n].space || LEVELS[n].onfoot || LEVELS[n].dogfight) n = 1;
   level = n; const L = LEVELS[n]; levelGroup.position.set(0, 0, 0);
   for (const c of levelGroup.children.slice()) { levelGroup.remove(c); disposeGroup(c); }
-  track = Phys.buildTrack(baseOf(n)); if (L.sideCam) track.path = null; ground = Phys.makeGround(track); car.ground = ground; car.pads = track.boosts || null; car.slow = track.slow || null; car.inSlow = -1; car.g = L.gravity || Phys.G; CPS = track.checkpoints;
+  track = Phys.buildTrack(baseOf(n)); if (L.sideCam) track.path = null; ground = Phys.makeGround(track); car.ground = ground; car.pads = track.boosts || null; car.g = L.gravity || Phys.G; CPS = track.checkpoints;
   document.body.classList.toggle('lowg', !!L.gravity);
   setSky(L);
   levelGroup.add(trackGroup2());
@@ -21,7 +21,9 @@ function loadLevel(n) {
   buildStorm(); buildCold(); buildChasm(); if (typeof buildCrates === 'function') buildCrates();
   level = real; const LR = LEVELS[real];
   if (LR.space) { buildSpace(LR); spaceStart(); }
-  $('lvlName').textContent = LR.name + (LR.space ? '  \u00B7  ZERO-G DEEP SPACE' : '') + (L.gravity ? '  \u00B7  LOW GRAVITY ' + Math.round(L.gravity / Phys.G * 100) + '%' : '') + (L.meteors ? '  \u00B7  METEOR STORM' : '') + (L.cold ? '  \u00B7  MARS COLD' : '');
+  if (LR.onfoot) footBuild();
+  if (LR.dogfight) dfBuild();
+  $('lvlName').textContent = LR.name + (LR.space ? '  \u00B7  ZERO-G DEEP SPACE' : '') + (LR.onfoot ? '  \u00B7  ON FOOT' : '') + (LR.dogfight ? '  \u00B7  SPACE BATTLE' : '') + (L.gravity ? '  \u00B7  LOW GRAVITY ' + Math.round(L.gravity / Phys.G * 100) + '%' : '') + (L.meteors ? '  \u00B7  METEOR STORM' : '') + (L.cold ? '  \u00B7  MARS COLD' : '');
   refreshMenu();
 }
 function marsTint(g) {

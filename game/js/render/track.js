@@ -51,7 +51,6 @@ function buildScenery(L) {
   seed = L.seed; hoopObjs.length = 0; starPts = null;
   const len = track.length;
   if (L.biome === 'lava') buildLavaScenery(L);   // lava plane + embers, then the standard rock islands
-  if (L.biome === 'circuit') { buildCircuitScenery(L); return; }
   if (L.biome === 'moon') { buildMoonScenery(L); return; }
   if (L.biome === 'ice') { buildIceScenery(L); return; }
   if (L.biome === 'jungle') { buildJungleScenery(L); return; }

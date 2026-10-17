@@ -45,7 +45,7 @@ const Phys = (function () {
   };
   function buildTrack(level) {
     const T = buildTrackRaw(level);
-    T.path = T.loopPath || buildPath(T);
+    T.path = buildPath(T);
     return T;
   }
   function buildTrackRaw(level) {
@@ -69,7 +69,7 @@ const Phys = (function () {
     if (level === 18) return buildLevel18(P, add);
     if (level === 19) return buildLevel19(P, add);
     if (level === 20) return buildLevel20(P, add);
-    if (level === 26) return buildLevel21(P, add);
+    if (level === 21) return buildLevel21(P, add);
     add('flat', 0, 90, ease.flat(0), 0, 0);
     add('kicker', 90, 108, ease.kicker(0, 2.4, 90, 108), 0, 2.4);               // jump 1
     add('drop', 126, 152, ease.drop(0.8, 0, 126, 152), 0.8, 0);
@@ -461,11 +461,31 @@ const Phys = (function () {
     add('flat', 2290, 2600, ease.flat(0), 0, 0);
     return { pieces: P, finishX: 2540, checkpoints: [{ x: 8 }, { x: 290 }, { x: 990 }, { x: 1470 }, { x: 1950 }], length: 2600, boosts: [{ x0: 280, x1: 288 }, { x0: 740, x1: 748 }, { x0: 855, x1: 863 }, { x0: 980, x1: 988 }, { x0: 1940, x1: 1948 }] };
   }
-  function buildLevel21(P, add) {   // INFINITE LOOP: a closed circuit with a bridge crossing; the path wraps, so lap restart is seamless
-    const Lo = LoopTrack.layout(), end = Lo.LP + 40, per = (x) => Lo.H(x);
-    for (let x0 = 0; x0 < end; x0 += 40) { const x1 = Math.min(end, x0 + 40); add('hills', x0, x1, per, per(x0), per(x1)); }
-    const cps = [8, 620, 1110, 1620].map((x) => ({ x }));
-    return { pieces: P, finishX: Lo.LP + Lo.START, checkpoints: cps, length: end, boosts: Lo.boosts, loopPath: Lo.path, loop: Lo, slow: Lo.slow, cones: Lo.cones, meshEnd: Lo.LP };
+  function buildLevel21(P, add) {   // SPACE ORBIT (race track, Moon gravity 17%): crater, jump, rolling hills, a spiral tower climb, a tower launch, a long descent, a crater and a final ramp (proven pieces of levels 18/19)
+    add('flat', 0, 100, ease.flat(0), 0, 0);
+    add('crater', 100, 190, ease.crater(3.0, 100, 190), 0, 0);
+    add('flat', 190, 230, ease.flat(0), 0, 0);
+    add('kicker', 230, 254, ease.kicker(0, 3.5, 230, 254), 0, 3.5);              // jump 1 (gap 254-364)
+    add('slope', 364, 420, ease.slope(2.6, 0, 364, 420), 2.6, 0);
+    add('flat', 420, 520, ease.flat(0), 0, 0);                                  // cp1 ~470
+    add('hills', 520, 600, ease.hills(0, 1.2, 40, 520), 0, 0);
+    add('flat', 600, 640, ease.flat(0), 0, 0);
+    add('slope', 640, 730, ease.slope(0, 9, 640, 730), 0, 9);                   // SPIRAL TOWER: three coils, a terrace after each
+    add('flat', 730, 755, ease.flat(9), 9, 9);
+    add('slope', 755, 845, ease.slope(9, 18, 755, 845), 9, 18);
+    add('flat', 845, 870, ease.flat(18), 18, 18);
+    add('slope', 870, 960, ease.slope(18, 27, 870, 960), 18, 27);
+    add('flat', 960, 1020, ease.flat(27), 27, 27);                              // cp2 ~990, tower top
+    add('kicker', 1020, 1052, ease.kicker(27, 31, 1020, 1052), 27, 31);          // launch off the tower
+    add('drop', 1150, 1330, ease.drop(29, 4, 1150, 1330), 29, 4);               // long landing ramp
+    add('slope', 1330, 1420, ease.slope(4, 0, 1330, 1420), 4, 0);
+    add('flat', 1420, 1520, ease.flat(0), 0, 0);                                // cp3 ~1470
+    add('crater', 1520, 1640, ease.crater(3.2, 1520, 1640), 0, 0);
+    add('flat', 1640, 1700, ease.flat(0), 0, 0);
+    add('kicker', 1700, 1726, ease.kicker(0, 4.2, 1700, 1726), 0, 4.2);          // final ramp (gap 1726-1850)
+    add('slope', 1850, 1950, ease.slope(3.4, 0, 1850, 1950), 3.4, 0);
+    add('flat', 1950, 2050, ease.flat(0), 0, 0);
+    return { pieces: P, finishX: 2000, checkpoints: [{ x: 8 }, { x: 470 }, { x: 990 }, { x: 1470 }], length: 2050, boosts: [{ x0: 460, x1: 468 }, { x0: 740, x1: 748 }, { x0: 855, x1: 863 }, { x0: 980, x1: 988 }, { x0: 1460, x1: 1468 }] };
   }
   function buildLevel20(P, add) {   // MOON COLLAPSE (Moon gravity 17% + heavy meteor storm, hardest): the Moon is breaking apart; two spiral towers, chained ramps, craters and a final giant launch to the Hover pad
     add('flat', 0, 90, ease.flat(0), 0, 0);
@@ -573,7 +593,7 @@ const Phys = (function () {
     [2.0, 0.42], [-2.3, 0.4],                  // nose / tail
   ];
   class Car {
-    constructor(ground) { this.ground = ground; this.g = G; this.flipT = 0; this.pads = null; this.p = Object.assign({}, NEUTRAL); this.coldK = 0; this.tw = 0; this.slow = null; this.inSlow = -1; this.reset(0, 0, 0); }
+    constructor(ground) { this.ground = ground; this.g = G; this.flipT = 0; this.pads = null; this.p = Object.assign({}, NEUTRAL); this.coldK = 0; this.tw = 0; this.reset(0, 0, 0); }
     setStats(p) { this.p = Object.assign({}, NEUTRAL, p); }
     reset(x, y, vx) {
       this.x = x; this.y = y; this.vx = vx; this.vy = 0; this.th = Math.atan(slopeAt(this.ground, x)); this.w = 0;
@@ -639,18 +659,6 @@ const Phys = (function () {
         }
         this.onPad = on;
       }
-      // slow zones (oil, sand, mud): while on the ground the speed is pulled down toward the zone's crawl speed
-      if (this.slow) {
-        let zi = -1;
-        if (groundedNow) for (let k = 0; k < this.slow.length; k++) if (this.x >= this.slow[k].x0 && this.x <= this.slow[k].x1) { zi = k; break; }
-        if (zi >= 0) {
-          const z = this.slow[zi], sp = Math.hypot(this.vx, this.vy);
-          if (sp > z.vz) { const f = 1 - Math.exp(-z.k * dt), sc = (sp - (sp - z.vz) * f) / sp; this.vx *= sc; this.vy *= sc; }
-          if (z.kind === 'oil') tau += 2.2 * Math.sin(this.tw * 9) * (1 - Math.exp(-(this.x - z.x0) * 0.4));
-          if (this.inSlow !== zi) this.events.push({ type: 'slow', kind: z.kind, zone: zi });
-        }
-        this.inSlow = zi;
-      }
       // air control & damping
       if (!groundedNow) {
         tau += ((inp.tiltUp ? 1 : 0) - (inp.tiltDown ? 1 : 0)) * AIR_TORQUE * P.airTorque;
@@ -689,6 +697,6 @@ const Phys = (function () {
     crash(reason) { this.crashed = true; this.crashReason = reason; this.events.push({ type: 'crash', reason }); }
     speed() { return Math.hypot(this.vx, this.vy); }
   }
-  return { loopOf: () => LoopTrack.layout(), MARS_G: G * 0.38, MOON_G: G * 0.17, Car, statsFor, CAR_STATS, UPGRADES, NEUTRAL, buildTrack, buildPath, makeGround, slopeAt, R, HALF_BASE, G, VMAX, BODY_POINTS };
+  return { MARS_G: G * 0.38, MOON_G: G * 0.17, Car, statsFor, CAR_STATS, UPGRADES, NEUTRAL, buildTrack, buildPath, makeGround, slopeAt, R, HALF_BASE, G, VMAX, BODY_POINTS };
 })();
 if (typeof module !== 'undefined') module.exports = Phys;

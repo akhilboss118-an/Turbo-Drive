@@ -15,11 +15,11 @@
     { s: 'menu', el: '#authSlot', t: 'Your profile', b: 'Your name and account. Tap it to see your stats or <b>sign out</b>.' },
     { s: 'menu', el: '#btnSettings', t: 'Settings', b: 'Turn <b>sound</b>, graphics quality and screen shake on or off.' },
     { s: 'menu', el: '#menu .hint', t: 'Controls', b: '<p><b>Keyboard:</b> <kbd>W</kbd>/<kbd>Space</kbd> gas, <kbd>S</kbd> brake, <kbd>A</kbd>/<kbd>D</kbd> tilt in the air, <kbd>Shift</kbd> nitro, <kbd>Esc</kbd> pause.</p><p><b>Touch:</b> hold GAS, and use the tilt buttons in the air so your wheels meet the road.</p>' },
-    { s: 'stages', el: '#worlds', t: 'Stage select', b: 'Four worlds, <b>25 campaign levels</b>. Finish every level in a world to unlock the next one.' },
-    { s: 'stages', el: '.uabtn', t: 'Unlock all levels', b: 'A <b>test button</b>: turn it ON to open every level from 1 to 25. Turn it OFF to restore your real progress.' },
+    { s: 'stages', el: '#worlds', t: 'Stage select', b: 'Four worlds, <b>24 levels</b>. Finish every level in a world to unlock the next one.' },
+    { s: 'stages', el: '.uabtn', t: 'Unlock all levels', b: 'A <b>test button</b>: turn it ON to open every level, including 21 and 22. Turn it OFF to restore your real progress.' },
     { s: 'garage', el: '#gList', t: 'Choose a vehicle', b: 'Tap a vehicle to preview it. Rarer vehicles are faster and have special abilities.' },
     { s: 'garage', el: '#btnEquip', t: 'Buy or equip', b: 'Buy with coins, or <b>equip</b> a vehicle you already own. Deep Space needs a <b>Legendary hover</b>.' },
-    { s: 'menu', t: 'Deep Space tip', b: '<p>Levels 21-25 are zero-g flights to Jupiter, Saturn, Uranus, Neptune and the Pluto Finale: steer with <kbd>A</kbd>/<kbd>D</kbd> or the LEFT / RIGHT buttons, fly through every <b>ring</b> (missed = +3 s), dodge asteroids and grab gold orbs.</p><p>You are ready. Hit <b>Play</b>!</p>' },
+    { s: 'menu', t: 'Deep Space tip', b: '<p>Levels 21-24 (plus a secret one!) are zero-g flights to Jupiter, Saturn, Uranus and Neptune (23-24 are much faster, with fewer asteroids): steer with <kbd>A</kbd>/<kbd>D</kbd> or the LEFT / RIGHT buttons, fly through every <b>ring</b> (missed = +3 s), dodge asteroids and grab gold orbs.</p><p>You are ready. Hit <b>Play</b>!</p>' },
   ];
   const HAND = '<svg viewBox="0 0 64 64"><path d="M26 6c-3 0-5 2-5 5v26l-5-5c-2-2-6-1-7 2-1 2 0 4 1 5l13 15c3 4 7 6 12 6h4c8 0 14-6 14-14V30c0-3-2-5-5-5-1 0-3 1-3 1-1-2-3-3-5-3-1 0-3 1-3 1-1-2-3-3-5-3V11c0-3-2-5-5-5z" fill="#fff" stroke="#1a1a3a" stroke-width="3" stroke-linejoin="round"/></svg>';
   let i = 0, el, spot, hand, card, active = false, ready = false, raf = 0, curTarget = null;

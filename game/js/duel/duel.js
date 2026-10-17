@@ -4,7 +4,7 @@
 const DUEL = { ws: null, role: '', pid: '', code: '', room: null, off: 0, bestRtt: 1e9, pingT: 0, result: null, oppFinish: null, ghost: null, samples: [], lastPos: 0, wantClose: false, reconnecting: false, rematchOn: false, modeJoin: false, lastLevelSent: 0, raceLaps: 1 };
 const DUEL_PROTO = 2;                            // v2 = lap-aware client (server refuses race mode with older clients)
 let duelRs = 0;
-const RACE_LEVELS = [26, 1, 5, 7];                // race-mode tracks: Infinite Loop (5 laps) + three existing levels (3 laps)
+const RACE_LEVELS = [1, 5, 7];                   // race-mode tracks (existing levels, different shapes)
 const DUEL_MAX_LEVEL = 19;                       // level 20 needs the Mars Hover
 const serverNow = () => Date.now() + DUEL.off;
 const dName = (n) => LEVELS[n].name.replace('  ', ' \u00B7 ');
@@ -12,7 +12,7 @@ const dMe = () => DUEL.room && DUEL.room.players.find((p) => p.role === DUEL.rol
 const dOpp = () => DUEL.room && DUEL.room.players.find((p) => p.role !== DUEL.role) || null;
 const duelRacing = () => state === 'countdown' || state === 'playing' || state === 'crashed' || state === 'finishing';
 const duelLaps = () => (duelOn ? DUEL.raceLaps : 1);   // locked at race start so both players always use the same lap count
-const duelProgress = (x, lp) => { const n = duelLaps(); return Math.max(0, Math.min(1, ((lp - 1) + Math.max(0, Math.min(1, x / track.finishX))) / n)); };
+const duelProgress = (x, lp) => Math.max(0, Math.min(1, x / track.finishX));   // endless race: bar shows progress through the current lap
 function duelOnLap() { duelSend({ t: 'pos', x: 0, y: 0, th: 0, vx: 0, vy: 0, rs: duelRs, cp: 0, lp: lap }); DUEL.lastPos = performance.now(); }
 const r2 = (v) => Math.round(v * 100) / 100;
 const dEsc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -51,7 +51,7 @@ function duelOnMsg(m) {
   }
   else if (m.t === 'start') duelStart(m);
   else if (m.t === 'opp') duelPushSample(m);
-  else if (m.t === 'finish_rejected') { if (state === 'finishing') { setState('playing'); toast('KEEP RACING', 'Lap ' + lap + ' of ' + duelLaps(), 'warn'); } }
+  else if (m.t === 'finish_rejected') { if (state === 'finishing') { setState('playing'); toast('KEEP RACING', 'Lap ' + lap, 'warn'); } }
   else if (m.t === 'opp_finished') { DUEL.oppFinish = m.time; duelBannerUpdate(); }
   else if (m.t === 'result') { DUEL.result = m; DUEL.room = m.room; duelOnResult(); }
   else if (m.t === 'result_update') { DUEL.room = m.room; if (state === 'duelresult') duelRenderResult(); }
@@ -83,9 +83,10 @@ function duelEnter() {
   document.body.classList.add('duelmode');
   const n = $('duelNick'); try { n.value = localStorage.getItem('td_nick') || ''; } catch (e) {} if (!n.value) n.value = 'Racer' + (100 + Math.floor(Math.random() * 900));
   $('duelCode').value = ''; duelHomeErr(''); duelBusy(false); $('duelJoinBox').classList.remove('open');
-  setState('duel');
+  duelSetKind(DUEL.kind || 'race'); setState('duel');
 }
-function duelEnd(msg) {   // tear everything down and go back to the main menu (single-player progress untouched)
+function duelEnd(msg) {
+  if (typeof shootReset === 'function') shootReset();   // tear everything down and go back to the main menu (single-player progress untouched)
   DUEL.wantClose = true; clearInterval(DUEL.pingT);
   if (DUEL.ws) { try { DUEL.ws.close(); } catch (e) {} DUEL.ws = null; }
   DUEL.code = ''; DUEL.room = null; DUEL.result = null; DUEL.oppFinish = null; DUEL.samples = [];
@@ -94,9 +95,9 @@ function duelEnd(msg) {   // tear everything down and go back to the main menu (
   if (level !== duelPrevLevel) loadLevel(duelPrevLevel);
   applyStats(vehicleId); applyVehicle(vehicleId); toMenu(); if (msg) toast('DUEL', msg, 'warn');
 }
-function duelLeave() { duelSend({ t: 'leave' }); setTimeout(() => duelEnd(), 30); }
+function duelLeave() { if (/^shoot/.test(state)) { shootLeave(); return; } duelSend({ t: 'leave' }); setTimeout(() => duelEnd(), 30); }
 function duelAskLeave() { if (!duelRacing()) return; $('duelLeaveModal').classList.remove('hidden'); }
-function duelEsc() { if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
+function duelEsc() { if (/^shoot/.test(state)) shootEsc(); else if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
 function duelBusy(b, txt) { for (const id of ['btnDuelCreate', 'btnDuelJoinGo', 'btnDuelJoin']) $(id).classList.toggle('off', b); if (b && txt) duelHomeErr(txt, true); }
 function duelHomeErr(t, info) { const e = $('duelErr'); e.textContent = t || ''; e.style.color = info ? '#9ff4ff' : ''; }
 function duelNick() {
@@ -111,8 +112,9 @@ async function duelConnectAnd(msgFn, busyTxt) {
   try { await duelOpen(); } catch (e) { duelBusy(false); duelHomeErr('Could not reach the game server. Check your internet connection.'); return; }
   duelSend(msgFn(nick));
 }
-function duelCreate() { duelConnectAnd((nick) => ({ t: 'create', nick, car: duelCar(), v: DUEL_PROTO }), 'Creating room\u2026'); }
+function duelCreate() { if (DUEL.kind === 'shoot') { shootCreate(); return; } duelConnectAnd((nick) => ({ t: 'create', nick, car: duelCar(), v: DUEL_PROTO }), 'Creating room\u2026'); }
 function duelJoin() {
+  if (DUEL.kind === 'shoot') { shootJoin(); return; }
   const c = $('duelCode').value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
   if (c.length !== 5) { duelHomeErr('Enter the 5-character room code.'); return; }
   duelConnectAnd((nick) => ({ t: 'join', code: c, nick, car: duelCar(), v: DUEL_PROTO }), 'Joining room\u2026');
@@ -142,12 +144,12 @@ function duelRenderLobby() {
   const host = r.players.find((p) => p.role === 'host'), guest = r.players.find((p) => p.role === 'guest'), mine = dMe();
   $('lobCards').innerHTML = pCard(host, 'host') + pCard(guest, 'guest');
   const isHost = DUEL.role === 'host', maxL = Math.min(DUEL_MAX_LEVEL, unlocked), race = r.mode === 'race';
-  $('lobLevelName').textContent = race ? dName(r.level) + ' \u00B7 ' + (r.laps || 3) + ' LAPS' : dName(r.level);
+  $('lobLevelName').textContent = race ? dName(r.level) + ' \u00B7 ' + 'ENDLESS' : dName(r.level);
   $('lobPrev').classList.toggle('hidden', !isHost); $('lobNext').classList.toggle('hidden', !isHost);
   $('btnModeDuel').classList.toggle('on', !race); $('btnModeRace').classList.toggle('on', race);
   $('btnModeDuel').classList.toggle('off', !isHost); $('btnModeRace').classList.toggle('off', !isHost);
   $('lobModeLab').textContent = isHost ? 'Mode' : 'Mode picked by host';
-  $('lobLevelLab').textContent = race ? (isHost ? 'Pick race track (' + (RACE_LEVELS.indexOf(r.level) + 1) + '/' + RACE_LEVELS.length + ') \u00B7 first to finish ' + (r.laps || 3) + ' laps wins' : 'Race track picked by host') : isHost ? 'Pick level (unlocked: 1\u2013' + maxL + ')' : 'Level picked by host';
+  $('lobLevelLab').textContent = race ? (isHost ? 'Pick race track (' + (RACE_LEVELS.indexOf(r.level) + 1) + '/' + RACE_LEVELS.length + ') \u00B7 endless laps, keep the loop going' : 'Race track picked by host') : isHost ? 'Pick level (unlocked: 1\u2013' + maxL + ')' : 'Level picked by host';
   const btn = $('btnDuelReady'); btn.classList.toggle('off', !guest); btn.classList.toggle('on', !!(mine && mine.ready));
   btn.textContent = !guest ? 'Waiting for friend\u2026' : mine && mine.ready ? 'Ready \u2713 (tap to cancel)' : 'Ready';
   if (level === r.level) dmapDraw($('lobMap'), null, null);

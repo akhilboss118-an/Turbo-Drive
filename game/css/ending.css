@@ -1,0 +1,35 @@
+/* v43 - Space Battle ending */
+#enOverlay{position:fixed;inset:0;z-index:62;pointer-events:none;font-family:'Chakra Petch','Arial Narrow',sans-serif;color:var(--cream)}
+#enCredits,#enCap,#enEnd,#enSkip{display:none}
+#enFade{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .45s ease}
+body[data-state="credits"] #enCredits{display:block}
+body[data-state="cinematic"] #enCap{display:block}
+body[data-state="end"] #enEnd{display:block}
+body[data-state="credits"] #enSkip,body[data-state="cinematic"] #enSkip{display:block}
+body[data-state="victory"] #dfLives,body[data-state="victory"] #dfHint,body[data-state="victory"] #dfTouch,body[data-state="victory"] #dfLock,body[data-state="victory"] #dfBoss,body[data-state="victory"] #dfWarn{display:none!important}
+body.dogfight[data-state="victory"] #dfHud{display:block}
+body[data-state="victory"] #btnPause,body[data-state="credits"] #btnPause,body[data-state="cinematic"] #btnPause,body[data-state="end"] #btnPause{display:none!important}
+
+#enCredits{position:absolute;inset:0;overflow:hidden;text-align:center;background:radial-gradient(ellipse at center,rgba(2,4,16,.3),rgba(0,0,8,.8));-webkit-mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(transparent 0,#000 10%,#000 90%,transparent 100%)}
+#enCol{position:absolute;left:0;right:0;top:42%;display:flex;flex-direction:column;align-items:center;gap:clamp(26px,7vh,64px);padding:0 6vw;animation:enIn 1.6s ease-out both,enScroll 13s linear 2.6s both}
+@keyframes enIn{from{opacity:0}to{opacity:1}}
+@keyframes enScroll{to{transform:translateY(calc(-100% - 42vh))}}
+.enMsg p{margin:0 0 8px;font-family:'Big Shoulders Display',sans-serif;font-weight:800;letter-spacing:.06em;font-size:clamp(24px,6vh,52px);line-height:1.1;text-shadow:0 0 22px rgba(53,230,255,.65),0 3px 0 #05102a}
+.enMsg p.gold{color:#ffe066;text-shadow:0 0 26px rgba(255,170,40,.85),0 3px 0 #2a1200}
+.enBlock{display:flex;flex-direction:column;align-items:center;gap:6px}
+.enBlock small{font-size:clamp(10px,2vh,13px);letter-spacing:.3em;color:var(--orange);opacity:.9}
+.enBlock b{font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:clamp(22px,5vh,38px);letter-spacing:.14em}
+.enTitle h1{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-style:italic;font-size:clamp(44px,13vh,96px);line-height:.9;transform:skewX(-6deg);text-shadow:4px 4px 0 var(--orange)}
+.enTitle h3{margin:0;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-size:clamp(18px,4vh,30px);letter-spacing:.5em;color:var(--cyan);text-indent:.5em}
+
+#enCap{position:absolute;left:0;right:0;bottom:12vh;text-align:center;font-family:'Big Shoulders Display',sans-serif;font-weight:800;font-style:italic;letter-spacing:.3em;font-size:clamp(26px,7vh,60px);text-shadow:0 0 24px rgba(53,230,255,.8),0 3px 0 #05102a;opacity:0;animation:enCap 4s ease-in-out 7.5s both}
+@keyframes enCap{0%{opacity:0;transform:translateY(10px)}25%,75%{opacity:1;transform:none}100%{opacity:0}}
+
+#enEnd{position:absolute;left:max(6vw,env(safe-area-inset-left));bottom:14vh;max-width:min(560px,52vw);text-align:left;animation:enIn 1.4s ease-out both}
+#enEnd small{display:block;font-size:clamp(10px,2vh,13px);letter-spacing:.32em;color:var(--cyan)}
+#enEnd h1{margin:6px 0 4px;font-family:'Big Shoulders Display',sans-serif;font-weight:900;font-style:italic;font-size:clamp(38px,11vh,88px);line-height:.92;text-shadow:4px 4px 0 var(--orange),0 0 28px rgba(53,230,255,.4)}
+#enEnd p{margin:0 0 clamp(14px,3vh,28px);font-size:clamp(14px,2.6vh,20px);letter-spacing:.12em;opacity:.85}
+#enMenuBtn{pointer-events:auto;min-height:52px;min-width:200px;font-size:clamp(16px,3vh,22px);letter-spacing:.14em;touch-action:manipulation}
+#enSkip{position:absolute;pointer-events:auto;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));min-width:120px;min-height:48px;touch-action:manipulation;transition:opacity .3s ease}
+#enSkip:disabled{opacity:.35;pointer-events:none}
+@media (max-width:700px),(max-height:480px){#enEnd{max-width:62vw;bottom:10vh}#enCol{top:38%}}

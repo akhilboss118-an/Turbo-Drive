@@ -1,8 +1,8 @@
 {
   "name": "turbo-drive-upgraded",
-  "version": "2.0.0",
+  "version": "4.0.0",
   "private": true,
-  "description": "Turbo Drive with per-car stats, upgrade shop and cosmetics. Static game, no Python needed.",
+  "description": "Turbo Drive v4.0 - 1v1 & 1v1v1 Shooting Duel, Space Battle, Alien Hunt, Pluto Survival, and Online Race Duel.",
   "scripts": {
     "prepare-www": "node scripts/prepare-www.js",
     "build": "node scripts/prepare-www.js",

@@ -79,7 +79,7 @@ body.duel #btnMenu3{display:none}
 .menuDuel{margin-top:0}
 @media (max-height:340px){.dbtn{height:44px}.codeVal span{height:34px}}
 
-/* race mode (3 laps) */
+/* race mode (endless laps) */
 .modeSel .dRow{margin-top:4px}
 .modeSel .dbtn{flex:1 1 0}
 #lapHud{font-weight:900;font-style:italic;letter-spacing:.1em;color:var(--orange);font-size:clamp(13px,3.4vh,18px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,138,61,.6)}

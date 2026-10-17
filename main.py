@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from server.duel import router as duel_router, janitor
+from server.shoot_server import router as shoot_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,8 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Duel API and WebSocket routes
+# Duel API and WebSocket routes (Race Duel & Shooting Duel)
 app.include_router(duel_router, prefix="/api")
+app.include_router(shoot_router, prefix="/api")
 
 # Render health check endpoint
 @app.get("/healthz")
@@ -38,7 +40,9 @@ async def healthz():
 import mimetypes
 mimetypes.add_type("model/gltf-binary", ".glb")
 mimetypes.add_type("model/gltf+json", ".gltf")
+mimetypes.add_type("application/octet-stream", ".fbx")
 mimetypes.add_type("audio/mpeg", ".mp3")
+mimetypes.add_type("video/mp4", ".mp4")
 mimetypes.add_type("application/manifest+json", ".webmanifest")
 
 # Serve the static game client at the root URL

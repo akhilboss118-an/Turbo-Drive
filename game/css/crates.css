@@ -39,4 +39,3 @@
 .hvItem small{opacity:.75;font-size:clamp(10px,2.2vh,12px)}
 .hvItem .dbtn{width:100%;height:clamp(40px,9vh,48px);min-height:40px}
 .hvItem .dbtn.on{opacity:.7;pointer-events:none}
-

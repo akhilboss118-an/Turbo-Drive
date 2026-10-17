@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 package-lock.json
+__pycache__/
+*.pyc
 
 # Build outputs
 www/

@@ -1,0 +1,50 @@
+/* Level 26 - Pluto Survival (on foot) HUD and touch controls */
+#footHud{position:absolute;inset:0;pointer-events:none;display:none;z-index:5}
+body.foot[data-state="countdown"] #footHud,body.foot[data-state="playing"] #footHud,body.foot[data-state="paused"] #footHud,body.foot[data-state="crashed"] #footHud,body.foot[data-state="finishing"] #footHud{display:block}
+body.foot #controls,body.foot #spaceCtl,body.foot .hudr,body.foot #kbHint,body.foot #offCourse,body.foot #alienRadar,body.foot #lvlName{display:none!important}
+body.foot #bar{margin-top:4px}
+#ftVig{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,0,0,0) 45%,rgba(190,0,20,.75) 100%);transition:opacity .12s}
+#ftCross{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;display:none}
+body.foot[data-state="playing"] #ftCross{display:block}
+#ftCross{border:2px solid rgba(255,255,255,.8);border-radius:50%;box-shadow:0 0 8px rgba(53,230,255,.8)}
+#ftCross i{position:absolute;left:11px;top:11px;width:4px;height:4px;border-radius:50%;background:#ff5a3a}
+#ftStats{position:absolute;left:max(12px,env(safe-area-inset-left));top:68px;padding:8px 12px;width:clamp(150px,22vh,210px)}
+.ftRow{display:flex;align-items:center;gap:8px;margin:3px 0;font-size:11px;font-weight:900;letter-spacing:.12em}
+.ftRow span{width:54px;opacity:.85}
+.ftBar{flex:1;height:9px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden;border:1px solid rgba(255,255,255,.18)}
+.ftBar b{display:block;height:100%;width:100%;border-radius:6px;transition:width .1s linear}
+.ftBar.hp b{background:linear-gradient(90deg,#ff3a5a,#ff8a5a)}
+.ftBar.o2 b{background:linear-gradient(90deg,#35e6ff,#9dffea)}
+.ftBar.sig b{background:linear-gradient(90deg,#7dff6a,#ffe066,#ff7a2e);width:0}
+.ftBar.low{animation:ftPulse .6s infinite alternate}
+@keyframes ftPulse{to{box-shadow:0 0 10px #ff3a3a;border-color:#ff3a3a}}
+#ftSafe{margin-top:4px;font-size:10px;font-weight:900;letter-spacing:.1em;color:#7dff6a}
+#ftSafe.hidden,#ftPrompt.hidden,#ftLockHint.hidden{display:none}
+#ftSignal{position:absolute;right:max(12px,env(safe-area-inset-right));top:10px;padding:7px 12px;width:clamp(150px,24vh,220px);font-size:11px;font-weight:900;letter-spacing:.14em;color:#9dffea}
+#ftSignal .ftBar{margin:5px 0 3px;height:11px}
+#ftSignal em{font-style:normal;font-size:16px;color:var(--cream);letter-spacing:.04em}
+#ftObjBox{position:absolute;left:50%;top:84px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:5px 14px;border-radius:999px;background:rgba(10,8,28,.7);border:1px solid var(--line);font-weight:800;font-size:13px;letter-spacing:.04em;white-space:nowrap}
+#ftArrow{font-style:normal;color:#ffe066;font-size:16px;transition:transform .08s linear;display:inline-block}
+#ftInv{position:absolute;left:max(12px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom));padding:8px 14px;display:flex;gap:16px;align-items:flex-end}
+#ftInv small{display:block;font-size:10px;opacity:.75;letter-spacing:.14em}
+#ftInv b{font-size:20px;font-style:italic;color:var(--cream)}
+#ftInv #ftAmmoN{color:var(--orange);min-width:78px;display:inline-block}
+#ftPieces{display:flex;gap:5px;align-self:center}
+#ftPieces i{width:14px;height:14px;border-radius:4px;border:2px solid var(--cyan);opacity:.55}
+#ftPieces i.on{background:#7dff6a;border-color:#fff;opacity:1;box-shadow:0 0 10px #7dff6a}
+#ftPrompt{position:absolute;left:50%;bottom:24%;transform:translateX(-50%);padding:9px 20px;border-radius:12px;background:rgba(10,8,28,.82);border:2px solid var(--orange);font-weight:900;font-size:15px;letter-spacing:.06em;color:#fff;text-align:center}
+#ftLockHint{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);padding:6px 16px;border-radius:999px;background:rgba(10,8,28,.75);border:1px solid var(--line);font-weight:800;font-size:12px;letter-spacing:.08em;color:#cfe}
+#ftTouch{display:none;position:absolute;inset:0}
+body.touch[data-state="playing"] #ftTouch{display:block}
+#ftLook{position:absolute;left:38%;right:0;top:70px;bottom:0;pointer-events:auto;touch-action:none}
+#ftJoy{position:absolute;left:max(22px,env(safe-area-inset-left));bottom:max(22px,env(safe-area-inset-bottom));width:clamp(110px,30vh,150px);height:clamp(110px,30vh,150px);border-radius:50%;border:2px solid var(--line);background:rgba(21,12,58,.45);pointer-events:auto;touch-action:none;display:grid;place-items:center}
+#ftKnob{width:46%;height:46%;border-radius:50%;background:rgba(53,230,255,.55);border:2px solid #fff;box-shadow:0 0 16px rgba(53,230,255,.7)}
+.ftBtn{position:absolute;pointer-events:auto;touch-action:none;border-radius:50%;border:2px solid #fff;background:rgba(255,90,40,.62);color:#fff;font-weight:900;letter-spacing:.1em;font-size:14px;width:clamp(78px,22vh,104px);height:clamp(78px,22vh,104px);right:max(26px,env(safe-area-inset-right));bottom:max(30px,env(safe-area-inset-bottom));box-shadow:0 0 24px rgba(255,120,40,.55)}
+.ftBtn.sm{width:clamp(52px,14vh,66px);height:clamp(52px,14vh,66px);font-size:10px;background:rgba(21,12,58,.7);border-color:var(--cyan);box-shadow:none}
+#ftReload{right:calc(max(26px,env(safe-area-inset-right)) + clamp(86px,24vh,114px));bottom:max(24px,env(safe-area-inset-bottom))}
+#ftUse{right:max(34px,env(safe-area-inset-right));bottom:calc(max(30px,env(safe-area-inset-bottom)) + clamp(86px,24vh,114px))}
+.ftBtn.on{transform:scale(.92);background:rgba(255,200,60,.8)}
+body.touch.foot #ftInv{left:auto;right:max(12px,env(safe-area-inset-right));top:74px;bottom:auto}
+body.touch.foot #ftSignal{right:max(12px,env(safe-area-inset-right))}
+body.touch.foot #ftObjBox{top:62px;font-size:11px}
+@media (max-height:480px){#ftStats{top:62px;padding:5px 9px}#ftObjBox{top:58px}#ftSignal{padding:4px 9px}#ftInv b{font-size:16px}}
