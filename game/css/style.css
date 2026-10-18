@@ -61,6 +61,9 @@ button{font:inherit;color:inherit;cursor:pointer;pointer-events:auto;touch-actio
 .rbtn:active{transform:translateY(2px)}
 .rbtn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 #btnSettings:hover .ico{animation:spin 1.2s linear infinite}
+#btnFullscreen .ico{transition:transform .14s ease}
+#btnFullscreen:hover .ico{transform:scale(1.15)}
+#btnFullscreen.on{border-color:#ffd24a;background:linear-gradient(180deg,rgba(168,110,40,.92),rgba(80,50,14,.94))}
 @keyframes spin{to{transform:rotate(360deg)}}
 .stitle{display:flex;align-items:center;gap:12px}
 .stitle h2{margin:0;font-size:clamp(22px,6vh,36px);font-style:italic;font-weight:900;letter-spacing:.07em;text-transform:uppercase;text-shadow:3px 3px 0 rgba(255,138,61,.85)}

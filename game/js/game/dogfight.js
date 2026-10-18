@@ -48,7 +48,7 @@ function dfSub(main, sub, ms) { dfSubEl.querySelector('b').textContent = main; d
 function dfLivesHud() { dfLivesEls.forEach((e, i) => e.classList.toggle('on', i < DF_LIVES - DF.hits)); }
 function dfNoteClose() {
   if (!DF.noteOn) return; DF.noteOn = false; document.body.classList.remove('dfNoteOn'); countdownT = 2.6; lastCount = -1; Snd.init(); Snd.click();
-  try { const el = document.documentElement; if (el.requestFullscreen && !document.fullscreenElement) { const p = el.requestFullscreen(); if (p && p.catch) p.catch(() => {}); } } catch (e) {}
+  if (typeof requestGameFullscreen === 'function') requestGameFullscreen();
 }
 $('dfTakeOff').addEventListener('click', dfNoteClose);
 window.addEventListener('keydown', (e) => { if (dfOn() && DF.noteOn && state === 'countdown' && (e.code === 'Enter' || e.code === 'Space')) { e.preventDefault(); dfNoteClose(); } });

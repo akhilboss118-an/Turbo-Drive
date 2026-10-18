@@ -47,7 +47,7 @@ function resetGates() { resetHoops(); for (const h of hazards) h.warned = false;
 function applyStats(id) { car.setStats(Phys.statsFor(id, upgOf(id))); }
 function startRun(cd) {
   applyStats(vehicleId);
-  Snd.init(); try { const el = document.documentElement; if (el.requestFullscreen && !document.fullscreenElement) { const p = el.requestFullscreen(); if (p && p.catch) p.catch(() => {}); } if (screen.orientation && screen.orientation.lock) { const p = screen.orientation.lock('landscape'); if (p && p.catch) p.catch(() => {}); } } catch (e) {}
+  Snd.init(); if (typeof requestGameFullscreen === 'function') requestGameFullscreen();
   timeT = 0; crashes = 0; score = 0; cpIndex = 0; lap = 1; resetGates(); resetCrates(); clearInput();
   run = { stars: 0, style: 0, flips: 0, flipPts: 0, crates: 0 }; setCombo(0); fuel = 1; resetCold(true);
   car.spawn(CPS[0].x, 0); settle(300); snapCamera(); if (LEVELS[level].onfoot) footStart(); if (LEVELS[level].dogfight) dfStart(); if (LEVELS[level].space) { spaceStart(); setTimeout(() => { if (state === 'countdown' || state === 'playing') toast('DEEP SPACE', 'Steer LEFT / RIGHT through the rings. Dodge the asteroids!', 'good'); }, 2400); }

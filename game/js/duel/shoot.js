@@ -96,9 +96,9 @@ function shLobbyClosed(msg) {
 }
 function shootLobbyLeave() { shSend({ t: 'leave' }); shLobbyClosed(''); }
 function shLobbyShareText() { return 'Join my Turbo Drive duel (first to ' + shGoal() + ' kills)! Room code: ' + SH.room.code; }
-on('btnShootPrivate', () => { Snd.click(); shootCreate(); });
+on('btnShootPrivate', () => { Snd.click(); if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); shootCreate(); });
 on('btnShLobbyLeave', () => { Snd.click(); shootLobbyLeave(); });
-on('btnShStart', () => { Snd.click(); shSend({ t: 'begin' }); });
+on('btnShStart', () => { Snd.click(); if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); shSend({ t: 'begin' }); });
 on('btnShCopy', () => { Snd.click(); if (SH.room && navigator.clipboard) navigator.clipboard.writeText(SH.room.code).then(() => toast('COPIED', SH.room.code, 'good')).catch(() => {}); });
 on('btnShShare', () => { Snd.click(); if (!SH.room) return; if (navigator.share) navigator.share({ text: shLobbyShareText() }).catch(() => {}); else if (navigator.clipboard) navigator.clipboard.writeText(shLobbyShareText()).then(() => toast('COPIED', 'Invite text copied', 'good')).catch(() => {}); });
 for (const n of [10, 20, 40]) on('btnShLim' + n, () => { Snd.click(); shSend({ t: 'limit', n }); });

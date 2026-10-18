@@ -314,11 +314,11 @@ function duelRenderResult() {
 function duelRematch() { const m = dMe(); duelSend({ t: 'rematch', on: !(m && m.rematch) }); Snd.click(); }
 
 /* ---------- wiring ---------- */
-on('btnDuel', () => { Snd.click(); duelEnter(); });
+on('btnDuel', () => { Snd.click(); if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); duelEnter(); });
 on('btnDuelBack', () => { Snd.click(); duelEnd(); });
-on('btnDuelCreate', duelCreate);
-on('btnDuelJoin', () => { $('duelJoinBox').classList.add('open'); $('duelCode').focus(); Snd.click(); });
-on('btnDuelJoinGo', duelJoin);
+on('btnDuelCreate', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); duelCreate(); });
+on('btnDuelJoin', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); $('duelJoinBox').classList.add('open'); $('duelCode').focus(); Snd.click(); });
+on('btnDuelJoinGo', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); duelJoin(); });
 on('btnLobbyLeave', () => { Snd.click(); duelLeave(); });
 on('btnDuelCopy', () => { Snd.click(); duelCopy(); });
 on('btnDuelShare', () => { Snd.click(); duelShare(); });

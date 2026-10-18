@@ -6,6 +6,7 @@
   const TEXT = 'Developed by AkhilBoss';
   let resolve; window.introDone = new Promise((r) => { resolve = r; });
   if (!el) { resolve(); return; }
+  el.addEventListener('pointerdown', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); }, { passive: true });
   setTimeout(() => {
     let i = 0;
     const tick = () => { out.textContent = TEXT.slice(0, ++i); if (i < TEXT.length) setTimeout(tick, 75); };
@@ -47,8 +48,9 @@
     const start = () => { vid.muted = false; return vid.play(); };
     vid.addEventListener('ended', showStory);
     vid.addEventListener('error', showStory);
-    skip.addEventListener('click', showStory);
-    tap.addEventListener('click', () => { tap.hidden = true; start().catch(() => { vid.muted = true; vid.play().catch(showStory); }); });
+    skip.addEventListener('click', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); showStory(); });
+    tap.addEventListener('click', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); tap.hidden = true; start().catch(() => { vid.muted = true; vid.play().catch(showStory); }); });
+    ov.addEventListener('pointerdown', () => { if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); }, { passive: true });
     start().catch(() => { tap.hidden = false; });
   }
 })();

@@ -379,7 +379,7 @@ function equip() {
 }
 function leaveGarage() { for (const k in cosPrev) delete cosPrev[k]; applyVehicle(vehicleId); setState('menu'); Snd.click(); }
 const on = (id, fn) => { const el = $(id); if (el) el.addEventListener('click', (e) => { e.preventDefault(); Snd.init(); fn(); }); };
-on('btnPlay', () => { Snd.click(); pickLevel(level); });
+on('btnPlay', () => { Snd.click(); if (typeof requestGameFullscreen === 'function') requestGameFullscreen(); pickLevel(level); });
 on('btnHvClose', hoverClose);
 on('btnHvGo', () => { $('hoverModal').classList.add('hidden'); hvSkip19 = true; pickLevel(hvLevel); });
 on('btnLevels', () => { setState('stages'); Snd.click(); });
@@ -428,6 +428,9 @@ if (listEl) {
 on('btnLvBack', () => { setState('stages'); Snd.click(); });
 on('btnLvl2', () => { clearInput(); viewWorld = worldOf(level); setState('levels'); Snd.click(); });
 on('btnNext', () => { if (level < CAMPAIGN_LEVELS) { const nx = level + 1; if (hoverBlock(nx)) return; stageTravel(nx, () => { loadLevel(nx); save(); startRun(); }); } });
+on('btnFullscreen', () => { Snd.click(); if (typeof toggleGameFullscreen === 'function') toggleGameFullscreen(); });
+on('optFullscreen', () => { Snd.click(); if (typeof toggleGameFullscreen === 'function') toggleGameFullscreen(); });
+on('btnPauseFullscreen', () => { Snd.click(); if (typeof toggleGameFullscreen === 'function') toggleGameFullscreen(); });
 on('btnSettings', () => { setState('settings'); Snd.click(); });
 on('btnBack', () => { if (settingsFromPause) { closePauseSettings(); return; } setState('menu'); Snd.click(); });
 on('btnPauseSettings', () => { if (state !== 'paused') return; settingsFromPause = true; show(['hud', 'settings']); Snd.click(); });
@@ -441,7 +444,7 @@ on('btnRetry', retry);
 on('btnAgain', startRun);
 on('btnMenu2', toMenu);
 const optSound = $('optSound'), optQuality = $('optQuality'), optShake = $('optShake');
-const syncOpts = () => { optSound.textContent = settings.sound ? 'On' : 'Off'; optSound.classList.toggle('active', settings.sound); optShake.textContent = settings.shake ? 'On' : 'Off'; optShake.classList.toggle('active', settings.shake); optQuality.textContent = settings.quality === 'high' ? 'High' : 'Low'; };
+const syncOpts = () => { optSound.textContent = settings.sound ? 'On' : 'Off'; optSound.classList.toggle('active', settings.sound); optShake.textContent = settings.shake ? 'On' : 'Off'; optShake.classList.toggle('active', settings.shake); optQuality.textContent = settings.quality === 'high' ? 'High' : 'Low'; if (typeof syncFullscreenUi === 'function') syncFullscreenUi(); };
 optSound.addEventListener('click', () => { settings.sound = !settings.sound; Snd.init(); syncOpts(); save(); Snd.click(); });
 optQuality.addEventListener('click', () => { settings.quality = settings.quality === 'high' ? 'low' : 'high'; syncOpts(); resize(); save(); Snd.click(); });
 optShake.addEventListener('click', () => { settings.shake = !settings.shake; syncOpts(); save(); Snd.click(); });

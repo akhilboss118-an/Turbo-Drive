@@ -56,6 +56,8 @@
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
 <symbol id="i-crate" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z" fill="#c98a1a" stroke="#ffe08a"/><path d="M3 8l9 5 9-5M12 13v8" stroke="#ffe08a"/></symbol>
 <symbol id="i-phone" viewBox="0 0 24 24"><rect width="12" height="20" x="6" y="2" rx="2"/><path d="M11 18h2"/></symbol>
+<symbol id="i-fullscreen" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-fullscreen-exit" viewBox="0 0 24 24"><path d="M4 14h6m0 0v6m0-6L3 21m17-11h-6m0 0V4m0 6l7-7M14 10h6m-6 0V4m0 6 7-7M4 10h6m0 0V4m0 6L3 3m10 11h6m-6 0v6m0-6 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </defs></svg>
 <div id="ui">
   <div id="menu" class="hidden">
@@ -71,7 +73,7 @@
       <button class="mbtn" id="btnDuel" data-testid="menu-duel-btn" aria-label="Duel, race or shoot a friend online"><span class="ib"><svg class="ico "><use href="#i-duel"/></svg></span><span class="lb"><b>Duel</b><small>Race or shoot a friend online</small></span><span class="cv"><svg class="ico "><use href="#i-chev"/></svg></span></button>
       <div id="menuLbSlot"></div>
     </div>
-    <div id="topbar"><div id="authSlot"></div><button class="pill crateBtn" id="crateTotal" data-testid="menu-crates-btn" aria-label="Open space crates"></button><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
+    <div id="topbar"><div id="authSlot"></div><button class="pill crateBtn" id="crateTotal" data-testid="menu-crates-btn" aria-label="Open space crates"></button><div class="pill" id="coinTotal" data-testid="menu-coins"></div><div class="pill" id="starTotal"></div><div class="pill" id="bestTime" data-testid="menu-best-time"></div><button class="rbtn" id="btnFullscreen" data-testid="menu-fullscreen-btn" aria-label="Toggle Fullscreen" title="Toggle Fullscreen (F)"><svg class="ico"><use id="fsIcon" href="#i-fullscreen"/></svg></button><button class="rbtn" id="btnSettings" data-testid="menu-settings-btn" aria-label="Settings"><svg class="ico "><use href="#i-gear"/></svg></button></div>
     <div class="hint"><span class="kbd-only">Up / W / Space = gas &middot; A / D = tilt left / right (steer in space) &middot; Shift = nitro.</span><span class="touch-only">Hold GAS. In the air, use the left / right tilt buttons so your wheels meet the road.</span></div>
   </div>
   <div id="login" class="hidden" data-testid="login-screen">
@@ -125,6 +127,7 @@
   </div>
   <div id="settings" class="hidden">
     <div class="stitle"><button class="rbtn" id="btnBack" data-testid="settings-back-btn" aria-label="Back"><svg class="ico "><use href="#i-back"/></svg></button><h2>Settings</h2></div>
+    <div class="row"><span>Fullscreen</span><button class="btn" id="optFullscreen" data-testid="settings-fullscreen-btn">Off</button></div>
     <div class="row"><span>Sound</span><button class="btn" id="optSound" data-testid="settings-sound-btn">On</button></div>
     <div class="row"><span>Motion FX</span><button class="btn" id="optShake" data-testid="settings-shake-btn">On</button></div>
     <div class="row"><span>Graphics</span><button class="btn" id="optQuality" data-testid="settings-quality-btn">High</button></div>
@@ -233,6 +236,7 @@
   <div id="countdown" class="hidden" data-testid="countdown"></div>
   <div id="pauseMenu" class="hidden"><div class="modal panel"><h2>Paused</h2>
     <button class="btn primary" id="btnResume" data-testid="pause-resume-btn">Resume</button>
+    <button class="btn" id="btnPauseFullscreen" data-testid="pause-fullscreen-btn">Toggle Fullscreen</button>
     <button class="btn" id="btnRestartCp" data-testid="pause-restart-cp-btn">Restart from checkpoint</button>
     <button class="btn" id="btnRestartLevel" data-testid="pause-restart-level-btn">Restart level</button>
     <button class="btn" id="btnPauseSettings" data-testid="pause-settings-btn">Settings</button>
@@ -284,6 +288,7 @@
 <script src="game/js/physics.js"></script>
 <script src="game/js/core/storm.js"></script>
 <script src="game/js/core/config.js"></script>
+<script src="game/js/core/orientation.js"></script>
 <script src="game/js/render/renderer.js"></script>
 <script src="game/js/render/path.js"></script>
 <script src="game/js/render/track.js"></script>
@@ -331,7 +336,6 @@
 <script src="game/js/game/ending.js"></script>
 <script src="game/js/core/intro.js"></script>
 <script src="game/js/core/tutorial.js"></script>
-<script src="game/js/core/orientation.js"></script>
 <script src="game/js/main.js"></script>
 <script src="game/js/core/pwa.js"></script>
 </body>
