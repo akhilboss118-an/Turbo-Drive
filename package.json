@@ -1,8 +1,8 @@
 {
   "name": "turbo-drive-upgraded",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "private": true,
-  "description": "Turbo Drive v5.4 - 3D Online Shooting Duel with Private Rooms, Quips & P2P WebRTC Voice Chat.",
+  "description": "Turbo Drive v5.4.1 - Firebase Cloud Saves, Auth & Online Duel Multiplayer.",
   "scripts": {
     "prepare-www": "node scripts/prepare-www.js",
     "build": "node scripts/prepare-www.js",
