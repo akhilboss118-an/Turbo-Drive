@@ -12,11 +12,33 @@ const shSend = (o) => { if (SH.ws && SH.ws.readyState === 1) { SH.ws.send(JSON.s
 
 /* ---------- HUD overlay ---------- */
 const shHudEl = document.createElement('div'); shHudEl.id = 'd3Hud'; shHudEl.setAttribute('data-testid', 'duel3d-hud');
-shHudEl.innerHTML = '<div class="d3Bar me" data-testid="duel3d-me"><span class="nm" id="d3MeNm"></span><div class="bar"><i id="d3MeHp" data-testid="duel3d-me-hp-bar"></i></div><b id="d3MeN" data-testid="duel3d-me-hp">100</b></div><div class="d3Vs">VS</div><div class="d3Bar opp" data-testid="duel3d-opp"><b id="d3OppN" data-testid="duel3d-opp-hp">100</b><div class="bar"><i id="d3OppHp" data-testid="duel3d-opp-hp-bar"></i></div><span class="nm" id="d3OppNm" data-testid="duel3d-opp-name"></span></div>';
+shHudEl.innerHTML = '<div class="d3Bar me" data-testid="duel3d-me"><span class="nm" id="d3MeNm"></span><div class="bar"><i id="d3MeHp" data-testid="duel3d-me-hp-bar"></i></div><b id="d3MeN" data-testid="duel3d-me-hp">100</b></div><div class="d3Vs" data-testid="duel3d-score"><span id="d3Sc" data-testid="duel3d-kills"><b class="k me">0</b><em>:</em><b class="k op">0</b></span><small id="d3Goal" data-testid="duel3d-goal">FIRST TO 40</small><small id="d3Clock" data-testid="duel3d-clock">00:00</small></div><div class="d3Bar opp" data-testid="duel3d-opp"><b id="d3OppN" data-testid="duel3d-opp-hp">100</b><div class="bar"><i id="d3OppHp" data-testid="duel3d-opp-hp-bar"></i></div><span class="nm" id="d3OppNm" data-testid="duel3d-opp-name"></span></div>';
 $('ui').appendChild(shHudEl);
 const shHitEl = document.createElement('div'); shHitEl.id = 'd3Hit'; shHitEl.setAttribute('data-testid', 'duel3d-hit-marker'); shHitEl.innerHTML = '<i></i><i></i><i></i><i></i>'; $('ui').appendChild(shHitEl);
 const shExitEl = document.createElement('button'); shExitEl.id = 'd3Exit'; shExitEl.className = 'rbtn'; shExitEl.setAttribute('data-testid', 'duel3d-exit-btn'); shExitEl.setAttribute('aria-label', 'Leave match'); shExitEl.textContent = 'LEAVE'; $('ui').appendChild(shExitEl);
 shExitEl.addEventListener('click', () => { Snd.click(); shootAskLeave(); });
+
+/* ---------- quick chat (one-tap quips, index-based so no free text) ---------- */
+const SH_QUIPS = ['Nice shot!', 'Good game', 'Too easy', 'Watch out!', 'Oops, sorry', 'Rematch?'];
+const shQuipEl = document.createElement('div'); shQuipEl.id = 'd3Quips'; shQuipEl.setAttribute('data-testid', 'duel-quips-panel');
+shQuipEl.innerHTML = SH_QUIPS.map((q, i) => '<button class="d3QBtn" data-i="' + i + '" data-testid="duel-quip-btn-' + i + '" title="Key ' + (i + 1) + '"><kbd>' + (i + 1) + '</kbd>' + q + '</button>').join('');
+$('ui').appendChild(shQuipEl);
+const shQuipFeed = document.createElement('div'); shQuipFeed.id = 'd3QuipFeed'; shQuipFeed.setAttribute('data-testid', 'duel-quip-feed'); $('ui').appendChild(shQuipFeed);
+function shQuipShow(i, mine) {
+  const q = SH_QUIPS[i]; if (!q) return; const op = shOppInfo(), d = document.createElement('div');
+  d.className = mine ? 'me' : 'opp'; d.setAttribute('data-testid', mine ? 'duel-quip-sent' : 'duel-quip-received');
+  d.textContent = (mine ? 'You' : (op ? op.nick : 'Opponent')) + ': ' + q; shQuipFeed.appendChild(d);
+  while (shQuipFeed.children.length > 3) shQuipFeed.removeChild(shQuipFeed.firstChild);
+  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 400); }, 2800);
+  if (!mine) { try { Snd.tone(720, 0.07, 'sine', 0.08, 1); } catch (e) {} }
+}
+let shQuipT = 0;
+function shQuipSend(i) {
+  const now = Date.now(); if (!SH.on || !SH_QUIPS[i] || now - shQuipT < 900) return; shQuipT = now;
+  if (shSend({ t: 'quip', i })) shQuipShow(i, true);
+}
+shQuipEl.addEventListener('click', (e) => { const b = e.target.closest('.d3QBtn'); if (b) { Snd.click(); shQuipSend(+b.dataset.i); } });
+window.addEventListener('keydown', (e) => { if (e.repeat || !SH.on || !/^Digit[1-6]$/.test(e.code)) return; const t = e.target && e.target.tagName; if (t === 'INPUT' || t === 'TEXTAREA') return; shQuipSend(+e.code.slice(5) - 1); });
 
 /* ---------- network ---------- */
 function shootOpen() {
@@ -39,10 +61,53 @@ async function shootFind() {
   try { await shootOpen(); } catch (e) { duelHomeErr('Could not reach the duel server. Check your internet connection.'); return; }
   shSearchUi(true); duelHomeErr('Searching for an opponent\u2026', true); shSend({ t: 'quick', nick });
 }
+/* ---------- private rooms (code + kill limit) ---------- */
+async function shPrivateConnect(msgFn, busyTxt) {
+  const nick = duelNick(); if (!nick) return;
+  duelHomeErr(busyTxt, true); duelBusy(true); SH.wantClose = true;
+  if (SH.ws) { try { SH.ws.close(); } catch (e) {} SH.ws = null; }
+  SH.wantClose = false;
+  try { await shootOpen(); } catch (e) { duelBusy(false); duelHomeErr('Could not reach the duel server. Check your internet connection.'); return; }
+  shSend(msgFn(nick));
+}
+function shootCreate() { shPrivateConnect((nick) => ({ t: 'create', nick }), 'Creating room\u2026'); }
+function shootJoin() {
+  const c = $('duelCode').value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (c.length !== 5) { duelHomeErr('Enter the 5-character room code.'); return; }
+  shPrivateConnect((nick) => ({ t: 'join', code: c, nick }), 'Joining room\u2026');
+}
+function shLobbyOnMsg(m) {
+  SH.role = m.role; SH.room = m.room; duelBusy(false); duelHomeErr('');
+  if (!SH.lobbyOn) { SH.lobbyOn = true; setState('shootlobby'); }
+  shLobbyRender();
+}
+function shLobbyRender() {
+  const r = SH.room; if (!r) return; const host = SH.role === 'host', two = r.players.length === 2;
+  $('shlCode').innerHTML = r.code.split('').map((c) => '<span>' + c + '</span>').join('');
+  $('shlPlayers').innerHTML = ['host', 'guest'].map((role) => { const p = r.players.find((q) => q.role === role); return '<div class="drRow ' + (role === SH.role ? 'me' : 'opp') + '"><span class="nm" data-testid="shoot-lobby-' + role + '-nick">' + (p ? dEsc(p.nick) + (role === SH.role ? ' (you)' : '') : 'Waiting for friend\u2026') + '</span><span class="tm">' + (role === 'host' ? 'HOST' : '') + '</span></div>'; }).join('');
+  for (const n of [10, 20, 40]) { const b = $('btnShLim' + n); b.classList.toggle('on', r.kills_to_win === n); b.classList.toggle('off', !host); }
+  $('shlLimLab').textContent = host ? 'Kills to win \u00B7 you choose' : 'Kills to win \u00B7 picked by host';
+  const st = $('btnShStart'); st.classList.toggle('off', !host || !two); st.style.display = host ? '' : 'none';
+  $('shlHint').textContent = host ? (two ? 'Your friend is in. Press Start when ready.' : 'Send the code to your friend and wait for them to join.') : 'Waiting for the host to start the duel\u2026 First to ' + r.kills_to_win + ' kills wins.';
+}
+function shLobbyClosed(msg) {
+  SH.wantClose = true; if (SH.ws) { try { SH.ws.close(); } catch (e) {} SH.ws = null; }
+  SH.lobbyOn = false; SH.room = null; SH.role = ''; if (state === 'shootlobby') setState('duel'); duelBusy(false); duelHomeErr(msg || '');
+}
+function shootLobbyLeave() { shSend({ t: 'leave' }); shLobbyClosed(''); }
+function shLobbyShareText() { return 'Join my Turbo Drive duel (first to ' + shGoal() + ' kills)! Room code: ' + SH.room.code; }
+on('btnShootPrivate', () => { Snd.click(); shootCreate(); });
+on('btnShLobbyLeave', () => { Snd.click(); shootLobbyLeave(); });
+on('btnShStart', () => { Snd.click(); shSend({ t: 'begin' }); });
+on('btnShCopy', () => { Snd.click(); if (SH.room && navigator.clipboard) navigator.clipboard.writeText(SH.room.code).then(() => toast('COPIED', SH.room.code, 'good')).catch(() => {}); });
+on('btnShShare', () => { Snd.click(); if (!SH.room) return; if (navigator.share) navigator.share({ text: shLobbyShareText() }).catch(() => {}); else if (navigator.clipboard) navigator.clipboard.writeText(shLobbyShareText()).then(() => toast('COPIED', 'Invite text copied', 'good')).catch(() => {}); });
+for (const n of [10, 20, 40]) on('btnShLim' + n, () => { Snd.click(); shSend({ t: 'limit', n }); });
+
 function shootCancel() { SH.wantClose = true; shSend({ t: 'cancel' }); if (SH.ws) { try { SH.ws.close(); } catch (e) {} SH.ws = null; } shSearchUi(false); duelHomeErr(''); }
 function shootOnClose() {
   if (SH.wantClose || !duelOn) return;
   if (SH.searching) { shSearchUi(false); duelHomeErr('Connection lost. Try again.'); return; }
+  if (SH.lobbyOn) { shLobbyClosed('Connection lost.'); return; }
   if (SH.on && SH.phase !== 'over') { shootOver({ winner: SH.role === 'host' ? 'guest' : 'host', reason: 'disconnect', room: SH.room, local: true }); return; }
   if (SH.on) { if (SH.room) SH.room.players.forEach((p) => { if (p.role !== SH.role) p.connected = false; }); shootRenderResult(); }
 }
@@ -50,27 +115,34 @@ function shootOnMsg(m) {
   if (m.t === 'queued') { duelHomeErr('Searching for an opponent\u2026 (' + m.waiting + ' waiting)', true); }
   else if (m.t === 'start') shootStart(m);
   else if (m.t === 'opp') shOppState(m);
+  else if (m.t === 'rtc') TdVoice.signal(m.d);
+  else if (m.t === 'quip') shQuipShow(m.i, false);
   else if (m.t === 'oshot') shOppShot(m);
+  else if (m.t === 'lobby') shLobbyOnMsg(m);
+  else if (m.t === 'closed') shLobbyClosed('The host closed the room.');
+  else if (m.t === 'err') { try { SH.wantClose = true; if (SH.ws) SH.ws.close(); } catch (e) {} SH.ws = null; duelBusy(false); duelHomeErr(m.msg || 'Could not join.'); }
   else if (m.t === 'hp') shOnHp(m);
+  else if (m.t === 'kill') shOnKill(m);
   else if (m.t === 'over') { SH.room = m.room; shootOver(m); }
   else if (m.t === 'room') { SH.room = m.room; shootRenderResult(); }
-  else if (m.t === 'opp_left') { if (m.room) SH.room = m.room; shootRenderResult(); }
+  else if (m.t === 'opp_left') { TdVoice.stop(); if (m.room) SH.room = m.room; shootRenderResult(); }
 }
 
 /* ---------- match start ---------- */
 function shSpawn() {
   const s = SH_SPAWN[SH.role] || SH_SPAWN.host;
-  FT.p.set(s[0], footGround(s[0], s[1]), s[1]); FT.yaw = FT.camYaw = FT.charYaw = s[2]; FT.camPitch = 0.2; FT.hp = 100; FT.reserve = Math.max(FT.reserve, 90);
+  FT.p.set(s[0], footGround(s[0], s[1]), s[1]); FT.yaw = FT.camYaw = FT.charYaw = s[2]; FT.camPitch = 0.2; FT.hp = 100; FT.reserve = Math.max(FT.reserve, 90); FT.hurtT = 0;
 }
 function shootStart(m) {
-  shSearchUi(false); duelHomeErr(''); SH.role = m.role; SH.room = m.room; SH.over = null; SH.phase = 'count'; SH.sendT = 0; SH.on = true; SH.opp = null;
+  shSearchUi(false); duelHomeErr(''); SH.lobbyOn = false; SH.role = m.role; SH.room = m.room; SH.over = null; SH.phase = 'count'; SH.clock = 0; SH.sendT = 0; SH.on = true; SH.opp = null;
   if (SH.prevVeh === null) SH.prevVeh = vehicleId;
   if (!SH_FB0) SH_FB0 = { x0: FB.x0, x1: FB.x1, z0: FB.z0, z1: FB.z1 };
   Object.assign(FB, SH_ARENA); document.body.classList.add('d3'); $('duelLeaveModal').classList.add('hidden'); $('shootResult').classList.add('hidden');
-  const me = shMe(), op = shOppInfo(); $('d3MeNm').textContent = me ? me.nick : 'You'; $('d3OppNm').textContent = op ? op.nick : 'Opponent'; shHudBars(100, 100);
+  const me = shMe(), op = shOppInfo(); $('d3MeNm').textContent = me ? me.nick : 'You'; $('d3OppNm').textContent = op ? op.nick : 'Opponent'; shHudBars(100, 100); shScore(); SH.deadT = 0;
   if (level !== 27) loadLevel(27);
   startRun(3.4);
   astroOnReady(() => { if (ASTRO.inner) ASTRO.inner.rotation.x = 0; if (SH.on) { shMakeOpp(); shMakeWalls(); } });
+  TdVoice.start(shSend, SH.role === 'host');
 }
 function shMakeWalls() {
   if (SH.walls && SH.walls.parent === FT.world) return;
@@ -137,9 +209,18 @@ function shHitOpp() {
 }
 function shOnHp(m) {
   SH.room = m.room; const me = shMe(), op = shOppInfo();
-  if (m.victim === SH.role && me) { FT.hp = me.hp; FT.hurtT = 0.35; shake = Math.max(shake, 0.3); ftSnd('bite'); vibe && vibe(25); }
+  if (m.victim === SH.role && me) { FT.hp = Math.max(1, me.hp); FT.hurtT = 0.35; shake = Math.max(shake, 0.3); ftSnd('bite'); vibe && vibe(25); }
   else if (op && SH.opp) { SH.opp.hp = op.hp; SH.opp.hitT = 0.12; if (op.hp <= 0) SH.opp.dead = 1; }
   shHudBars(me ? me.hp : 100, op ? op.hp : 100);
+}
+function shClock(dt) { SH.clock = (SH.clock || 0) + dt; const t = Math.floor(SH.clock), el = $('d3Clock'), v = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); if (el.textContent !== v) el.textContent = v; }
+function shGoal() { return (SH.room && SH.room.kills_to_win) || 40; }
+function shScore() { const me = shMe(), op = shOppInfo(); $('d3Sc').innerHTML = '<b class="k me">' + (me ? me.kills : 0) + '</b><em>:</em><b class="k op">' + (op ? op.kills : 0) + '</b>'; $('d3Goal').textContent = 'FIRST TO ' + shGoal(); }
+function shOnKill(m) {
+  SH.room = m.room; const me = shMe(), op = shOppInfo(), O = SH.opp;
+  if (m.victim === SH.role) { SH.deadT = 1.5; FT.hp = 100; FT.hurtT = 0.35; shake = Math.max(shake, 0.5); ftSnd('bite'); vibe && vibe(60); }
+  else if (O) { O.hp = 0; O.dead = 1; ftSnd('hit'); setTimeout(() => { if (SH.opp === O) { O.hp = 100; O.dead = 0; O.fall = 0; O.c.rotation.x = 0; } }, 1500); }
+  shHudBars(me ? me.hp : 100, op ? op.hp : 100); shScore();
 }
 function shHudBars(a, b) {
   $('d3MeHp').style.width = Math.max(0, a) + '%'; $('d3OppHp').style.width = Math.max(0, b) + '%'; $('d3MeN').textContent = Math.max(0, a); $('d3OppN').textContent = Math.max(0, b);
@@ -153,22 +234,29 @@ function shTick(dt) {
     if (FT.hp <= 0 && ASTRO.inner) { SH.myFall = Math.min(1, (SH.myFall || 0) + dt / 0.8); ASTRO.inner.rotation.x = -SH.myFall * SH.myFall * 1.52; }
     return;
   }
-  SH.phase = 'play'; SH.myFall = 0;
+  if (SH.deadT > 0) {
+    SH.deadT -= dt; shClock(dt); FT.firing = false; FT.touch.fire = false; astroUpdate(dt); shOppUpdate(dt); huntWorld(dt);
+    SH.myFall = Math.min(1, (SH.myFall || 0) + dt / 0.8); if (ASTRO.inner) ASTRO.inner.rotation.x = -SH.myFall * SH.myFall * 1.52;
+    if (SH.deadT <= 0) { SH.deadT = 0; SH.myFall = 0; if (ASTRO.inner) ASTRO.inner.rotation.x = 0; shSpawn(); }
+    SH.sendT -= dt; if (SH.sendT <= 0) { SH.sendT = 0.05; shSend({ t: 'st', x: shR(FT.p.x), y: shR(FT.p.y), z: shR(FT.p.z), yw: shR(FT.charYaw), an: 'idle', sp: 0 }); }
+    return;
+  }
+  SH.phase = 'play'; SH.myFall = 0; shClock(dt);
   footPlayer(dt); FT.reserve = Math.max(FT.reserve, 90); huntWorld(dt); shOppUpdate(dt);
   SH.sendT -= dt; if (SH.sendT <= 0) { SH.sendT = 0.05; shSend({ t: 'st', x: shR(FT.p.x), y: shR(FT.p.y), z: shR(FT.p.z), yw: shR(FT.charYaw), an: FT.anim || 'idle', sp: FT.sprint ? 1 : 0 }); }
 }
 function shHud() {
-  const o = SH.opp, me = shMe(), op = shOppInfo(); let txt = 'DUEL \u00B7 first one down loses', brg = 0, tgt = false;
+  const o = SH.opp, me = shMe(), op = shOppInfo(); let txt = 'DUEL \u00B7 first to ' + shGoal() + ' kills', brg = 0, tgt = false;
   if (o) { const dx = o.x - FT.p.x, dz = o.z - FT.p.z; txt = (op ? op.nick : 'OPPONENT').toUpperCase() + '  \u00B7  ' + Math.round(Math.hypot(dx, dz)) + ' m'; brg = -footAngDiff(FT.camYaw, Math.atan2(dx, dz)); tgt = o.hp > 0; }
   const lab = $('ftSignal').querySelector('span'); if (lab.textContent !== 'OPPONENT') lab.textContent = 'OPPONENT';
-  const ohp = op ? op.hp : 100; $('ftSigFill').style.width = ohp + '%'; $('ftSigN').textContent = ohp + ' HP'; $('ftObj').textContent = txt; $('ftArrow').style.visibility = tgt ? 'visible' : 'hidden'; if (tgt) $('ftArrow').style.transform = 'rotate(' + (brg * 57.3).toFixed(0) + 'deg)';
-  $('progress').style.width = ohp + '%'; $('cp').textContent = 'Duel \u00B7 ' + (me ? me.nick : ''); $('ftPrompt').classList.add('hidden'); $('ftLockHint').classList.toggle('hidden', !(state === 'playing' && SH.phase === 'play' && !FT.lock && !document.body.classList.contains('touch')));
+  shScore(); const ohp = op ? op.hp : 100; $('ftSigFill').style.width = ohp + '%'; $('ftSigN').textContent = ohp + ' HP'; $('ftObj').textContent = txt; $('ftArrow').style.visibility = tgt ? 'visible' : 'hidden'; if (tgt) $('ftArrow').style.transform = 'rotate(' + (brg * 57.3).toFixed(0) + 'deg)';
+  $('progress').style.width = Math.min(100, (me ? me.kills : 0) / shGoal() * 100) + '%'; $('cp').textContent = 'Kills ' + (me ? me.kills : 0) + ' / ' + shGoal(); $('ftPrompt').classList.add('hidden'); $('ftLockHint').classList.toggle('hidden', !(state === 'playing' && SH.phase === 'play' && !FT.lock && !document.body.classList.contains('touch')));
 }
 
 /* ---------- result ---------- */
 function shootOver(m) {
   if (SH.phase === 'over' && !m.local) return;
-  SH.phase = 'over'; SH.over = m; if (m.room) SH.room = m.room; FT.firing = false; FT.touch.fire = false; if (document.pointerLockElement) document.exitPointerLock();
+  TdVoice.stop(); SH.phase = 'over'; SH.over = m; if (m.room) SH.room = m.room; FT.firing = false; FT.touch.fire = false; if (document.pointerLockElement) document.exitPointerLock();
   const won = m.winner === SH.role; try { if (won) Snd.win(); else Snd.lose(); } catch (e) {}
   const me = shMe(), op = shOppInfo(); if (me) { if (me.hp <= 0) FT.hp = 0; } if (op && SH.opp && op.hp <= 0) SH.opp.hp = 0;
   setTimeout(() => { if (SH.on && SH.phase === 'over') { $('shootResult').classList.remove('hidden'); shootRenderResult(); } }, m.local ? 200 : 1400);
@@ -177,8 +265,10 @@ function shootRenderResult() {
   const m = SH.over, r = SH.room; if (!m || !r || $('shootResult').classList.contains('hidden')) return;
   const won = m.winner === SH.role, me = shMe() || {}, op = shOppInfo(), nm = op ? op.nick : 'Your opponent';
   const head = $('shRHead'); head.textContent = won ? 'YOU WIN!' : 'YOU LOST'; head.classList.toggle('lose', !won);
-  $('shRSub').textContent = m.reason === 'ko' ? (won ? 'You took down ' + nm : nm + ' took you down') : m.reason === 'disconnect' ? (won ? nm + ' disconnected \u2014 you win' : 'You lost the connection') : 'Duel over';
-  $('shRRows').innerHTML = r.players.slice().sort((a, b) => b.hp - a.hp).map((p) => '<div class="drRow ' + (p.role === SH.role ? 'me' : 'opp') + (p.role === m.winner ? ' win' : '') + '"><span class="nm" data-testid="shoot-result-' + p.role + '-nick">' + dEsc(p.nick) + (p.role === SH.role ? ' (you)' : '') + '</span><span class="tm" data-testid="shoot-result-' + p.role + '-hp">' + Math.max(0, p.hp) + ' HP left</span></div>').join('');
+  $('shRSub').textContent = m.reason === 'kills' ? (won ? 'You reached ' + shGoal() + ' kills!' : nm + ' reached ' + shGoal() + ' kills') : m.reason === 'disconnect' ? (won ? nm + ' disconnected \u2014 you win' : 'You lost the connection') : 'Duel over';
+  const acc = (p) => p.shots > 0 ? Math.min(100, Math.round(p.hits / p.shots * 100)) + '%' : '\u2014';
+  $('shRRows').innerHTML = r.players.slice().sort((a, b) => b.kills - a.kills).map((p) => '<div class="drRow ' + (p.role === SH.role ? 'me' : 'opp') + (p.role === m.winner ? ' win' : '') + '"><span class="nm" data-testid="shoot-result-' + p.role + '-nick">' + dEsc(p.nick) + (p.role === SH.role ? ' (you)' : '') + '</span><span class="st" data-testid="shoot-result-' + p.role + '-kills"><b>' + p.kills + '</b><small>/ ' + shGoal() + ' kills</small></span><span class="st" data-testid="shoot-result-' + p.role + '-accuracy"><b>' + acc(p) + '</b><small>accuracy</small></span></div>').join('');
+  const dur = Math.round(r.duration || 0); $('shRTime').textContent = 'Match time ' + String(Math.floor(dur / 60)).padStart(2, '0') + ':' + String(dur % 60).padStart(2, '0');
   const rb = $('btnShootRematch'), gone = !op || !op.connected || !SH.ws;
   rb.classList.toggle('off', gone); rb.classList.toggle('on', !!me.rematch); rb.textContent = gone ? 'Opponent left' : me.rematch ? 'Waiting\u2026 (tap to cancel)' : 'Rematch';
   $('shRNote').textContent = op && op.rematch && !me.rematch ? 'Opponent wants a rematch!' : '';
@@ -192,7 +282,7 @@ function shootAskLeave() {
   const m = $('duelLeaveModal'); m.querySelector('h2').textContent = 'Leave duel?'; m.querySelector('p').textContent = SH.phase === 'over' ? 'Return to the menu.' : 'Leaving mid-duel counts as a loss.'; $('btnDuelKeep').textContent = 'Keep playing'; $('btnDuelQuit').textContent = 'Leave duel'; m.classList.remove('hidden');
 }
 function shootReset() {
-  const was = SH.on; SH.wantClose = true; SH.phase = 'idle'; SH.on = false; SH.opp = null; SH.walls = null; SH.over = null; SH.room = null; shSearchUi(false);
+  TdVoice.stop(); shQuipFeed.innerHTML = ''; const was = SH.on; SH.lobbyOn = false; SH.wantClose = true; SH.phase = 'idle'; SH.on = false; SH.opp = null; SH.walls = null; SH.over = null; SH.room = null; shSearchUi(false);
   if (SH.ws) { try { SH.ws.close(); } catch (e) {} SH.ws = null; }
   document.body.classList.remove('d3'); if (SH_FB0) Object.assign(FB, SH_FB0); $('shootResult').classList.add('hidden');
   const m = $('duelLeaveModal'); m.querySelector('h2').textContent = 'Leave race?'; m.querySelector('p').textContent = 'Leaving mid-race counts as a loss.'; $('btnDuelKeep').textContent = 'Keep racing'; $('btnDuelQuit').textContent = 'Leave race';
@@ -209,9 +299,9 @@ function shootEsc() {
 function duelSetKind(k) {
   DUEL.kind = k; const s = k === 'shoot';
   $('btnKindRace').classList.toggle('on', !s); $('btnKindShoot').classList.toggle('on', s);
-  $('duelKindDesc').textContent = s ? '3D online duel \u00B7 same arena, camera and controls as Level 27 \u00B7 quick match vs a real player' : 'Race a friend on the same track';
+  $('duelKindDesc').textContent = s ? '3D online duel \u00B7 quick match vs a stranger, or Private Room with a code (host picks 10 / 20 / 40 kills)' : 'Race a friend on the same track';
   $('duelHomeTitle').textContent = s ? 'Duel \u00B7 3D Shooting' : 'Duel \u00B7 Race';
-  $('btnDuelJoin').style.display = s ? 'none' : ''; $('duelJoinBox').style.display = s ? 'none' : '';
+  $('btnShootPrivate').style.display = s ? '' : 'none'; $('btnDuelJoin').style.display = '';
   if (!s && SH.searching) shootCancel();
   $('btnDuelCreate').textContent = SH.searching ? 'Cancel search' : (s ? 'Find Match' : 'Create Room');
   duelHomeErr('');

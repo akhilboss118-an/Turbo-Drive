@@ -137,7 +137,7 @@
       <div class="dKindDesc" id="duelKindDesc" data-testid="duel-kind-desc">Race a friend on the same track</div>
       <div class="dLabel">Your nickname</div>
       <input class="dInput" id="duelNick" data-testid="duel-nickname-input" maxlength="16" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Nickname">
-      <div class="dRow"><button class="dbtn go" id="btnDuelCreate" data-testid="duel-create-room-btn">Create Room</button><button class="dbtn" id="btnDuelJoin" data-testid="duel-join-room-btn">Join Room</button></div>
+      <div class="dRow"><button class="dbtn go" id="btnDuelCreate" data-testid="duel-create-room-btn">Create Room</button><button class="dbtn" id="btnShootPrivate" data-testid="duel-private-room-btn" style="display:none">Private Room</button><button class="dbtn" id="btnDuelJoin" data-testid="duel-join-room-btn">Join Room</button></div>
       <div class="dJoin" id="duelJoinBox"><div class="dLabel">Friend's 5-character code</div><div class="dRow"><input class="dInput code" id="duelCode" data-testid="duel-code-input" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCDE"><button class="dbtn go" id="btnDuelJoinGo" data-testid="duel-join-submit-btn">Join</button></div></div>
       <div class="dErr" id="duelErr" data-testid="duel-error"></div>
     </div>
@@ -162,10 +162,19 @@
     <div class="drBox panel"><div class="drHead" id="drHead" data-testid="duel-result-head"></div><div class="drSub" id="drSub" data-testid="duel-result-reason"></div><div class="drRows" id="drRows"></div><div class="drNote" id="drNote" data-testid="duel-rematch-note"></div>
       <div class="drBtns"><button class="dbtn go" id="btnDuelRematch" data-testid="duel-rematch-btn">Rematch</button><button class="dbtn" id="btnDuelLeave" data-testid="duel-leave-btn">Leave</button></div></div>
   </div>
-  <div id="shootLobby" class="hidden"></div>
+  <div id="shootLobby" class="hidden duelScr" data-testid="shoot-lobby">
+    <div class="dTop"><button class="rbtn" id="btnShLobbyLeave" data-testid="shoot-lobby-leave-btn" aria-label="Leave room"><svg class="ico "><use href="#i-back"/></svg></button><h2>Private Duel</h2></div>
+    <div class="dHomeBox">
+      <div class="codeBox panel"><div class="dLabel">Room code &middot; share it with your friend</div><div class="codeVal" id="shlCode" data-testid="shoot-lobby-code"></div><div class="dRow"><button class="dbtn sm" id="btnShCopy" data-testid="shoot-lobby-copy-btn">Copy</button><button class="dbtn sm" id="btnShShare" data-testid="shoot-lobby-share-btn">Share</button></div></div>
+      <div class="drRows" id="shlPlayers" data-testid="shoot-lobby-players"></div>
+      <div class="lvlSel panel"><div class="dLabel" id="shlLimLab" data-testid="shoot-lobby-limit-label">Kills to win</div><div class="dRow kindSel"><button class="dbtn sm" id="btnShLim10" data-testid="shoot-limit-10-btn">10</button><button class="dbtn sm" id="btnShLim20" data-testid="shoot-limit-20-btn">20</button><button class="dbtn sm" id="btnShLim40" data-testid="shoot-limit-40-btn">40</button></div></div>
+      <button class="dbtn go" id="btnShStart" data-testid="shoot-lobby-start-btn">Start Duel</button>
+      <div class="dKindDesc" id="shlHint" data-testid="shoot-lobby-hint"></div>
+    </div>
+  </div>
   <div id="shootGame" class="hidden"></div>
   <div id="shootResult" class="hidden duelScr" data-testid="shoot-result">
-    <div class="drBox panel"><div class="drHead" id="shRHead" data-testid="shoot-result-head"></div><div class="drSub" id="shRSub" data-testid="shoot-result-reason"></div><div class="drRows" id="shRRows"></div><div class="drNote" id="shRNote" data-testid="shoot-rematch-note"></div>
+    <div class="drBox panel"><div class="drHead" id="shRHead" data-testid="shoot-result-head"></div><div class="drSub" id="shRSub" data-testid="shoot-result-reason"></div><div class="drRows" id="shRRows"></div><div class="drTime" id="shRTime" data-testid="shoot-result-time"></div><div class="drNote" id="shRNote" data-testid="shoot-rematch-note"></div>
       <div class="drBtns"><button class="dbtn go" id="btnShootRematch" data-testid="shoot-rematch-btn">Rematch</button><button class="dbtn" id="btnShootResLeave" data-testid="shoot-result-leave-btn">Leave</button></div></div>
   </div>
   <div id="hud" class="hidden">
@@ -308,6 +317,7 @@
 <script src="game/js/ui/account.js"></script>
 <script src="game/js/ui/crates.js"></script>
 <script src="game/js/duel/duel.js"></script>
+<script src="game/js/duel/voice.js"></script>
 <script src="game/js/duel/shoot.js"></script>
 <script src="game/js/game/cutscene.js"></script>
 <script src="game/js/game/plutoscene.js"></script>

@@ -288,7 +288,7 @@ function footPlayer(dt) {
   // survival: oxygen + safe zones
   FT.safe = footNear(HOVER_AT, 9) || (FT.built3 > 0 && footNear(BASE_AT, 7.5));
   if (FT.safe && !huntOn()) { FT.o2 = Math.min(100, FT.o2 + 30 * dt); FT.hp = Math.min(100, FT.hp + 4 * dt); } else if (!huntOn()) FT.o2 = Math.max(0, FT.o2 - 0.45 * dt);
-  if (FT.o2 <= 0) { FT.hp -= 5 * dt; FT.hurtT = Math.max(FT.hurtT, 0.1); }
+  if (FT.o2 <= 0 && !SH.on) { FT.hp -= 5 * dt; FT.hurtT = Math.max(FT.hurtT, 0.1); }
   if (FT.hp <= 0) footDie();
 }
 function footEnemies(dt) {

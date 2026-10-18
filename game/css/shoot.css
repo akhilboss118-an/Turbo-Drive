@@ -62,3 +62,65 @@ body.d3 #d3Hit{display:block}
 #d3Hit.on{animation:d3hit .22s ease-out}
 @keyframes d3hit{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
 #shootResult{z-index:40}
+
+.d3Vs{display:flex;flex-direction:column;align-items:center;line-height:1.05}
+.d3Vs #d3Sc{font-size:clamp(18px,4.4vh,26px)}
+.d3Vs small{font-size:9px;letter-spacing:.12em;color:#fff;opacity:.85}
+
+body.d3 .hudbox,body.d3 #ftSignal,body.d3 #progress{display:none!important}
+body.d3 #ftObjBox{top:clamp(66px,16vh,92px)}
+#d3Hud{gap:10px}
+.d3Bar{background:rgba(10,8,34,.72);backdrop-filter:blur(6px);min-width:clamp(140px,24vw,270px);border-width:1.5px}
+.d3Vs{min-width:clamp(96px,12vw,130px);padding:4px 12px 5px;border-radius:14px;background:rgba(10,8,34,.82);border:1.5px solid rgba(255,210,74,.55);gap:1px}
+.d3Vs #d3Sc{display:flex;align-items:baseline;gap:8px;font-size:clamp(22px,5.4vh,32px);line-height:1}
+.d3Vs #d3Sc em{font-style:normal;color:#ffd24a;opacity:.8}
+.d3Vs #d3Sc b.k{min-width:1.1em;text-align:center;font-variant-numeric:tabular-nums;font-size:inherit}
+.d3Vs #d3Sc b.me{color:#35e6ff;text-shadow:0 0 10px rgba(53,230,255,.7)}
+.d3Vs #d3Sc b.op{color:#ff8a3d;text-shadow:0 0 10px rgba(255,138,61,.7)}
+.d3Vs small{font-size:9px;letter-spacing:.14em;color:#ffd24a;opacity:1}
+.d3Vs #d3Clock{color:#fff;opacity:.7;font-variant-numeric:tabular-nums}
+@media (max-height:460px){.d3Bar .nm{max-width:70px}.d3Bar{min-width:120px;padding:4px 8px}}
+
+#shootResult .drBox{width:min(620px,88vw)}
+#shootResult .drRow .st{display:flex;flex-direction:column;align-items:center;min-width:clamp(64px,13vw,96px);line-height:1.05;font-variant-numeric:tabular-nums}
+#shootResult .drRow .st b{font-size:clamp(16px,4.2vh,24px)}
+#shootResult .drRow .st small{font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.75;font-style:normal}
+.drTime{margin:0 0 clamp(6px,1.6vh,12px);font-size:clamp(11px,2.8vh,14px);font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#ffd24a}
+
+/* ---- duel voice chat (v52) ---- */
+#d3Voice{display:none;position:absolute;right:calc(max(12px,env(safe-area-inset-right)) + 96px);bottom:max(12px,env(safe-area-inset-bottom));z-index:26;flex-direction:column;align-items:stretch;gap:6px;padding:8px 10px;border-radius:12px;background:rgba(21,12,58,.78);border:1px solid var(--line);pointer-events:auto;color:#fff;font-weight:900;letter-spacing:.08em;min-width:158px}
+body.d3[data-state="countdown"] #d3Voice,body.d3[data-state="playing"] #d3Voice{display:flex}
+body.touch #d3Voice{bottom:auto;top:calc(max(10px,env(safe-area-inset-top)) + 46px);right:max(12px,env(safe-area-inset-right));min-width:140px;padding:6px 8px}
+.d3VBtn{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 10px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:11px;cursor:pointer;transition:background-color .15s,border-color .15s,transform .15s,box-shadow .15s}
+.d3VBtn:hover{background:rgba(255,255,255,.16)}.d3VBtn:active{transform:scale(.96)}
+.d3VBtn .sl,.d3VBtn .wv{transition:opacity .15s}
+#d3VMic .sl,#d3VOppBtn .sl{opacity:0}
+#d3VMic[data-state="on"]{border-color:#7dff6a;color:#7dff6a}
+#d3VMic[data-state="muted"],#d3VMic[data-state="denied"],#d3VMic[data-state="unsupported"]{border-color:#ff5a4a;color:#ff8a7a}
+#d3VMic[data-state="muted"] .sl,#d3VMic[data-state="denied"] .sl,#d3VMic[data-state="unsupported"] .sl{opacity:1}
+#d3VMic[data-state="asking"]{border-color:#ffd24a;color:#ffd24a}
+#d3VMic.talk{box-shadow:0 0 0 2px rgba(125,255,106,.55),0 0 14px rgba(125,255,106,.6)}
+.d3VOpp{display:flex;align-items:center;gap:8px}
+.d3VBtn.sq{padding:5px 7px}.d3VBtn.sq.mt{border-color:#ff5a4a;color:#ff8a7a}#d3VOppBtn.mt .sl{opacity:1}#d3VOppBtn.mt .wv{opacity:0}
+#d3VSpk{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.25);flex:none;transition:background-color .1s,box-shadow .1s}
+#d3VSpk.on{background:#ff8a3d;box-shadow:0 0 10px 3px rgba(255,138,61,.8)}
+#d3VVol{flex:1;min-width:0;accent-color:#ff8a3d;height:16px;cursor:pointer}
+#d3VVol:disabled{opacity:.4}
+#d3VStat{font-size:9px;opacity:.75;text-transform:none;letter-spacing:.03em;font-style:normal;min-height:1.2em}
+body.touch #d3VStat{display:none}
+.d3Bar.opp.talking{box-shadow:0 0 0 2px rgba(255,138,61,.75),0 0 16px rgba(255,138,61,.7)}
+
+/* ---- quick chat quips (v54) ---- */
+#d3Quips{display:none;position:absolute;left:max(10px,env(safe-area-inset-left));top:44%;transform:translateY(-50%);z-index:26;flex-direction:column;gap:5px;pointer-events:auto}
+body.d3[data-state="countdown"] #d3Quips,body.d3[data-state="playing"] #d3Quips{display:flex}
+.d3QBtn{display:flex;align-items:center;gap:7px;padding:5px 10px;border-radius:9px;border:1px solid var(--line);background:rgba(21,12,58,.72);color:#fff;font:inherit;font-size:11px;font-weight:900;letter-spacing:.05em;text-align:left;cursor:pointer;opacity:.8;transition:background-color .15s,opacity .15s,transform .15s}
+.d3QBtn:hover{background:rgba(53,230,255,.22);opacity:1}.d3QBtn:active{transform:scale(.95)}
+.d3QBtn kbd{font:inherit;font-size:10px;min-width:16px;padding:1px 4px;border-radius:5px;background:rgba(255,255,255,.16);text-align:center}
+body.touch .d3QBtn kbd{display:none}
+body.touch #d3Quips{top:50%;gap:4px}body.touch .d3QBtn{padding:4px 8px;font-size:10px}
+#d3QuipFeed{display:none;position:absolute;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 58px);transform:translateX(-50%);z-index:27;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+body.d3 #d3QuipFeed{display:flex}
+#d3QuipFeed div{padding:5px 14px;border-radius:99px;font-weight:900;font-style:italic;font-size:clamp(12px,2.8vh,15px);letter-spacing:.04em;background:rgba(21,12,58,.85);border:2px solid #ff8a3d;color:#ffd0b0;animation:d3qin .22s cubic-bezier(.2,1.5,.4,1);transition:opacity .4s,transform .4s}
+#d3QuipFeed div.me{border-color:var(--cyan);color:#bff6ff;font-size:clamp(10px,2.3vh,12px);opacity:.85}
+#d3QuipFeed div.out{opacity:0;transform:translateY(-6px)}
+@keyframes d3qin{from{opacity:0;transform:translateY(-10px) scale(.85)}to{opacity:1;transform:none}}

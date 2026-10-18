@@ -1,5 +1,5 @@
 /* Turbo Drive offline service worker */
-const CACHE = 'turbo-drive-v47';
+const CACHE = 'turbo-drive-v54';
 const FILES = [
  "game/js/lib/fflate.min.js",
  "game/js/lib/FBXLoader.js",
@@ -35,6 +35,7 @@ const FILES = [
  "game/js/game/spaceflight.js",
  "game/css/duel.css",
  "game/css/shoot.css",
+ "game/js/duel/voice.js",
  "game/js/duel/shoot.js",
  "game/css/premium.css",
  "game/js/render/premium.js",

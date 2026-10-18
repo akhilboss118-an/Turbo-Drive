@@ -97,8 +97,8 @@ function duelEnd(msg) {
 }
 function duelLeave() { if (SH.on || /^shoot/.test(state)) { shootLeave(); return; } duelSend({ t: 'leave' }); setTimeout(() => duelEnd(), 30); }
 function duelAskLeave() { if (SH.on) { shootAskLeave(); return; } if (!duelRacing()) return; $('duelLeaveModal').classList.remove('hidden'); }
-function duelEsc() { if (SH.on || /^shoot/.test(state)) shootEsc(); else if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
-function duelBusy(b, txt) { for (const id of ['btnDuelCreate', 'btnDuelJoinGo', 'btnDuelJoin']) $(id).classList.toggle('off', b); if (b && txt) duelHomeErr(txt, true); }
+function duelEsc() { if (state === 'shootlobby') { shootLobbyLeave(); return; } if (SH.on || /^shoot/.test(state)) shootEsc(); else if (duelRacing()) { $('duelLeaveModal').classList.toggle('hidden'); } else if (state === 'duel' || state === 'lobby') duelLeave(); else if (state === 'duelresult') duelLeave(); }
+function duelBusy(b, txt) { for (const id of ['btnDuelCreate', 'btnDuelJoinGo', 'btnDuelJoin', 'btnShootPrivate']) $(id).classList.toggle('off', b); if (b && txt) duelHomeErr(txt, true); }
 function duelHomeErr(t, info) { const e = $('duelErr'); e.textContent = t || ''; e.style.color = info ? '#9ff4ff' : ''; }
 function duelNick() {
   const v = $('duelNick').value.replace(/\s+/g, ' ').trim().slice(0, 16);
