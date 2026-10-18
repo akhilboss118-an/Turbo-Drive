@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from server.duel import router as duel_router, janitor
 from server.shoot_server import router as shoot_router
+from server.firebase_backend import router as firebase_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,9 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Duel API and WebSocket routes (Race Duel & Shooting Duel)
+# Duel API, WebSocket routes, and Firebase integration endpoints
 app.include_router(duel_router, prefix="/api")
 app.include_router(shoot_router, prefix="/api")
+app.include_router(firebase_router, prefix="/api")
 
 # Render health check endpoint
 @app.get("/healthz")

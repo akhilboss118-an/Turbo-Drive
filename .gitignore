@@ -3,6 +3,12 @@ node_modules/
 package-lock.json
 __pycache__/
 *.pyc
+.venv/
+*.env
+*firebase*credentials*.json
+*service-account*.json
+google-services.json
+*google-services*.json
 
 # Build outputs
 www/
